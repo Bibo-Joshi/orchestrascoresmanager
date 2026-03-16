@@ -34,7 +34,7 @@
     "@nextcloud/password-confirmation": "^6.0.3",
     "@nextcloud/router": "^3.0.1",
     "@nextcloud/vue": "^9.3.2",
-    "ag-grid-community": "^35.0.0",
+    "ag-grid-community": "^35.1.0",
     "ag-grid-vue3": "^35.0.0",
     "exceljs": "^4.4.0",
     "jspdf": "^4.2.0",
