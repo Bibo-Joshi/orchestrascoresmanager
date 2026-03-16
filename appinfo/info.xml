@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>orchestrascoresmanager</id>
+	<name>Orchestra Scores Manager</name>
+	<summary>Manage your orchestra's sheet music database directly within Nextcloud</summary>
+	<description><![CDATA[⚠️ Early development phase – expect rough edges and breaking changes. Source code and issue tracker at https://github.com/Bibo-Joshi/orchestrascoresmanager
+
+Orchestra Scores Manager lets you maintain a structured database of your orchestra's sheet music (scores) inside Nextcloud.
+
+Key features:
+- Manage individual scores with rich metadata (composer, arranger, publisher, year, difficulty, and more)
+- Organize scores into score books and folder collections
+- Track version history of folder collections
+- Build and manage setlists
+- Categorize scores with tags
+- Add comments to scores]]></description>
+	<version>0.6.0</version>
+	<licence>AGPL-3.0-or-later</licence>
+	<author mail="orchestrascoresmanager@mahlerhome.de" homepage="https://github.com/Bibo-Joshi">Hinrich Mahler</author>
+	<namespace>OrchestraScoresManager</namespace>
+	<category>office</category>
+	<category>organization</category>
+	<website>https://github.com/Bibo-Joshi/orchestrascoresmanager</website>
+	<bugs>https://github.com/Bibo-Joshi/orchestrascoresmanager/issues</bugs>
+	<repository>https://github.com/Bibo-Joshi/orchestrascoresmanager</repository>
+	<dependencies>
+		<nextcloud min-version="32" max-version="33"/>
+	</dependencies>
+	<settings>
+		<admin>OCA\OrchestraScoresManager\Settings\AdminSettings</admin>
+		<admin-section>OCA\OrchestraScoresManager\Settings\AdminSection</admin-section>
+	</settings>
+	<navigations>
+		<navigation>
+			<id>orchestrascoresmanager</id>
+			<name>Orchestra Scores Manager</name>
+			<route>orchestrascoresmanager.page.index</route>
+			<icon>app.svg</icon>
+			<type>link</type>
+		</navigation>
+	</navigations>
+</info>

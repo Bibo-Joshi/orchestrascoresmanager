@@ -1,0 +1,20 @@
+# Files to ignore during translation string extraction
+# These are auto-generated or don't contain translatable strings
+
+# Generated API client code
+src/api/generated
+
+# Type definitions
+src/types
+
+# Build output
+js
+dist
+
+# Tests
+tests
+
+# Vendor directories
+vendor
+vendor-bin
+node_modules

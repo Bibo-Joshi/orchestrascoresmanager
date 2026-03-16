@@ -1,0 +1,54 @@
+name: Auto approve nextcloud/ocp
+
+on:
+  pull_request_target:
+    branches:
+      - main
+      - master
+      - stable*
+
+permissions:
+  contents: read
+
+concurrency:
+  group: update-nextcloud-ocp-approve-merge-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  auto-approve-merge:
+    if: github.actor == 'nextcloud-command'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+
+    steps:
+      - name: Disabled on forks
+        if: ${{ github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          echo 'Can not approve PRs from forks'
+          exit 1
+
+      - uses: mdecoleman/pr-branch-name@55795d86b4566d300d237883103f052125cc7508 # v3.0.0
+        id: branchname
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: hmarr/auto-approve-action@b40d6c9ed2fa10c9a2749eca7eb004418a705501 # v2
+        if: startsWith(steps.branchname.outputs.branch, 'automated/noid/') && endsWith(steps.branchname.outputs.branch, 'update-nextcloud-ocp')
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto merge
+        uses: alexwilson/enable-github-automerge-action@56e3117d1ae1540309dc8f7a9f2825bc3c5f06ff # v2.0.0
+        if: startsWith(steps.branchname.outputs.branch, 'automated/noid/') && endsWith(steps.branchname.outputs.branch, 'update-nextcloud-ocp')
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Write job summary
+        if: always()
+        run: |
+          echo "## Auto-approve nextcloud/ocp update" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Branch: \`${{ steps.branchname.outputs.branch }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "Actor: \`${{ github.actor }}\`" >> $GITHUB_STEP_SUMMARY

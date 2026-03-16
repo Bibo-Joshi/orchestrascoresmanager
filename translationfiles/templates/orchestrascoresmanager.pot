@@ -1,0 +1,911 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Nextcloud package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Nextcloud 3.14159\n"
+"Report-Msgid-Bugs-To: translations\\@example.com\n"
+"POT-Creation-Date: 2026-03-08 21:17+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Insufficient permissions"
+msgstr ""
+
+msgid "Folder collection not found"
+msgstr ""
+
+msgid "No active version exists for this folder collection"
+msgstr ""
+
+msgid "Version does not belong to this folder collection"
+msgstr ""
+
+msgid "Folder collection version not found"
+msgstr ""
+
+msgid "Invalid collection type. Must be \"alphabetical\" or \"indexed\"."
+msgstr ""
+
+msgid "Collection type cannot be changed after creation."
+msgstr ""
+
+msgid "Score not found"
+msgstr ""
+
+msgid ""
+"Cannot add score individually when its score book is already in the "
+"collection"
+msgstr ""
+
+msgid "Index is required for indexed folder collections"
+msgstr ""
+
+msgid "Index should not be provided for alphabetical folder collections"
+msgstr ""
+
+#, php-format
+msgid "Index %d or score %d is already used in this folder collection"
+msgstr ""
+
+#, php-format
+msgid "Failed to add score to folder collection: %1$s"
+msgstr ""
+
+msgid ""
+"Cannot remove score that is part of a score book in this collection. Remove "
+"the score book instead."
+msgstr ""
+
+msgid "Score is not directly in this folder collection"
+msgstr ""
+
+msgid "Failed to remove score from folder collection"
+msgstr ""
+
+msgid "Score book not found"
+msgstr ""
+
+msgid ""
+"Cannot add score book when one of its scores is already in the collection"
+msgstr ""
+
+#, php-format
+msgid "Index %d or score book %d is already used in this folder collection"
+msgstr ""
+
+#, php-format
+msgid "Failed to add score book to folder collection: %1$s"
+msgstr ""
+
+#, php-format
+msgid "Failed to remove score book from folder collection: %1$s"
+msgstr ""
+
+msgid "Version date range overlaps with an existing version"
+msgstr ""
+
+msgid ""
+"An active version already exists. Deactivate it first by setting valid_to."
+msgstr ""
+
+msgid "New version must start at least one day after the current version"
+msgstr ""
+
+msgid "Cannot delete score book with linked scores. Remove all scores first."
+msgstr ""
+
+msgid "Score is already part of a score book"
+msgstr ""
+
+#, php-format
+msgid "Index %d is already occupied in this score book"
+msgstr ""
+
+#, php-format
+msgid "Failed to add score to score book: %1$s"
+msgstr ""
+
+#, php-format
+msgid "Score %d not found"
+msgstr ""
+
+#, php-format
+msgid "Score %d is already part of a score book"
+msgstr ""
+
+#, php-format
+msgid "Duplicate index %d in request"
+msgstr ""
+
+#, php-format
+msgid "Failed to add scores to score book: %1$s"
+msgstr ""
+
+#, php-format
+msgid "Failed to remove score from score book: %1$s"
+msgstr ""
+
+msgid "Index is required when adding score to a score book"
+msgstr ""
+
+#, php-format
+msgid "Tag not found: %s"
+msgstr ""
+
+msgid "Cannot delete score because it is part of a folder collection"
+msgstr ""
+
+msgid "Score is already part of another score book. Remove it first."
+msgstr ""
+
+msgid "Setlist entry not found"
+msgstr ""
+
+msgid "Each entry must have an id field"
+msgstr ""
+
+#, php-format
+msgid "Setlist entry with id %d not found"
+msgstr ""
+
+msgid "Invalid filter parameter. Must be \"all\", \"future\", or \"past\"."
+msgstr ""
+
+msgid "Setlist not found"
+msgstr ""
+
+msgid "Either scoreId or breakDuration must be set"
+msgstr ""
+
+msgid "Only one of scoreId or breakDuration can be set"
+msgstr ""
+
+msgid "An entry with this index already exists in the setlist"
+msgstr ""
+
+msgid "Orchestra Scores Manager"
+msgstr ""
+
+msgid ""
+"Score must belong to the folder collection version specified in the setlist"
+msgstr ""
+
+msgid "Organize your orchestras scores database directly within NextCloud"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Create"
+msgstr ""
+
+msgid "Settings updated successfully."
+msgstr ""
+
+msgid "Failed to update settings."
+msgstr ""
+
+msgid "Group Permissions"
+msgstr ""
+
+msgid "Select the groups that are allowed to edit the orchestra scores table."
+msgstr ""
+
+msgid "Allowed Groups"
+msgstr ""
+
+msgid "Select groups..."
+msgstr ""
+
+msgid "Score book assignment updated"
+msgstr ""
+
+msgid "Failed to update score book assignment: "
+msgstr ""
+
+msgid "Assign to Score Book"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
+msgid "Score Book"
+msgstr ""
+
+msgid "Select a score book"
+msgstr ""
+
+msgid "Index"
+msgstr ""
+
+msgid "Enter index position"
+msgstr ""
+
+msgid "This will remove the score from its current book."
+msgstr ""
+
+msgid "Clone"
+msgstr ""
+
+msgid "Setlist cloned"
+msgstr ""
+
+msgid "Cloning setlist failed: "
+msgstr ""
+
+msgid "Clone setlist"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Confirm"
+msgstr ""
+
+msgid "Loading..."
+msgstr ""
+
+msgid "An error occurred"
+msgstr ""
+
+msgid "No content"
+msgstr ""
+
+msgid "This score is not part of any folder collection"
+msgstr ""
+
+msgid "This score book is not part of any folder collection"
+msgstr ""
+
+msgid "Failed to fetch folder collections. Please reload the page."
+msgstr ""
+
+msgid "Not in any folder collection"
+msgstr ""
+
+msgid "Export failed: "
+msgstr ""
+
+msgid "Export CSV"
+msgstr ""
+
+msgid "Main app navigation"
+msgstr ""
+
+msgid "No folder collections yet"
+msgstr ""
+
+msgid "Operation failed: "
+msgstr ""
+
+msgid "Delete Score Book"
+msgstr ""
+
+msgid "Delete Score"
+msgstr ""
+
+msgid ""
+"Are you sure you want to delete this score book? This action cannot be "
+"undone."
+msgstr ""
+
+msgid ""
+"Are you sure you want to delete this score? This action cannot be undone."
+msgstr ""
+
+msgid "Failed to delete score book: "
+msgstr ""
+
+msgid "Failed to delete score: "
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Comments"
+msgstr ""
+
+msgid "Folder Collections"
+msgstr ""
+
+msgid "Invalid duration format. Use (HH:)MM:SS"
+msgstr ""
+
+msgid "Book Index"
+msgstr ""
+
+msgid "Remove score from book"
+msgstr ""
+
+msgid "Are you sure you want to remove this score from the book?"
+msgstr ""
+
+msgid "Score removed from book"
+msgstr ""
+
+msgid "Failed to remove score from book: "
+msgstr ""
+
+msgid "Changes saved"
+msgstr ""
+
+msgid "Saving changes failed: "
+msgstr ""
+
+msgid "Remove from collection"
+msgstr ""
+
+msgid "Remove from book"
+msgstr ""
+
+msgid "Included in folder collection via score book »{name}«"
+msgstr ""
+
+msgid "Short Title"
+msgstr ""
+
+msgid "Composer"
+msgstr ""
+
+msgid "Arranger"
+msgstr ""
+
+msgid "Publisher"
+msgstr ""
+
+msgid "Year"
+msgstr ""
+
+msgid "Difficulty"
+msgstr ""
+
+msgid "Duration"
+msgstr ""
+
+msgid "Medley Contents"
+msgstr ""
+
+msgid "GEMA IDs"
+msgstr ""
+
+msgid "Defects"
+msgstr ""
+
+msgid "Digital Status"
+msgstr ""
+
+msgid "Physical Copies"
+msgstr ""
+
+msgid "Tags"
+msgstr ""
+
+msgid "Active"
+msgstr ""
+
+msgid "History"
+msgstr ""
+
+msgid "Remove score book from collection"
+msgstr ""
+
+msgid ""
+"This score is part of score book \"{title}\". Removing it will remove the "
+"entire score book and all {count} of its scores from the collection. Do you "
+"want to continue?"
+msgstr ""
+
+msgid "Remove score from collection"
+msgstr ""
+
+msgid "Are you sure you want to remove this score from the collection?"
+msgstr ""
+
+msgid "Failed to remove score from collection: "
+msgstr ""
+
+msgid "Failed to remove score book from collection: "
+msgstr ""
+
+msgid "Failed to load folder collection"
+msgstr ""
+
+msgid "Please check if the folder collection exists and try again."
+msgstr ""
+
+msgid "No entries in this collection"
+msgstr ""
+
+msgid "Add scores or score books to this folder collection to see them here."
+msgstr ""
+
+msgid ""
+"You are viewing an inactive version. Scores and score books cannot be added "
+"or removed."
+msgstr ""
+
+msgid "Select version"
+msgstr ""
+
+msgid "Score"
+msgstr ""
+
+msgid "Score added to collection"
+msgstr ""
+
+msgid "Score book added to collection"
+msgstr ""
+
+msgid "Failed to add to collection: "
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Add to collection"
+msgstr ""
+
+msgid "Failed to load data. Please try again."
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Select what to add"
+msgstr ""
+
+msgid "Select a score"
+msgstr ""
+
+msgid "Export ToC & Index"
+msgstr ""
+
+msgid "Could not determine current version information"
+msgstr ""
+
+msgid "New version started successfully"
+msgstr ""
+
+msgid "Failed to start new version: "
+msgstr ""
+
+msgid "Start new version"
+msgstr ""
+
+msgid "New Version"
+msgstr ""
+
+msgid ""
+"This will create a new version starting on the selected date. The current "
+"active version will be marked as ended one day before. All scores and score "
+"books will be copied to the new version."
+msgstr ""
+
+msgid "Start date for new version"
+msgstr ""
+
+msgid "Start Version"
+msgstr ""
+
+msgid "Delete Folder Collection"
+msgstr ""
+
+msgid ""
+"Are you sure you want to delete this folder collection? This action cannot "
+"be undone."
+msgstr ""
+
+msgid "Failed to delete folder collection: "
+msgstr ""
+
+msgid "Create your first folder collection to organize your scores"
+msgstr ""
+
+msgid "Indexed"
+msgstr ""
+
+msgid "Alphabetical"
+msgstr ""
+
+msgid "Delete folder collection"
+msgstr ""
+
+msgid "Please enter a name"
+msgstr ""
+
+msgid "Please select a collection type"
+msgstr ""
+
+msgid "Folder collection created"
+msgstr ""
+
+msgid "Creating folder collection failed: "
+msgstr ""
+
+msgid "Create folder collection"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "Enter a name"
+msgstr ""
+
+msgid "Name is required"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Enter a description (optional)"
+msgstr ""
+
+msgid "Collection type"
+msgstr ""
+
+msgid "Select collection type"
+msgstr ""
+
+msgid "Failed to load score book"
+msgstr ""
+
+msgid "Please check if the score book exists and try again."
+msgstr ""
+
+msgid "No scores in this book"
+msgstr ""
+
+msgid "Add scores to this score book to see them here."
+msgstr ""
+
+msgid "Score added to book"
+msgstr ""
+
+msgid "Failed to add score to book: "
+msgstr ""
+
+msgid "Add score to book"
+msgstr ""
+
+msgid "Failed to load scores. Please try again."
+msgstr ""
+
+msgid "Score Books"
+msgstr ""
+
+msgid "No score books yet"
+msgstr ""
+
+msgid "Create your first score book to organize your scores"
+msgstr ""
+
+msgid "Please enter a title"
+msgstr ""
+
+msgid "Score book created"
+msgstr ""
+
+msgid "Creating score book failed: "
+msgstr ""
+
+msgid "Create score book"
+msgstr ""
+
+msgid "Failed to load scores"
+msgstr ""
+
+msgid "Show detailed list"
+msgstr ""
+
+msgid "Go to score book"
+msgstr ""
+
+msgid "Scores"
+msgstr ""
+
+msgid "Open"
+msgstr ""
+
+msgid "Editor"
+msgstr ""
+
+msgid "No scores yet"
+msgstr ""
+
+msgid "Create your first score to get started"
+msgstr ""
+
+msgid "Score created"
+msgstr ""
+
+msgid "Creating score failed: "
+msgstr ""
+
+msgid "Create score"
+msgstr ""
+
+msgid "Delete Comment"
+msgstr ""
+
+msgid ""
+"Are you sure you want to delete this comment? This action cannot be undone."
+msgstr ""
+
+msgid "Failed to delete comment: "
+msgstr ""
+
+msgid "Unknown user"
+msgstr ""
+
+msgid "Delete comment"
+msgstr ""
+
+msgid "Unable to determine current user"
+msgstr ""
+
+msgid "Failed to submit comment: "
+msgstr ""
+
+msgid "Failed to fetch comments. Please reload the page."
+msgstr ""
+
+msgid "No comments yet"
+msgstr ""
+
+msgid "Write a new comment …"
+msgstr ""
+
+msgid "GitHub flavored markdown is supported."
+msgstr ""
+
+msgid "Learn more"
+msgstr ""
+
+msgid "Submit comment"
+msgstr ""
+
+msgid "Scores in this book"
+msgstr ""
+
+msgid "Failed to load setlist"
+msgstr ""
+
+msgid "Break"
+msgstr ""
+
+msgid "Failed to load available scores"
+msgstr ""
+
+msgid "Failed to add entry"
+msgstr ""
+
+msgid "Add Entry"
+msgstr ""
+
+msgid "Add Setlist Entry"
+msgstr ""
+
+msgid "Entry Type"
+msgstr ""
+
+msgid "Select entry type"
+msgstr ""
+
+msgid "Select score"
+msgstr ""
+
+msgid "Break Duration (HH:MM:SS)"
+msgstr ""
+
+msgid "e.g., 0:30 or 1:30:00"
+msgstr ""
+
+msgid "Export PDF"
+msgstr ""
+
+msgid "Select and reorder the columns to include in the PDF export."
+msgstr ""
+
+msgid "Export"
+msgstr ""
+
+msgid "Delete Setlist Entry"
+msgstr ""
+
+msgid "Are you sure you want to delete this setlist entry?"
+msgstr ""
+
+msgid "Failed to delete setlist entry: "
+msgstr ""
+
+msgid "Failed to reorder entries: "
+msgstr ""
+
+msgid "Start Time"
+msgstr ""
+
+msgid "End Time"
+msgstr ""
+
+msgid "Moderation"
+msgstr ""
+
+msgid "Comment"
+msgstr ""
+
+msgid "Invalid default moderation time format. Use (HH:)MM:SS"
+msgstr ""
+
+msgid "Invalid duration format. Use (HH:)MM"
+msgstr ""
+
+msgid "Setlist updated successfully"
+msgstr ""
+
+msgid "Failed to update setlist: "
+msgstr ""
+
+msgid "Start Date & Time"
+msgstr ""
+
+msgid "Enter description"
+msgstr ""
+
+msgid "Folder Collection"
+msgstr ""
+
+msgid "Select folder collection"
+msgstr ""
+
+msgid "Default Moderation Time (HH:MM:SS)"
+msgstr ""
+
+msgid "Duration (HH:MM)"
+msgstr ""
+
+msgid "e.g., 90 or 1:30"
+msgstr ""
+
+msgid "Is Draft"
+msgstr ""
+
+msgid "Is Published"
+msgstr ""
+
+msgid "Saving..."
+msgstr ""
+
+msgid "Setlists"
+msgstr ""
+
+msgid "Drafts"
+msgstr ""
+
+msgid "No drafts"
+msgstr ""
+
+msgid "Create your first setlist draft"
+msgstr ""
+
+msgid "Future"
+msgstr ""
+
+msgid "No future setlists"
+msgstr ""
+
+msgid "Schedule your next performances"
+msgstr ""
+
+msgid "Unscheduled"
+msgstr ""
+
+msgid "No unscheduled setlists"
+msgstr ""
+
+msgid "Setlists without a start date will appear here"
+msgstr ""
+
+msgid "Past"
+msgstr ""
+
+msgid "No past setlists"
+msgstr ""
+
+msgid "Past performances will appear here"
+msgstr ""
+
+msgid "Setlist created"
+msgstr ""
+
+msgid "Creating setlist failed: "
+msgstr ""
+
+msgid "Create setlist"
+msgstr ""
+
+msgid "Optional description"
+msgstr ""
+
+msgid "Start date and time"
+msgstr ""
+
+msgid "Draft"
+msgstr ""
+
+msgid "Published"
+msgstr ""
+
+msgid "Setlist deleted"
+msgstr ""
+
+msgid "Deleting setlist failed: "
+msgstr ""
+
+msgid "Delete setlist"
+msgstr ""
+
+msgid "Are you sure you want to delete this setlist?"
+msgstr ""
+
+msgid "Present"
+msgstr ""
+
+msgid "Index must be a non-negative integer"
+msgstr ""
+
+msgid "This index is already occupied"
+msgstr ""
+
+msgid "Loading occupied indices..."
+msgstr ""
+
+msgid "Index is unchanged"
+msgstr ""
+
+msgid "Index is valid"
+msgstr ""
+
+msgid "Enter the position index in the collection"
+msgstr ""
+
+msgid "Setlist"
+msgstr ""
+
+msgid "Value must not be empty"
+msgstr ""
+
+msgid "h"
+msgstr ""
+
+msgid "Info"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Playtime"
+msgstr ""
+
+msgid "Moderation & Breaks"
+msgstr ""
+
+msgid "Overall Duration"
+msgstr ""
+
+msgid "Invalid duration format"
+msgstr ""
+
+msgid "Contents"
+msgstr ""

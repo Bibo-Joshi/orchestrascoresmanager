@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="bootstrap.php" timeoutForSmallTests="900" timeoutForMediumTests="900" timeoutForLargeTests="900" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" cacheDirectory=".phpunit.cache">
+	<testsuites>
+		<testsuite name="Unit Tests">
+			<directory suffix="Test.php">unit</directory>
+		</testsuite>
+		<testsuite name="Integration Tests">
+			<directory suffix="Test.php">integration</directory>
+		</testsuite>
+	</testsuites>
+	<source>
+		<include>
+			<directory suffix=".php">../appinfo</directory>
+			<directory suffix=".php">../lib</directory>
+		</include>
+	</source>
+</phpunit>

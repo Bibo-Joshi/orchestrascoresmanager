@@ -1,0 +1,131 @@
+name: OpenAPI
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'lib/**'
+      - 'appinfo/**'
+      - 'src/types/openapi/**'
+      - 'openapi*.json'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'package.json'
+      - 'package-lock.json'
+      - '**.php'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openapi-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  openapi:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.repository_owner != 'nextcloud-gmbh' }}
+
+    name: openapi
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Get php version
+        id: php_versions
+        uses: icewind1991/nextcloud-version-matrix@58becf3b4bb6dc6cef677b15e2fd8e7d48c0908f # v1.3.1
+
+      - name: Set up php
+        uses: shivammathur/setup-php@cf4cade2721270509d5b1c766ab3549210a39a2a # v2.33.0
+        with:
+          php-version: ${{ steps.php_versions.outputs.php-available }}
+          extensions: xml
+          coverage: none
+          ini-file: development
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check Typescript OpenApi types
+        id: check_typescript_openapi
+        uses: andstor/file-existence-action@076e0072799f4942c8bc574a82233e1e4d13e9d6 # v3.0.0
+        with:
+          files: "src/types/openapi/openapi*.ts"
+
+      - name: Read package.json node and npm engines version
+        if: steps.check_typescript_openapi.outputs.files_exists == 'true'
+        uses: skjnldsv/read-package-engines-version-actions@06d6baf7d8f41934ab630e97d9e6c0bc9c9ac5e4 # v3
+        id: node_versions
+        continue-on-error: true
+        with:
+          fallbackNode: '^22'
+          fallbackNpm: '^10'
+
+      - name: Set up node ${{ steps.node_versions.outputs.nodeVersion }}
+        if: ${{ steps.node_versions.outputs.nodeVersion }}
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: ${{ steps.node_versions.outputs.nodeVersion }}
+
+      - name: Set up npm ${{ steps.node_versions.outputs.npmVersion }}
+        if: ${{ steps.node_versions.outputs.nodeVersion }}
+        run: npm i -g 'npm@${{ steps.node_versions.outputs.npmVersion }}'
+
+      - name: Install node dependencies
+        if: ${{ steps.node_versions.outputs.nodeVersion }}
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+          PUPPETEER_SKIP_DOWNLOAD: true
+        run: npm ci
+
+      - name: Set up PHP dependencies
+        run: composer i
+
+      - name: Regenerate OpenAPI
+        id: regenerate
+        run: |
+          composer run openapi 2>&1 | tee /tmp/openapi-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Check openapi*.json and typescript changes
+        id: check-changes
+        run: |
+          git status --porcelain > /tmp/changes.txt
+          if [ -s /tmp/changes.txt ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            git --no-pager diff > /tmp/diff-output.txt
+            exit 1
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Write job summary
+        if: always()
+        run: |
+          echo "## OpenAPI Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.regenerate.outcome }}" != "success" ]; then
+            echo "### ❌ OpenAPI generation failed" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/openapi-output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.check-changes.outputs.has_changes }}" == "true" ]; then
+            echo "### ❌ OpenAPI files are out of date" >> $GITHUB_STEP_SUMMARY
+            echo 'Please run `composer run openapi` and commit the openapi*.json files and (if applicable) src/types/openapi/openapi*.ts.' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Changed files:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/changes.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Diff:**" >> $GITHUB_STEP_SUMMARY
+            echo '```diff' >> $GITHUB_STEP_SUMMARY
+            head -200 /tmp/diff-output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ✅ OpenAPI files are up to date" >> $GITHUB_STEP_SUMMARY
+          fi

@@ -1,0 +1,425 @@
+name: Translations
+
+on:
+  pull_request:
+    paths:
+      - 'lib/**'
+      - 'src/**'
+      - 'l10n/**'
+      - 'translationfiles/**'
+      - 'appinfo/info.xml'
+      - '.github/workflows/translations.yml'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: translations-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  APP_NAME: orchestrascoresmanager
+
+jobs:
+  # Job 0: Determine which jobs need to run based on changed files
+  detect-changes:
+    runs-on: ubuntu-latest
+    name: Detect changes
+    outputs:
+      source_changed: ${{ steps.filter.outputs.source }}
+      po_files_exist: ${{ steps.check-po.outputs.po_files_exist }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Check for file changes
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            source:
+              - 'lib/**'
+              - 'src/**'
+
+      - name: Check if PO files exist
+        id: check-po
+        run: |
+          if [ -d "translationfiles" ] && find translationfiles -name "*.po" -type f 2>/dev/null | grep -q .; then
+            echo "po_files_exist=true" >> $GITHUB_OUTPUT
+          else
+            echo "po_files_exist=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Write detection summary
+        run: |
+          echo "## 🔍 Change Detection" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Result |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Source files changed (lib/, src/) | ${{ steps.filter.outputs.source == 'true' && '✅ Yes' || '❌ No' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| PO files exist | ${{ steps.check-po.outputs.po_files_exist == 'true' && '✅ Yes' || '❌ No' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Jobs to run:" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.filter.outputs.source }}" == "true" ]; then
+            echo "- ✅ **update-pot-po**: Will update POT/PO files" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⏭️ **update-pot-po**: Skipped (no source changes)" >> $GITHUB_STEP_SUMMARY
+          fi
+          if [ "${{ steps.check-po.outputs.po_files_exist }}" == "true" ]; then
+            echo "- ✅ **update-l10n**: Will check l10n files" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- ⏭️ **update-l10n**: Skipped (no PO files)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+  # Job 1: Updates .pot and .po files when source code changes
+  # Only runs when lib/* or src/* files changed
+  update-pot-po:
+    runs-on: ubuntu-latest
+    name: Update POT/PO files
+    needs: [detect-changes]
+    if: needs.detect-changes.outputs.source_changed == 'true'
+
+    outputs:
+      pot_po_changed: ${{ steps.check-changes.outputs.has_changes }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext
+
+      - name: Download translationtool.phar
+        run: |
+          curl -L -o translationtool.phar https://github.com/nextcloud/docker-ci/raw/master/translations/translationtool/translationtool.phar
+          chmod +x translationtool.phar
+
+      - name: Get php version
+        id: php_versions
+        uses: icewind1991/nextcloud-version-matrix@58becf3b4bb6dc6cef677b15e2fd8e7d48c0908f # v1.3.1
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@cf4cade2721270509d5b1c766ab3549210a39a2a # v2.33.0
+        with:
+          php-version: ${{ steps.php_versions.outputs.php-available }}
+          coverage: none
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Preprocess source files for translation scanning
+        run: |
+          # The project uses a custom t('text') function instead of t('appname', 'text')
+          # We need to transform these calls before scanning
+
+          echo "Preprocessing TypeScript/JavaScript files..."
+          find src -type f \( -name "*.ts" -o -name "*.js" -o -name "*.vue" \) | while read file; do
+            # Transform t('text') to t('orchestrascoresmanager', 'text')
+            # Transform n('singular', 'plural', count) to n('orchestrascoresmanager', 'singular', 'plural', count)
+            # Use pattern that avoids matching method calls like obj.t() - only match standalone t() or after non-identifier chars
+            # Handle single quotes
+            sed -i -E "s/(^|[^a-zA-Z0-9_.])t\(\s*'([^']+)'/\1t('$APP_NAME', '\2'/g" "$file"
+            sed -i -E "s/(^|[^a-zA-Z0-9_.])n\(\s*'([^']+)'\s*,\s*'([^']+)'/\1n('$APP_NAME', '\2', '\3'/g" "$file"
+            # Handle double quotes
+            sed -i -E 's/(^|[^a-zA-Z0-9_.])t\(\s*"([^"]+)"/\1t("'"$APP_NAME"'", "\2"/g' "$file"
+            sed -i -E 's/(^|[^a-zA-Z0-9_.])n\(\s*"([^"]+)"\s*,\s*"([^"]+)"/\1n("'"$APP_NAME"'", "\2", "\3"/g' "$file"
+            # Handle template literals (backticks) - simplified version
+            sed -i -E "s/(^|[^a-zA-Z0-9_.])t\(\s*\x60([^\x60]+)\x60/\1t('$APP_NAME', \x60\2\x60/g" "$file"
+          done
+
+          echo "Preprocessing complete"
+
+      - name: Create POT file
+        id: create-pot
+        run: |
+          # Create translationfiles directory structure
+          mkdir -p translationfiles/templates
+
+          # Run the translation tool to extract strings
+          php translationtool.phar create-pot-files 2>&1 | tee /tmp/pot-output.txt
+          exit_code=${PIPESTATUS[0]}
+
+          if [ $exit_code -ne 0 ]; then
+            echo "pot_created=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          # Check if POT file was created
+          if [ -f "translationfiles/templates/$APP_NAME.pot" ]; then
+            echo "pot_created=true" >> $GITHUB_OUTPUT
+            echo "POT file created successfully"
+            # Show extracted strings count
+            msgfmt --statistics -o /dev/null "translationfiles/templates/$APP_NAME.pot" 2>&1 || true
+          else
+            echo "pot_created=false" >> $GITHUB_OUTPUT
+            echo "Warning: POT file was not created"
+          fi
+
+      - name: Restore original source files
+        if: always()
+        run: |
+          # Reset source files to original state after preprocessing
+          git checkout -- src/
+          echo "Original source files restored"
+
+      - name: Update PO files from POT
+        if: steps.create-pot.outputs.pot_created == 'true'
+        run: |
+          # Process all language directories in translationfiles/
+          for lang_dir in translationfiles/*/; do
+            lang=$(basename "$lang_dir")
+
+            # Skip templates directory
+            if [ "$lang" = "templates" ]; then
+              continue
+            fi
+
+            po_file="translationfiles/$lang/$APP_NAME.po"
+
+            if [ -f "$po_file" ]; then
+              echo "Updating existing PO file for $lang..."
+              # Merge new strings from POT into existing PO
+              msgmerge --no-wrap --update --no-fuzzy-matching --backup=none \
+                "$po_file" \
+                "translationfiles/templates/$APP_NAME.pot"
+            fi
+          done
+
+      - name: Clean up translation files
+        if: steps.create-pot.outputs.pot_created == 'true'
+        run: |
+          # Remove TRANSLATORS comments and file path references from POT and all PO files
+          # These are generated by the translation tool but clutter the files
+          echo "Cleaning up translation files..."
+          for file in translationfiles/templates/$APP_NAME.pot translationfiles/*/$APP_NAME.po; do
+            if [ -f "$file" ]; then
+              echo "Cleaning $file..."
+              sed -i '/^#\. TRANSLATORS/d' "$file"
+              sed -i '/^#:/d' "$file"
+            fi
+          done
+          echo "Translation files cleaned"
+
+      - name: Check for POT/PO changes
+        id: check-changes
+        run: |
+          # Check for changes in POT and PO files only (not l10n/)
+          git status --porcelain translationfiles/ > /tmp/pot-po-changes.txt
+
+          if [ ! -s /tmp/pot-po-changes.txt ]; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Get the diff, filtering out POT-Creation-Date lines which change every time
+          git --no-pager diff translationfiles/ > /tmp/full-diff.txt
+
+          # Filter out date-only changes
+          grep -v "POT-Creation-Date" /tmp/full-diff.txt > /tmp/filtered-diff.txt || true
+
+          # Check for meaningful changes
+          meaningful_changes=$(grep -E "^[+-][^+-]" /tmp/filtered-diff.txt | grep -v "POT-Creation-Date" | grep -v "PO-Revision-Date" | wc -l)
+
+          if [ "$meaningful_changes" -gt 0 ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            cp /tmp/full-diff.txt /tmp/diff-output.txt
+            git --no-pager diff --stat translationfiles/ > /tmp/diff-stat.txt
+            cat /tmp/pot-po-changes.txt > /tmp/changes.txt
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "Only POT-Creation-Date changes detected, ignoring"
+          fi
+
+      - name: Upload POT/PO artifacts
+        if: steps.check-changes.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pot-po-files
+          path: translationfiles/
+          retention-days: 30
+
+      - name: Write job summary
+        if: always()
+        run: |
+          echo "## 🌐 POT/PO Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.create-pot.outputs.pot_created }}" == "true" ]; then
+            echo "### ✅ POT file generated successfully" >> $GITHUB_STEP_SUMMARY
+
+            # Count strings in POT file
+            if [ -f "translationfiles/templates/$APP_NAME.pot" ]; then
+              string_count=$(grep -c "^msgid " "translationfiles/templates/$APP_NAME.pot" 2>/dev/null || echo "0")
+              echo "Found **$string_count** translatable strings." >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "### ⚠️ POT file generation had issues" >> $GITHUB_STEP_SUMMARY
+            if [ -f "/tmp/pot-output.txt" ]; then
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              head -50 /tmp/pot-output.txt >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.check-changes.outputs.has_changes }}" == "true" ]; then
+            echo "### ❌ POT/PO files need updating" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The following translation source files have changes:" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/changes.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "**Summary of changes:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/diff-stat.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "<details>" >> $GITHUB_STEP_SUMMARY
+            echo "<summary>📝 Full diff (click to expand)</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```diff' >> $GITHUB_STEP_SUMMARY
+            head -500 /tmp/diff-output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            echo "📦 **Download the updated files from the \`pot-po-files\` artifact:** [View workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ✅ POT/PO files are up to date" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # Add section about supported languages
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "### 📚 Supported Languages" >> $GITHUB_STEP_SUMMARY
+          echo "- 🇩🇪 German (de)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "_To add more languages, create a new PO file in \`translationfiles/<lang>/\` directory._" >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail if POT/PO files need updating
+        if: steps.check-changes.outputs.has_changes == 'true'
+        run: |
+          echo "POT/PO files are out of date. Please update them."
+          echo "See job summary for details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          exit 1
+
+  # Job 2: Updates l10n JS/JSON files when PO files exist
+  # Runs after detect-changes and update-pot-po (if it ran)
+  update-l10n:
+    runs-on: ubuntu-latest
+    name: Update l10n files
+    needs: [detect-changes, update-pot-po]
+    # Run if PO files exist, regardless of whether update-pot-po ran or succeeded
+    if: always() && needs.detect-changes.outputs.po_files_exist == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext
+
+      - name: Download translationtool.phar
+        run: |
+          curl -L -o translationtool.phar https://github.com/nextcloud/docker-ci/raw/master/translations/translationtool/translationtool.phar
+          chmod +x translationtool.phar
+
+      - name: Get php version
+        id: php_versions
+        uses: icewind1991/nextcloud-version-matrix@58becf3b4bb6dc6cef677b15e2fd8e7d48c0908f # v1.3.1
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@cf4cade2721270509d5b1c766ab3549210a39a2a # v2.33.0
+        with:
+          php-version: ${{ steps.php_versions.outputs.php-available }}
+          coverage: none
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get updated PO files from previous job
+        if: needs.update-pot-po.outputs.pot_po_changed == 'true'
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+            name: pot-po-files
+            path: translationfiles/
+
+      - name: Convert PO to Nextcloud format
+        run: |
+          php translationtool.phar convert-po-files
+
+      - name: Check for l10n changes
+        id: check-l10n-changes
+        run: |
+          git status --porcelain l10n/ > /tmp/l10n-changes.txt
+          if [ -s /tmp/l10n-changes.txt ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            git --no-pager diff l10n/ > /tmp/l10n-diff.txt
+            git --no-pager diff --stat l10n/ > /tmp/l10n-diff-stat.txt
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload l10n artifacts
+        if: steps.check-l10n-changes.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: l10n-files
+          path: l10n/
+          retention-days: 30
+
+      - name: Write job summary
+        if: always()
+        run: |
+          echo "## 🔄 L10n Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.check-l10n-changes.outputs.has_changes }}" == "true" ]; then
+            echo "### ❌ L10n files need updating" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The PO files have been modified but the l10n/*.js and l10n/*.json files have not been regenerated." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Changed files:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/l10n-changes.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Summary of changes:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/l10n-diff-stat.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "<details>" >> $GITHUB_STEP_SUMMARY
+            echo "<summary>📝 Diff (click to expand)</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```diff' >> $GITHUB_STEP_SUMMARY
+            head -200 /tmp/l10n-diff.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please run \`php translationtool.phar convert-po-files\` and commit the updated l10n files." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "📦 **Download the updated files from the \`l10n-files\` artifact:** [View workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ✅ L10n files are up to date" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if l10n files need updating
+        if: steps.check-l10n-changes.outputs.has_changes == 'true'
+        run: |
+          echo "L10n files are out of date. Please regenerate them from PO files."
+          echo "See job summary for details: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          exit 1

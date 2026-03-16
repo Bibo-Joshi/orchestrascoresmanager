@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<psalm
+    errorLevel="1"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    findUnusedBaselineEntry="true"
+    findUnusedCode="true"
+	phpVersion="8.1"
+>
+    <projectFiles>
+        <directory name="lib" />
+        <ignoreFiles>
+            <directory name="vendor" />
+        </ignoreFiles>
+    </projectFiles>
+	<extraFiles>
+		<directory name="vendor"/>
+	</extraFiles>
+
+	<issueHandlers>
+		<!-- For openapi code gen-->
+		<LessSpecificReturnStatement errorLevel="error" />
+		<LessSpecificReturnType errorLevel="error" />
+		<LessSpecificImplementedReturnType errorLevel="error" />
+		<MoreSpecificReturnType errorLevel="error" />
+
+		<!-- Migration files use Doctrine DBAL types internally that are wrapped by NextCloud -->
+		<!-- Controller files use Http::STATUS_OK etc in docblocks which psalm cannot resolve -->
+		<UndefinedDocblockClass>
+			<errorLevel type="suppress">
+				<directory name="lib/Migration" />
+				<directory name="lib/Controller" />
+			</errorLevel>
+		</UndefinedDocblockClass>
+
+		<!-- Http::STATUS_OK constants used in DataResponse template params for OpenAPI generation -->
+		<InvalidTemplateParam>
+			<errorLevel type="suppress">
+				<directory name="lib/Controller" />
+			</errorLevel>
+		</InvalidTemplateParam>
+
+		<!-- Controllers return types involve psalm's inability to infer JsonSerializable types -->
+		<MixedInferredReturnType>
+			<errorLevel type="suppress">
+				<directory name="lib/Controller" />
+			</errorLevel>
+		</MixedInferredReturnType>
+
+		<!-- Controllers return Entity objects which implement JsonSerializable, but psalm can't infer serialized format -->
+		<InvalidReturnStatement>
+			<errorLevel type="suppress">
+				<directory name="lib/Controller" />
+			</errorLevel>
+		</InvalidReturnStatement>
+		<InvalidReturnType>
+			<errorLevel type="suppress">
+				<directory name="lib/Controller" />
+			</errorLevel>
+		</InvalidReturnType>
+
+		<!-- Controllers return Entity arrays but docblocks declare serialized format for OpenAPI - psalm can't infer this -->
+		<LessSpecificReturnStatement>
+			<errorLevel type="suppress">
+				<directory name="lib/Controller" />
+			</errorLevel>
+		</LessSpecificReturnStatement>
+		<MixedReturnTypeCoercion>
+			<errorLevel type="suppress">
+				<directory name="lib/Controller" />
+			</errorLevel>
+		</MixedReturnTypeCoercion>
+	</issueHandlers>
+</psalm>

@@ -1,0 +1,23 @@
+/.idea/
+/*.iml
+
+/vendor/
+/vendor-bin/*/vendor/
+
+/.php-cs-fixer.cache
+/tests/.phpunit.cache
+/tests/clover.xml
+
+/node_modules/
+/js/
+/css/
+translationtool.phar
+
+# Import script
+/import_script/venv/
+/import_script/*.log
+/import_script/__pycache__/
+/import_script/modules/__pycache__/
+/import_script/*.egg-info/
+/import_script/.env
+

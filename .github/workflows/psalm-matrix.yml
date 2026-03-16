@@ -1,0 +1,108 @@
+name: Static analysis
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'lib/**'
+      - 'tests/**'
+      - 'appinfo/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'psalm.xml'
+      - '**.php'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: psalm-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  compute-matrix:
+    runs-on: ubuntu-latest
+
+    outputs:
+      ocp-matrix: ${{ steps.versions.outputs.ocp-matrix }}
+      php-min: ${{ steps.versions.outputs.php-min }}
+
+    steps:
+      - name: Checkout app
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Get version matrix
+        id: versions
+        uses: icewind1991/nextcloud-version-matrix@58becf3b4bb6dc6cef677b15e2fd8e7d48c0908f # v1.3.1
+
+      - name: Check enforcement of minimum PHP version ${{ steps.versions.outputs.php-min }} in psalm.xml
+        run: grep 'phpVersion="${{ steps.versions.outputs.php-min }}' psalm.xml
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    needs: compute-matrix
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.compute-matrix.outputs.ocp-matrix) }}
+
+    name: static-psalm-analysis ${{ matrix.ocp-version }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Set up php${{ matrix.php-min }}
+        uses: shivammathur/setup-php@cf4cade2721270509d5b1c766ab3549210a39a2a # v2.33.0
+        with:
+          php-version: ${{ matrix.php-min }}
+          extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite
+          coverage: none
+          ini-file: development
+          ini-values: disable_functions=
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies
+        run: |
+          composer remove nextcloud/ocp --dev --no-scripts
+          composer i
+
+      - name: Install nextcloud/ocp
+        run: composer require --dev 'nextcloud/ocp:${{ matrix.ocp-version }}' --ignore-platform-reqs --with-dependencies
+
+      - name: Run coding standards check
+        run: composer run psalm -- --threads=1 --monochrome --no-progress --output-format=github
+
+  summary:
+    runs-on: ubuntu-latest
+    needs: [compute-matrix, static-analysis]
+
+    if: always()
+
+    name: static-psalm-analysis-summary
+
+    steps:
+      - name: Summary status
+        env:
+          OCP_MATRIX: ${{ needs.compute-matrix.outputs.ocp-matrix }}
+          ANALYSIS_RESULT: ${{ needs.static-analysis.result }}
+        run: |
+          echo "## Psalm Static Analysis Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Matrix Configurations Tested" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| OCP Version | PHP Version |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------|-------------|" >> $GITHUB_STEP_SUMMARY
+          echo "$OCP_MATRIX" | jq -r '.include[] | "| \(.["ocp-version"]) | \(.["php-min"]) |"' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "$ANALYSIS_RESULT" != "success" ]; then
+            echo "### ❌ Static analysis failed" >> $GITHUB_STEP_SUMMARY
+            echo "Please check the individual job logs above for details." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ✅ All static analysis checks passed" >> $GITHUB_STEP_SUMMARY
+          fi

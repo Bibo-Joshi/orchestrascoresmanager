@@ -1,0 +1,50 @@
+name: Lint info.xml
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'appinfo/info.xml'
+      - '.info.xsd'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lint-info-xml-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    name: info.xml lint
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Download schema
+        run: wget https://raw.githubusercontent.com/nextcloud/appstore/master/nextcloudappstore/api/v1/release/info.xsd
+
+      - name: Lint info.xml
+        id: lint
+        uses: ChristophWurst/xmllint-action@36f2a302f84f8c83fceea0b9c59e1eb4a616d3c1 # v1.2
+        with:
+          xml-file: ./appinfo/info.xml
+          xml-schema-file: ./info.xsd
+
+      - name: Write job summary
+        if: always()
+        run: |
+          if [ "${{ steps.lint.outcome }}" == "success" ]; then
+            echo "## ✅ info.xml lint passed" >> $GITHUB_STEP_SUMMARY
+            echo "The info.xml file is valid according to the schema." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ info.xml lint failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "The info.xml file does not conform to the expected schema." >> $GITHUB_STEP_SUMMARY
+            echo "Please check the info.xml file against the Nextcloud app schema." >> $GITHUB_STEP_SUMMARY
+          fi

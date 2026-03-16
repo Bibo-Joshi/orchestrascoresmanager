@@ -1,0 +1,117 @@
+name: Node
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+      - 'src/**'
+      - 'appinfo/info.xml'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'vite.config.*'
+      - 'webpack.*'
+      - '**.js'
+      - '**.ts'
+      - '**.vue'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: node-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    name: node
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Read package.json node and npm engines version
+        uses: skjnldsv/read-package-engines-version-actions@06d6baf7d8f41934ab630e97d9e6c0bc9c9ac5e4 # v3
+        id: versions
+        with:
+          fallbackNode: '^22'
+          fallbackNpm: '^10'
+
+      - name: Set up node ${{ steps.versions.outputs.nodeVersion }}
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: ${{ steps.versions.outputs.nodeVersion }}
+
+      - name: Set up npm ${{ steps.versions.outputs.npmVersion }}
+        run: npm i -g 'npm@${{ steps.versions.outputs.npmVersion }}'
+
+      - name: Validate package-lock.json
+        id: validate-lock
+        run: |
+          npm i -g npm-package-lock-add-resolved@1.1.4
+          npm-package-lock-add-resolved
+          git --no-pager diff --exit-code 2>&1 | tee /tmp/lock-diff.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Install dependencies & build
+        id: build
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+          PUPPETEER_SKIP_DOWNLOAD: true
+        run: |
+          npm ci
+          npm run build --if-present 2>&1 | tee /tmp/build-output.txt
+          exit ${PIPESTATUS[0]}
+
+      - name: Check build changes
+        id: check-changes
+        run: |
+          git status --porcelain > /tmp/changes.txt
+          if [ -s /tmp/changes.txt ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            git --no-pager diff > /tmp/diff-output.txt
+            exit 1
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Write job summary
+        if: always()
+        run: |
+          echo "## Node.js Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ steps.validate-lock.outcome }}" != "success" ]; then
+            echo "### ⚠️ package-lock.json validation failed" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/lock-diff.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [ "${{ steps.build.outcome }}" != "success" ]; then
+            echo "### ❌ Build failed" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/build-output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.check-changes.outputs.has_changes }}" == "true" ]; then
+            echo "### ❌ Uncommitted build changes detected" >> $GITHUB_STEP_SUMMARY
+            echo "Please recompile and commit the assets." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Changed files:**" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat /tmp/changes.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Diff:**" >> $GITHUB_STEP_SUMMARY
+            echo '```diff' >> $GITHUB_STEP_SUMMARY
+            head -200 /tmp/diff-output.txt >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ✅ Build passed" >> $GITHUB_STEP_SUMMARY
+            echo "All assets are up to date." >> $GITHUB_STEP_SUMMARY
+          fi

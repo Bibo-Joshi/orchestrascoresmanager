@@ -1,0 +1,159 @@
+# SPDX-FileCopyrightText: 2024 Hinrich Mahler <orchestra-scores-manager@mahlerhome.de>
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+name: PHPUnit
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/phpunit*.yml'
+      - 'appinfo/**'
+      - 'lib/**'
+      - 'templates/**'
+      - 'tests/**'
+      - 'vendor-bin/**'
+      - '.php-cs-fixer.dist.php'
+      - 'composer.json'
+      - 'composer.lock'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/phpunit*.yml'
+      - 'appinfo/**'
+      - 'lib/**'
+      - 'templates/**'
+      - 'tests/**'
+      - 'vendor-bin/**'
+      - '.php-cs-fixer.dist.php'
+      - 'composer.json'
+      - 'composer.lock'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phpunit-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-versions: ['8.2', '8.3', '8.4']
+        server-versions: ['stable32', 'master']
+        database: ['sqlite', 'mysql', 'mariadb', 'pgsql']
+
+    name: ${{ matrix.database }} | PHP ${{ matrix.php-versions }} | NC ${{ matrix.server-versions }}
+
+    services:
+      mysql:
+        image: ghcr.io/nextcloud/continuous-integration-mysql-8.4:latest
+        ports:
+          - 4444:3306/tcp
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+        options: --health-cmd="mysqladmin ping" --health-interval 5s --health-timeout 2s --health-retries 10
+
+      mariadb:
+        image: ghcr.io/nextcloud/continuous-integration-mariadb-11.4:latest
+        ports:
+          - 4445:3306/tcp
+        env:
+          MARIADB_ROOT_PASSWORD: rootpassword
+        options: --health-cmd="mariadb-admin ping" --health-interval 5s --health-timeout 2s --health-retries 5
+
+      postgres:
+        image: ghcr.io/nextcloud/continuous-integration-postgres-16:latest
+        ports:
+          - 4446:5432/tcp
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: rootpassword
+          POSTGRES_DB: nextcloud
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 2s --health-retries 5
+
+    steps:
+      - name: Set app env
+        run: echo "APP_NAME=orchestrascoresmanager" >> $GITHUB_ENV
+
+      - name: Checkout server
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: true
+          repository: nextcloud/server
+          ref: ${{ matrix.server-versions }}
+
+      - name: Checkout app
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          path: apps/${{ env.APP_NAME }}
+
+      - name: Set up php ${{ matrix.php-versions }}
+        uses: shivammathur/setup-php@cf4cade2721270509d5b1c766ab3549210a39a2a # v2.33.0
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite, mysql, pdo_mysql, pgsql, pdo_pgsql
+          coverage: none
+          ini-file: development
+          ini-values: disable_functions=
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable ONLY_FULL_GROUP_BY for MySQL
+        if: matrix.database == 'mysql'
+        run: |
+          echo "SET GLOBAL sql_mode=(SELECT CONCAT(@@sql_mode,',ONLY_FULL_GROUP_BY'));" | mysql -h 127.0.0.1 -P 4444 -u root -prootpassword
+          echo 'SELECT @@sql_mode;' | mysql -h 127.0.0.1 -P 4444 -u root -prootpassword
+
+      - name: Enable ONLY_FULL_GROUP_BY for MariaDB
+        if: matrix.database == 'mariadb'
+        run: |
+          echo "SET GLOBAL sql_mode=(SELECT CONCAT(@@sql_mode,',ONLY_FULL_GROUP_BY'));" | mysql -h 127.0.0.1 -P 4445 -u root -prootpassword
+          echo 'SELECT @@sql_mode;' | mysql -h 127.0.0.1 -P 4445 -u root -prootpassword
+
+      - name: Set up dependencies
+        working-directory: apps/${{ env.APP_NAME }}
+        run: |
+          composer remove nextcloud/ocp --dev --no-scripts --no-update
+          composer install --no-interaction --prefer-dist
+
+      - name: Set up Nextcloud with SQLite
+        if: matrix.database == 'sqlite'
+        run: |
+          mkdir data
+          ./occ maintenance:install --verbose --database=sqlite --database-name=nextcloud --database-host=127.0.0.1 --admin-user admin --admin-pass admin
+          ./occ app:enable --force ${{ env.APP_NAME }}
+
+      - name: Set up Nextcloud with MySQL
+        if: matrix.database == 'mysql'
+        run: |
+          mkdir data
+          ./occ maintenance:install --verbose --database=mysql --database-name=nextcloud --database-host=127.0.0.1 --database-port=4444 --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
+          ./occ app:enable --force ${{ env.APP_NAME }}
+
+      - name: Set up Nextcloud with MariaDB
+        if: matrix.database == 'mariadb'
+        run: |
+          mkdir data
+          ./occ maintenance:install --verbose --database=mysql --database-name=nextcloud --database-host=127.0.0.1 --database-port=4445 --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
+          ./occ app:enable --force ${{ env.APP_NAME }}
+
+      - name: Set up Nextcloud with PostgreSQL
+        if: matrix.database == 'pgsql'
+        run: |
+          mkdir data
+          ./occ maintenance:install --verbose --database=pgsql --database-name=nextcloud --database-host=127.0.0.1 --database-port=4446 --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
+          ./occ app:enable --force ${{ env.APP_NAME }}
+
+      - name: PHPUnit
+        working-directory: apps/${{ env.APP_NAME }}
+        run: composer run test:unit
+
+      - name: Print logs
+        if: always()
+        run: |
+          cat data/nextcloud.log
