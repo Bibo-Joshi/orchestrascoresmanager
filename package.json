@@ -40,7 +40,7 @@
     "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.7",
     "pinia": "^3.0.4",
-    "vue": "^3.5.26",
+    "vue": "^3.5.30",
     "vue-draggable-next": "^2.3.0",
     "vue-material-design-icons": "^5.3.1",
     "vue-router": "^4.6.4"
