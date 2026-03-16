@@ -23,7 +23,7 @@
     "extends @nextcloud/browserslist-config"
   ],
   "dependencies": {
-    "@ag-grid-community/locale": "^35.0.0",
+    "@ag-grid-community/locale": "^35.1.0",
     "@mdi/svg": "^7.4.47",
     "@nextcloud/auth": "^2.5.3",
     "@nextcloud/axios": "^2.5.1",
