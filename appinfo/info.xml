@@ -25,7 +25,7 @@ Key features:
 	<bugs>https://github.com/Bibo-Joshi/orchestrascoresmanager/issues</bugs>
 	<repository>https://github.com/Bibo-Joshi/orchestrascoresmanager</repository>
 	<dependencies>
-		<nextcloud min-version="32" max-version="33"/>
+		<nextcloud min-version="33" max-version="34"/>
 	</dependencies>
 	<settings>
 		<admin>OCA\OrchestraScoresManager\Settings\AdminSettings</admin>
