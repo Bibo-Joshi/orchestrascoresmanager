@@ -124,14 +124,14 @@ jobs:
           # Copy only files and directories intended for appstore distribution.
           INCLUDE_PATHS=(
             "appinfo"
-            "assets"
+            "css"
             "img"
             "js"
             "l10n"
             "lib"
             "templates"
             "vendor"
-            "COPYING"
+            "LICENSE"
             "README.md"
             "CHANGELOG.md"
           )
