@@ -8,6 +8,10 @@ on:
         required: true
         default: true
         type: boolean
+  # TODO: Remove before merging – enables dry-run testing of this workflow from the PR branch.
+  push:
+    branches:
+      - release-workflow
 
 env:
   PHP_VERSION: '8.4'
@@ -190,7 +194,7 @@ jobs:
     needs:
       - prepare
       - build
-    if: ${{ !inputs.dry_run }}
+    if: ${{ github.event_name == 'workflow_dispatch' && !inputs.dry_run }}
     environment: nextcloud-appstore
     steps:
       - name: Download signed artifacts
