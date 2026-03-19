@@ -8,6 +8,11 @@ on:
         required: true
         default: true
         type: boolean
+      version_suffix:
+        description: "Optional suffix appended to appinfo/info.xml version (e.g. -rc1)"
+        required: false
+        default: ""
+        type: string
   # TODO: Remove before merging – enables dry-run testing of this workflow from the PR branch.
   push:
     branches:
@@ -38,14 +43,18 @@ jobs:
       - name: Read app metadata from info.xml
         id: meta
         shell: bash
+        env:
+          VERSION_SUFFIX: ${{ github.event_name == 'push' && '-rc1' || inputs.version_suffix || '' }}
         run: |
           APP_ID=$(sed -n 's|.*<id>\(.*\)</id>.*|\1|p' appinfo/info.xml | head -n1)
-          APP_VERSION=$(sed -n 's|.*<version>\(.*\)</version>.*|\1|p' appinfo/info.xml | head -n1)
+          BASE_APP_VERSION=$(sed -n 's|.*<version>\(.*\)</version>.*|\1|p' appinfo/info.xml | head -n1)
 
-          if [[ -z "${APP_ID}" || -z "${APP_VERSION}" ]]; then
+          if [[ -z "${APP_ID}" || -z "${BASE_APP_VERSION}" ]]; then
             echo "Could not parse app id or version from appinfo/info.xml" >&2
             exit 1
           fi
+
+          APP_VERSION="${BASE_APP_VERSION}${VERSION_SUFFIX}"
 
           TAG_NAME="${APP_VERSION}"
           ARTIFACT_NAME="${APP_ID}-${APP_VERSION}.tar.gz"
@@ -196,7 +205,7 @@ jobs:
     needs:
       - prepare
       - build
-    if: ${{ github.event_name == 'workflow_dispatch' && !inputs.dry_run }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && !inputs.dry_run) || github.event_name == 'push' }}
     environment: nextcloud-appstore
     steps:
       - name: Download signed artifacts
