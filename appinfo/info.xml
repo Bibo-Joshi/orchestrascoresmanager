@@ -15,7 +15,7 @@ Key features:
 - Build and manage setlists
 - Categorize scores with tags
 - Add comments to scores]]></description>
-	<version>0.6.1</version>
+	<version>0.7.0</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author homepage="https://github.com/Bibo-Joshi">Hinrich Mahler</author>
 	<namespace>OrchestraScoresManager</namespace>
@@ -24,6 +24,9 @@ Key features:
 	<website>https://github.com/Bibo-Joshi/orchestrascoresmanager</website>
 	<bugs>https://github.com/Bibo-Joshi/orchestrascoresmanager/issues</bugs>
 	<repository>https://github.com/Bibo-Joshi/orchestrascoresmanager</repository>
+	<screenshot>https://raw.githubusercontent.com/Bibo-Joshi/orchestrascoresmanager/main/screenshots/scorestable.webp</screenshot>
+	<screenshot>https://raw.githubusercontent.com/Bibo-Joshi/orchestrascoresmanager/main/screenshots/setlist.webp</screenshot>
+	<screenshot>https://raw.githubusercontent.com/Bibo-Joshi/orchestrascoresmanager/main/screenshots/setlists.webp</screenshot>
 	<dependencies>
 		<nextcloud min-version="32" max-version="33"/>
 	</dependencies>
