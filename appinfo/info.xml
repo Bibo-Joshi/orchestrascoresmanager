@@ -17,7 +17,7 @@ Key features:
 - Add comments to scores]]></description>
 	<version>0.6.0</version>
 	<licence>AGPL-3.0-or-later</licence>
-	<author mail="orchestrascoresmanager@mahlerhome.de" homepage="https://github.com/Bibo-Joshi">Hinrich Mahler</author>
+	<author homepage="https://github.com/Bibo-Joshi">Hinrich Mahler</author>
 	<namespace>OrchestraScoresManager</namespace>
 	<category>office</category>
 	<category>organization</category>
