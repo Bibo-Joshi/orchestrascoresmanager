@@ -1,6 +1,7 @@
 <template>
 	<div ref="tableContainer" class="full-page-table" :data-ag-theme-mode="themeMode">
 		<AgGridVue
+			:modules="resolvedModules"
 			:row-data="props.data"
 			:column-defs="props.columnDefs"
 			:default-col-def="defaultColDef"
@@ -15,15 +16,12 @@
 
 <script setup lang="ts">
 import { isDarkTheme } from '@nextcloud/vue/functions/isDarkTheme'
-import { ref, defineProps, watch, defineEmits, defineExpose } from 'vue'
+import { ref, defineProps, watch, defineEmits, defineExpose, computed } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
-import { ModuleRegistry, AllCommunityModule, LocaleModule } from 'ag-grid-community'
+import { AllCommunityModule, LocaleModule } from 'ag-grid-community'
 import type { ColDef, GridOptions, GridApi, GridReadyEvent } from 'ag-grid-community'
 import { nextcloudTheme } from '../utils/agGridTheme'
 import { getAgGridLocaleText } from '../utils/agGridLocale'
-
-// Register AG Grid modules (required for v34+)
-ModuleRegistry.registerModules([AllCommunityModule, LocaleModule])
 
 const themeMode = ref<string>(isDarkTheme ? 'dark' : 'light')
 
@@ -39,6 +37,7 @@ interface Props {
 	data: TableData[]
 	columnDefs: ColDef[]
 	editable: boolean
+	modules?: Module[]
 	rowDragManaged?: boolean
 	context?: Record<string, unknown>
 }
@@ -145,6 +144,13 @@ watch(() => props.data, () => {
 watch(() => props.columnDefs, () => {
 	// Grid will automatically update when columnDefs changes
 }, { deep: true })
+
+const defaultModules: Module[] = [AllCommunityModule, LocaleModule]
+
+const resolvedModules = computed<Module[]>(() => {
+	const additionalModules = props.modules ?? []
+	return [...defaultModules, ...additionalModules]
+})
 </script>
 
 <style lang="scss" scoped>

@@ -143,6 +143,6 @@ async function deleteComment() {
 }
 
 .comment-content {
-	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
 </style>

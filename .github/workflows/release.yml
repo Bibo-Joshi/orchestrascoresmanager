@@ -1,0 +1,238 @@
+name: Release Nextcloud App
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build and sign only (skip App Store upload and GitHub release)"
+        required: true
+        default: true
+        type: boolean
+      version_suffix:
+        description: "Optional suffix appended to appinfo/info.xml version (e.g. -rc1)"
+        required: false
+        default: ""
+        type: string
+
+env:
+  PHP_VERSION: '8.4'
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    name: Prepare Metadata
+    runs-on: ubuntu-latest
+    outputs:
+      app_id: ${{ steps.meta.outputs.app_id }}
+      app_version: ${{ steps.meta.outputs.app_version }}
+      tag_name: ${{ steps.meta.outputs.tag_name }}
+      artifact_name: ${{ steps.meta.outputs.artifact_name }}
+      checksum_name: ${{ steps.meta.outputs.checksum_name }}
+      signature_name: ${{ steps.meta.outputs.signature_name }}
+      cert_name: ${{ steps.meta.outputs.cert_name }}
+      is_prerelease: ${{ steps.meta.outputs.is_prerelease }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - name: Read app metadata from info.xml
+        id: meta
+        shell: bash
+        env:
+          VERSION_SUFFIX: ${{ inputs.version_suffix || '' }}
+        run: |
+          APP_ID=$(sed -n 's|.*<id>\(.*\)</id>.*|\1|p' appinfo/info.xml | head -n1)
+          BASE_APP_VERSION=$(sed -n 's|.*<version>\(.*\)</version>.*|\1|p' appinfo/info.xml | head -n1)
+
+          if [[ -z "${APP_ID}" || -z "${BASE_APP_VERSION}" ]]; then
+            echo "Could not parse app id or version from appinfo/info.xml" >&2
+            exit 1
+          fi
+
+          APP_VERSION="${BASE_APP_VERSION}${VERSION_SUFFIX}"
+
+          TAG_NAME="${APP_VERSION}"
+          ARTIFACT_NAME="${APP_ID}-${APP_VERSION}.tar.gz"
+          CHECKSUM_NAME="${ARTIFACT_NAME}.sha256"
+          SIGNATURE_NAME="${ARTIFACT_NAME}.sig"
+          CERT_NAME="${APP_ID}.crt"
+
+          echo "app_id=${APP_ID}" >> "$GITHUB_OUTPUT"
+          echo "app_version=${APP_VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=${ARTIFACT_NAME}" >> "$GITHUB_OUTPUT"
+          echo "checksum_name=${CHECKSUM_NAME}" >> "$GITHUB_OUTPUT"
+          echo "signature_name=${SIGNATURE_NAME}" >> "$GITHUB_OUTPUT"
+          echo "cert_name=${CERT_NAME}" >> "$GITHUB_OUTPUT"
+          echo "is_prerelease=$([[ -n "${VERSION_SUFFIX}" ]] && echo 'true' || echo 'false')" >> "$GITHUB_OUTPUT"
+
+      - name: Ensure tag does not already exist
+        shell: bash
+        env:
+          TAG_NAME: ${{ steps.meta.outputs.tag_name }}
+        run: |
+          git fetch --tags --force
+          if git rev-parse -q --verify "refs/tags/${TAG_NAME}" >/dev/null; then
+            echo "Tag ${TAG_NAME} already exists. Aborting release workflow." >&2
+            exit 1
+          fi
+
+  build:
+    name: Build and Sign Artifact
+    runs-on: ubuntu-latest
+    needs: prepare
+    environment: nextcloud-appstore
+    outputs:
+      artifact_name: ${{ needs.prepare.outputs.artifact_name }}
+      checksum_name: ${{ needs.prepare.outputs.checksum_name }}
+      signature_name: ${{ needs.prepare.outputs.signature_name }}
+      cert_name: ${{ needs.prepare.outputs.cert_name }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - name: Set up PHP ${{ env.PHP_VERSION }}
+        uses: shivammathur/setup-php@cf4cade2721270509d5b1c766ab3549210a39a2a # v2.33.0
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib
+          coverage: none
+          ini-file: production
+
+      - name: Set up Node.js from package engines
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: package.json
+          cache: npm
+
+      - name: Install PHP dependencies (production)
+        run: composer install --no-dev --no-interaction --prefer-dist -o
+
+      - name: Install Node.js dependencies
+        env:
+          CYPRESS_INSTALL_BINARY: 0
+          PUPPETEER_SKIP_DOWNLOAD: true
+        run: npm ci
+
+      - name: Build frontend assets
+        env:
+          NODE_ENV: production
+        run: npm run build
+
+      - name: Build release tarball from included paths
+        shell: bash
+        env:
+          APP_ID: ${{ needs.prepare.outputs.app_id }}
+          ARTIFACT_NAME: ${{ needs.prepare.outputs.artifact_name }}
+        run: |
+          rm -rf build
+          mkdir -p "build/source/${APP_ID}" build/artifacts
+
+          # Copy only files and directories intended for appstore distribution.
+          INCLUDE_PATHS=(
+            "appinfo"
+            "css"
+            "img"
+            "js"
+            "l10n"
+            "lib"
+            "templates"
+            "openapi.json"
+            "openapi-administration.json"
+            "openapi-full.json"
+            "LICENSE"
+            "README.md"
+            "CHANGELOG.md"
+          )
+
+          for path in "${INCLUDE_PATHS[@]}"; do
+            if [[ -e "$path" ]]; then
+              rsync -a "$path" "build/source/${APP_ID}/"
+            else
+              echo "Required release path '$path' is missing." >&2
+              exit 1
+            fi
+          done
+
+          tar -czf "build/artifacts/${ARTIFACT_NAME}" --directory="build/source" "${APP_ID}"
+
+      - name: Write signing credentials
+        shell: bash
+        env:
+          APP_ID: ${{ needs.prepare.outputs.app_id }}
+          APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
+          APP_PUBLIC_CRT: ${{ secrets.APP_PUBLIC_CRT }}
+        run: |
+          mkdir -p "$HOME/.nextcloud/certificates"
+          printf '%s' "${APP_PRIVATE_KEY}" > "$HOME/.nextcloud/certificates/${APP_ID}.key"
+          printf '%s' "${APP_PUBLIC_CRT}" > "$HOME/.nextcloud/certificates/${APP_ID}.crt"
+          chmod 600 "$HOME/.nextcloud/certificates/${APP_ID}.key"
+
+      - name: Sign artifact and generate checksums
+        shell: bash
+        env:
+          APP_ID: ${{ needs.prepare.outputs.app_id }}
+          ARTIFACT_NAME: ${{ needs.prepare.outputs.artifact_name }}
+          CHECKSUM_NAME: ${{ needs.prepare.outputs.checksum_name }}
+          SIGNATURE_NAME: ${{ needs.prepare.outputs.signature_name }}
+          CERT_NAME: ${{ needs.prepare.outputs.cert_name }}
+        run: |
+          openssl dgst -sha512 -sign "$HOME/.nextcloud/certificates/${APP_ID}.key" -out "build/artifacts/${SIGNATURE_NAME}" "build/artifacts/${ARTIFACT_NAME}"
+          cp "$HOME/.nextcloud/certificates/${APP_ID}.crt" "build/artifacts/${CERT_NAME}"
+          sha256sum "build/artifacts/${ARTIFACT_NAME}" "build/artifacts/${SIGNATURE_NAME}" "build/artifacts/${CERT_NAME}" > "build/artifacts/${CHECKSUM_NAME}"
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        with:
+          name: signed-release-artifacts
+          path: |
+            build/artifacts/${{ needs.prepare.outputs.artifact_name }}
+            build/artifacts/${{ needs.prepare.outputs.signature_name }}
+            build/artifacts/${{ needs.prepare.outputs.cert_name }}
+            build/artifacts/${{ needs.prepare.outputs.checksum_name }}
+          if-no-files-found: error
+
+      - name: Cleanup local signing material
+        if: always()
+        shell: bash
+        run: rm -rf "$HOME/.nextcloud/certificates"
+
+  publish:
+    name: Publish App Store and GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+      - build
+    if: ${{ !inputs.dry_run }}
+    environment: nextcloud-appstore
+    steps:
+      - name: Download signed artifacts
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: signed-release-artifacts
+          path: build/artifacts
+
+      - name: Create GitHub release and upload assets
+        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2.6.1
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag_name }}
+          name: ${{ needs.prepare.outputs.tag_name }}
+          draft: false
+          generate_release_notes: true
+          files: |
+            build/artifacts/${{ needs.prepare.outputs.artifact_name }}
+            build/artifacts/${{ needs.prepare.outputs.signature_name }}
+            build/artifacts/${{ needs.prepare.outputs.cert_name }}
+            build/artifacts/${{ needs.prepare.outputs.checksum_name }}
+
+      - name: Upload app to Nextcloud App Store
+        uses: R0Wi/nextcloud-appstore-push-action@9244bb5445776688cfe90fa1903ea8dff95b0c28 # v1.0.4
+        with:
+          app_name: ${{ needs.prepare.outputs.app_id }}
+          appstore_token: ${{ secrets.APPSTORE_TOKEN }}
+          download_url: https://github.com/${{ github.repository }}/releases/download/${{ needs.prepare.outputs.tag_name }}/${{ needs.prepare.outputs.artifact_name }}
+          app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          nightly: ${{ needs.prepare.outputs.is_prerelease }}
+

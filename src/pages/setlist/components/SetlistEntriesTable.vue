@@ -5,6 +5,7 @@
 			:data="tableData"
 			:column-defs="columnDefs"
 			:editable="false"
+			:modules="gridModules"
 			:context="gridContext"
 			:row-drag-managed="props.editable"
 			@cell-value-changed="handleCellValueChanged"
@@ -22,7 +23,10 @@ import FullPageTable from '@/components/FullPageTable.vue'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
-import { RowDragModule, ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community'
+import {
+	RowDragModule,
+	ClientSideRowModelModule,
+} from 'ag-grid-community'
 import type { ColDef, CellValueChangedEvent, RowDragEndEvent, GridApi } from 'ag-grid-community'
 import type { Score, Setlist, SetlistEntry, FolderCollection } from '@/api/generated/openapi/data-contracts'
 import { parseArrayValue } from '@/utils/arrayUtils'
@@ -30,8 +34,12 @@ import RowActionButton from './RowActionButton.vue'
 import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
 import { isBreakEntry, resolveScoreField } from '@/utils/setlistScoreUtils'
 import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
+import { showError } from '@nextcloud/dialogs'
 
-ModuleRegistry.registerModules([RowDragModule, ClientSideRowModelModule])
+const gridModules = [
+	ClientSideRowModelModule,
+	RowDragModule,
+]
 
 interface Props {
 	setlist: Setlist
