@@ -36,6 +36,7 @@ jobs:
       checksum_name: ${{ steps.meta.outputs.checksum_name }}
       signature_name: ${{ steps.meta.outputs.signature_name }}
       cert_name: ${{ steps.meta.outputs.cert_name }}
+      is_prerelease: ${{ steps.meta.outputs.is_prerelease }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
@@ -44,7 +45,7 @@ jobs:
         id: meta
         shell: bash
         env:
-          VERSION_SUFFIX: ${{ github.event_name == 'push' && '-rc1' || inputs.version_suffix || '' }}
+          VERSION_SUFFIX: ${{ github.event_name == 'push' && '-rc2' || inputs.version_suffix || '' }}
         run: |
           APP_ID=$(sed -n 's|.*<id>\(.*\)</id>.*|\1|p' appinfo/info.xml | head -n1)
           BASE_APP_VERSION=$(sed -n 's|.*<version>\(.*\)</version>.*|\1|p' appinfo/info.xml | head -n1)
@@ -69,6 +70,7 @@ jobs:
           echo "checksum_name=${CHECKSUM_NAME}" >> "$GITHUB_OUTPUT"
           echo "signature_name=${SIGNATURE_NAME}" >> "$GITHUB_OUTPUT"
           echo "cert_name=${CERT_NAME}" >> "$GITHUB_OUTPUT"
+          echo "is_prerelease=$([[ -n "${VERSION_SUFFIX}" ]] && echo 'true' || echo 'false')" >> "$GITHUB_OUTPUT"
 
       - name: Ensure tag does not already exist
         shell: bash
@@ -215,12 +217,12 @@ jobs:
           path: build/artifacts
 
       - name: Create GitHub release and upload assets
-        uses: softprops/action-gh-release@v2 # TODO: replace with pinned commit SHA
+        uses: softprops/action-gh-release@153bb8e04406b158c6c84fc1615b65b24149a1fe # v2.6.1
         with:
           tag_name: ${{ needs.prepare.outputs.tag_name }}
           name: ${{ needs.prepare.outputs.tag_name }}
           draft: false
-          prerelease: false
+          prerelease: ${{ needs.prepare.outputs.is_prerelease }}
           generate_release_notes: true
           files: |
             build/artifacts/${{ needs.prepare.outputs.artifact_name }}
@@ -229,11 +231,11 @@ jobs:
             build/artifacts/${{ needs.prepare.outputs.checksum_name }}
 
       - name: Upload app to Nextcloud App Store
-        uses: R0Wi/nextcloud-appstore-push-action@v1 # TODO: replace with pinned commit SHA
+        uses: R0Wi/nextcloud-appstore-push-action@9244bb5445776688cfe90fa1903ea8dff95b0c28 # v1.0.4
         with:
           app_name: ${{ needs.prepare.outputs.app_id }}
           appstore_token: ${{ secrets.APPSTORE_TOKEN }}
           download_url: https://github.com/${{ github.repository }}/releases/download/${{ needs.prepare.outputs.tag_name }}/${{ needs.prepare.outputs.artifact_name }}
           app_private_key: ${{ secrets.APP_PRIVATE_KEY }}
-          nightly: false
+          nightly: ${{ needs.prepare.outputs.is_prerelease }}
 
