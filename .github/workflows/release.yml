@@ -6,7 +6,7 @@ on:
       dry_run:
         description: "Build and sign only (skip App Store upload and GitHub release)"
         required: true
-        default: true
+        default: false
         type: boolean
       version_suffix:
         description: "Optional suffix appended to appinfo/info.xml version (e.g. -rc1)"
