@@ -5,6 +5,7 @@
 			:data="scores"
 			:column-defs="columnDefs"
 			:editable="editable"
+			:modules="gridModules"
 			:context="gridContext"
 			@cell-value-changed="handleCellValueChanged"
 			@cell-double-clicked="handleCellDoubleClicked" />
@@ -34,7 +35,9 @@ import type {
 	CellValueChangedEvent,
 	ColDef,
 } from 'ag-grid-community'
-import { ModuleRegistry, TooltipModule } from 'ag-grid-community'
+import {
+	TooltipModule,
+} from 'ag-grid-community'
 import type {
 	Score,
 	ScoreBook,
@@ -49,8 +52,7 @@ import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 
-// Register tooltip module for score book tooltips
-ModuleRegistry.registerModules([TooltipModule])
+const gridModules = [TooltipModule]
 
 interface Props {
 	editable: boolean
