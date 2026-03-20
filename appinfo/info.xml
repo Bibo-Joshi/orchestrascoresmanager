@@ -15,7 +15,7 @@ Key features:
 - Build and manage setlists
 - Categorize scores with tags
 - Add comments to scores]]></description>
-	<version>0.6.0</version>
+	<version>0.6.1</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author homepage="https://github.com/Bibo-Joshi">Hinrich Mahler</author>
 	<namespace>OrchestraScoresManager</namespace>
