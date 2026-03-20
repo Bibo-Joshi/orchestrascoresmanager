@@ -4,7 +4,7 @@
 	<id>orchestrascoresmanager</id>
 	<name>Orchestra Scores Manager</name>
 	<summary>Manage your orchestra's sheet music database directly within Nextcloud</summary>
-	<description><![CDATA[⚠️ Early development phase – expect rough edges and breaking changes. Source code and issue tracker at https://github.com/Bibo-Joshi/orchestrascoresmanager
+	<description><![CDATA[⚠️ Early development phase – expect rough edges and breaking changes.
 
 Orchestra Scores Manager lets you maintain a structured database of your orchestra's sheet music (scores) inside Nextcloud.
 
