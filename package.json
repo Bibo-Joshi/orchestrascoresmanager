@@ -54,7 +54,7 @@
     "@vue/tsconfig": "^0.9.0",
     "ag-mcp": "^1.0.0",
     "eslint": "^8.57.1",
-    "glob": "^13.0.0",
+    "glob": "^13.0.6",
     "rimraf": "^6.1.2",
     "swagger-typescript-api": "^13.2.16",
     "typescript": "^5.9.3",
