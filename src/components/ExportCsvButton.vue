@@ -1,9 +1,11 @@
 <template>
-	<NcButton :size="buttonSize" variant="primary" @click="onExportClick">
+	<NcButton :size="buttonSize"
+		variant="primary"
+		:text="buttonText(t('Export CSV'))"
+		@click="onExportClick">
 		<template #icon>
 			<DownloadIcon />
 		</template>
-		{{ t('Export CSV') }}
 	</NcButton>
 </template>
 
@@ -23,7 +25,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const { buttonSize } = useBreakpoints()
+const { buttonSize, buttonText } = useBreakpoints()
 function onExportClick() {
 	// early check for export availability
 	if (!(props.tableRef && typeof props.tableRef.exportAsCsv === 'function')) {

@@ -1,9 +1,11 @@
 <template>
-	<NcButton variant="primary" :size="buttonSize" @click="showDialog = true">
+	<NcButton variant="primary"
+		:text="buttonText(t('Add Entry'))"
+		:size="buttonSize"
+		@click="showDialog = true">
 		<template #icon>
 			<AddIcon :size="20" />
 		</template>
-		{{ t('Add Entry') }}
 	</NcButton>
 
 	<NcDialog
@@ -88,7 +90,7 @@ const props = defineProps<Props>()
 
 const setlistEntriesStore = useSetlistEntriesStore()
 const scoresStore = useScoresStore()
-const { buttonSize } = useBreakpoints()
+const { buttonSize, buttonText } = useBreakpoints()
 
 const showDialog = ref(false)
 

@@ -2,11 +2,11 @@
 	<NcButton v-if="editable"
 		:size="buttonSize"
 		variant="primary"
+		:text="buttonText(t('Add'))"
 		@click="openDialog">
 		<template #icon>
 			<AddIcon />
 		</template>
-		{{ t('Add') }}
 	</NcButton>
 
 	<AddOrEditDialog
@@ -114,7 +114,7 @@ interface TypeOption {
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
-const { buttonSize } = useBreakpoints()
+const { buttonSize, buttonText } = useBreakpoints()
 
 const showDialog = ref(false)
 const loadingData = ref(false)

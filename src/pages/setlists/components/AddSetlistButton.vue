@@ -2,11 +2,11 @@
 	<NcButton v-if="editable"
 		:size="buttonSize"
 		variant="primary"
+		:text="buttonText(t('Add'))"
 		@click="showCreateDialog = true">
 		<template #icon>
 			<AddIcon />
 		</template>
-		{{ t('Add') }}
 	</NcButton>
 
 	<NcDialog
@@ -88,7 +88,7 @@ interface Props {
 defineProps<Props>()
 
 const setlistsStore = useSetlistsStore()
-const { buttonSize } = useBreakpoints()
+const { buttonSize, buttonText } = useBreakpoints()
 
 const showCreateDialog = ref(false)
 const titleError = ref(false)

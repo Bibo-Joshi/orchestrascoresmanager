@@ -3,11 +3,11 @@
 		v-if="editable"
 		:size="buttonSize"
 		variant="primary"
+		:text="buttonText(t('Add'))"
 		@click="showCreateDialog = true">
 		<template #icon>
 			<AddIcon />
 		</template>
-		{{ t('Add') }}
 	</NcButton>
 
 	<AddOrEditDialog
@@ -42,7 +42,7 @@ const scoresStore = useScoresStore()
 
 const showCreateDialog = ref(false)
 const inputNewScoreTitle = ref('')
-const { buttonSize } = useBreakpoints()
+const { buttonSize, buttonText } = useBreakpoints()
 
 const isFormValid = computed(() => inputNewScoreTitle.value.trim().length > 0)
 

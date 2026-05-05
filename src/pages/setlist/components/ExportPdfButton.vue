@@ -1,9 +1,11 @@
 <template>
-	<NcButton variant="primary" :size="buttonSize" @click="openDialog">
+	<NcButton variant="primary"
+		:text="buttonText(t('Export PDF'))"
+		:size="buttonSize"
+		@click="openDialog">
 		<template #icon>
 			<DownloadIcon />
 		</template>
-		{{ t('Export PDF') }}
 	</NcButton>
 
 	<NcDialog
@@ -79,7 +81,7 @@ const props = defineProps<Props>()
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
-const { buttonSize } = useBreakpoints()
+const { buttonSize, buttonText } = useBreakpoints()
 
 /** Column IDs that are enabled by default in the export dialog */
 const DEFAULT_ENABLED_IDS: ReadonlySet<PdfColumnId> = new Set([

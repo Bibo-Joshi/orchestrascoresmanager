@@ -1,9 +1,11 @@
 <template>
-	<NcButton variant="primary" :size="buttonSize" @click="onExportClick">
+	<NcButton variant="primary"
+		:size="buttonSize"
+		:text="buttonText(t('Export ToC & Index'))"
+		@click="onExportClick">
 		<template #icon>
 			<DownloadIcon />
 		</template>
-		{{ t('Export ToC & Index') }}
 	</NcButton>
 </template>
 
@@ -24,7 +26,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const { buttonSize } = useBreakpoints()
+const { buttonSize, buttonText } = useBreakpoints()
 
 /**
  * Handle export button click
