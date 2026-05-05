@@ -45,7 +45,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits(['cell-value-changed', 'cell-double-clicked', 'row-drag-end'] as const)
+const emit = defineEmits(['cellValueChanged', 'cellDoubleClicked', 'rowDragEnd'] as const)
 
 // Container ref for dynamic sizing
 const tableContainer = ref<HTMLElement>()
@@ -91,17 +91,17 @@ const gridOptions: GridOptions = {
 
 	// Emit cell value changes to parent so it can persist via API
 	onCellValueChanged: (event) => {
-		emit('cell-value-changed', event)
+		emit('cellValueChanged', event)
 	},
 
 	// Emit cell double-click events to parent for custom handling (e.g., opening dialogs)
 	onCellDoubleClicked: (event) => {
-		emit('cell-double-clicked', event)
+		emit('cellDoubleClicked', event)
 	},
 
 	// Emit row drag end events to parent
 	onRowDragEnd: (event) => {
-		emit('row-drag-end', event)
+		emit('rowDragEnd', event)
 	},
 }
 

@@ -35,7 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-	'version-created': [version: FolderCollectionVersion]
+	'versionCreated': [version: FolderCollectionVersion]
 }>()
 
 const versionsStore = useFolderCollectionVersionsStore()
@@ -68,7 +68,7 @@ async function handleStartNewVersion() {
 				// Update folder collection active version in store
 				folderCollectionsStore.updateFolderCollectionActiveVersion(props.folderCollectionId, newVersion.id)
 				showSuccess(t('New version started successfully'))
-				emit('version-created', newVersion)
+				emit('versionCreated', newVersion)
 			},
 			t('Failed to start new version: '),
 		)
