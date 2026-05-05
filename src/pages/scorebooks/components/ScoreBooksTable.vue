@@ -20,6 +20,7 @@ import type { ColDef, CellValueChangedEvent } from 'ag-grid-community'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useTagsStore } from '@/stores/tagsStore'
 import type { ScoreBook } from '@/api/generated/openapi/data-contracts'
+import { useBreakpoints } from '@/composables/useBreakpoints.ts'
 
 interface Props {
 	editable: boolean
@@ -29,6 +30,8 @@ const props = defineProps<Props>()
 
 const scoreBooksStore = useScoreBooksStore()
 const tagsStore = useTagsStore()
+
+const { columnPin } = useBreakpoints()
 
 // Ref to access FullPageTable exposed methods
 type TableExportRef = { exportAsCsv?: (fileName?: string) => boolean }
@@ -86,7 +89,7 @@ async function handleCellValueChanged(event: CellValueChangedEvent) {
 const columnDefs = ref<ColDef[]>([
 	{
 		headerName: '',
-		pinned: 'left' as const,
+		pinned: columnPin.value,
 		filter: false,
 		editable: false,
 		cellRenderer: markRaw(RowActionButton),
@@ -105,7 +108,7 @@ const columnDefs = ref<ColDef[]>([
 		resizable: false,
 		suppressMovable: true,
 	},
-	{ field: 'title', headerName: t('Title') },
+	{ field: 'title', headerName: t('Title'), sort: 'asc' },
 	{ field: 'titleShort', headerName: t('Short Title') },
 	{ field: 'composer', headerName: t('Composer') },
 	{ field: 'arranger', headerName: t('Arranger') },

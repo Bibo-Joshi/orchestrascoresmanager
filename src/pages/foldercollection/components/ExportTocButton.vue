@@ -1,5 +1,5 @@
 <template>
-	<NcButton variant="primary" @click="onExportClick">
+	<NcButton variant="primary" :size="buttonSize" @click="onExportClick">
 		<template #icon>
 			<DownloadIcon />
 		</template>
@@ -14,6 +14,7 @@ import { DownloadIcon } from '@/icons/vue-material'
 import { tryShowError } from '@/utils/errorHandling'
 import { exportFolderCollectionToXlsx, type CollectionEntry } from '@/utils/xlsx-exporter'
 import type { FolderCollection, FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	folderCollection: FolderCollection
@@ -22,6 +23,8 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const { buttonSize } = useBreakpoints()
 
 /**
  * Handle export button click

@@ -1,5 +1,5 @@
 <template>
-	<NcButton variant="primary" @click="showDialog = true">
+	<NcButton variant="primary" :size="buttonSize" @click="showDialog = true">
 		<template #icon>
 			<AddIcon :size="20" />
 		</template>
@@ -77,6 +77,7 @@ import { useScoresStore } from '@/stores/scoresStore'
 import { parseDurationHHMMSS, formatDurationHHMMSS, restrictToTimeFormat as restrictInputToTimeFormat } from '@/utils/timeFormatUtils'
 import type { Setlist, Score, ScoreIndexed } from '@/api/generated/openapi/data-contracts'
 import { apiClients } from '@/api/client'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	setlist: Setlist
@@ -87,6 +88,7 @@ const props = defineProps<Props>()
 
 const setlistEntriesStore = useSetlistEntriesStore()
 const scoresStore = useScoresStore()
+const { buttonSize } = useBreakpoints()
 
 const showDialog = ref(false)
 

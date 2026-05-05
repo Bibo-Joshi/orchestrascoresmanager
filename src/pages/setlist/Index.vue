@@ -15,6 +15,7 @@
 				:get-columns="getPdfColumns" />
 			<NcButton
 				v-if="setlist && editable"
+				:size="buttonSize"
 				variant="primary"
 				@click="showCloneDialog = true">
 				<template #icon>
@@ -24,6 +25,7 @@
 			</NcButton>
 			<NcButton
 				variant="primary"
+				:size="buttonSize"
 				@click="handleDetailsButtonClick()">
 				<template #icon>
 					<InfoIcon :size="20" />
@@ -89,6 +91,7 @@ import { apiClients } from '@/api/client'
 import type { Setlist, Score, ScoreIndexed, FolderCollection, ScoreBookIndexed } from '@/api/generated/openapi/data-contracts'
 import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import type { PdfColumnConfig } from '@/utils/pdf-exporter'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 const route = useRoute()
 const setlistsStore = useSetlistsStore()
@@ -97,6 +100,7 @@ const setlistEntriesStore = useSetlistEntriesStore()
 const scoreSidebarStore = useScoreSidebarStore()
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
+const { buttonSize } = useBreakpoints()
 
 const loading = ref(false)
 const loadError = ref(false)

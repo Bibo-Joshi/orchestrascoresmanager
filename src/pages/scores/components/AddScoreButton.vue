@@ -1,5 +1,9 @@
 <template>
-	<NcButton v-if="editable" variant="primary" @click="showCreateDialog = true">
+	<NcButton
+		v-if="editable"
+		:size="buttonSize"
+		variant="primary"
+		@click="showCreateDialog = true">
 		<template #icon>
 			<AddIcon />
 		</template>
@@ -26,6 +30,7 @@ import { showError, showSuccess } from '@nextcloud/dialogs'
 import { tryShowError } from '@/utils/errorHandling'
 import AddOrEditDialog from '@/components/AddOrEditDialog.vue'
 import { useScoresStore } from '@/stores/scoresStore'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	editable: boolean
@@ -37,6 +42,7 @@ const scoresStore = useScoresStore()
 
 const showCreateDialog = ref(false)
 const inputNewScoreTitle = ref('')
+const { buttonSize } = useBreakpoints()
 
 const isFormValid = computed(() => inputNewScoreTitle.value.trim().length > 0)
 

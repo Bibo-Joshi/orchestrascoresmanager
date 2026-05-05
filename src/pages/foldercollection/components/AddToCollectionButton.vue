@@ -1,5 +1,8 @@
 <template>
-	<NcButton v-if="editable" variant="primary" @click="openDialog">
+	<NcButton v-if="editable"
+		:size="buttonSize"
+		variant="primary"
+		@click="openDialog">
 		<template #icon>
 			<AddIcon />
 		</template>
@@ -86,6 +89,7 @@ import {
 import { useScoresStore } from '@/stores/scoresStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import type { Score, ScoreIndexed, ScoreBook, ScoreBookIndexed } from '@/api/generated/openapi/data-contracts'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	editable: boolean
@@ -110,6 +114,7 @@ interface TypeOption {
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
+const { buttonSize } = useBreakpoints()
 
 const showDialog = ref(false)
 const loadingData = ref(false)

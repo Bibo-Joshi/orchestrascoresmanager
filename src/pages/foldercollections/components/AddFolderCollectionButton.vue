@@ -1,5 +1,8 @@
 <template>
-	<NcButton v-if="editable" variant="primary" @click="showCreateDialog = true">
+	<NcButton v-if="editable"
+		:size="buttonSize"
+		variant="primary"
+		@click="showCreateDialog = true">
 		<template #icon>
 			<AddIcon />
 		</template>
@@ -47,6 +50,7 @@ import { showError, showSuccess } from '@nextcloud/dialogs'
 import { tryShowError } from '@/utils/errorHandling'
 import AddOrEditDialog from '@/components/AddOrEditDialog.vue'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	editable: boolean
@@ -55,6 +59,7 @@ interface Props {
 defineProps<Props>()
 
 const folderCollectionsStore = useFolderCollectionsStore()
+const { buttonSize } = useBreakpoints()
 
 interface CollectionTypeOption {
 	label: string

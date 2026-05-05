@@ -35,6 +35,7 @@ import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
 import { isBreakEntry, resolveScoreField } from '@/utils/setlistScoreUtils'
 import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
 import { showError } from '@nextcloud/dialogs'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 const gridModules = [
 	ClientSideRowModelModule,
@@ -64,6 +65,8 @@ const props = defineProps<Props>()
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
 const setlistEntriesStore = useSetlistEntriesStore()
+
+const { columnPin } = useBreakpoints()
 
 // Ref to access FullPageTable exposed methods
 type TableExportRef = { exportAsCsv?: (fileName?: string) => boolean; getGridApi?: () => GridApi | null }
@@ -305,7 +308,7 @@ const columnDefs = computed<ColDef[]>(() => {
 	const cols: ColDef[] = [
 		{
 			headerName: '',
-			pinned: 'left' as const,
+			pinned: columnPin.value,
 			filter: false,
 			editable: false,
 			sortable: false,
