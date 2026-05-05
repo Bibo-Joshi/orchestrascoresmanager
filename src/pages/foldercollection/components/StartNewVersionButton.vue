@@ -3,11 +3,12 @@
 		:aria-label="t('Start new version')"
 		:disabled="disabled"
 		:size="buttonSize"
+
+		:text="buttonText(t('New Version'))"
 		@click="handleStartNewVersion">
 		<template #icon>
 			<HistoryIcon :size="20" />
 		</template>
-		{{ t('New Version') }}
 	</NcButton>
 </template>
 
@@ -39,7 +40,7 @@ const emit = defineEmits<{
 
 const versionsStore = useFolderCollectionVersionsStore()
 const folderCollectionsStore = useFolderCollectionsStore()
-const { buttonSize } = useBreakpoints()
+const { buttonSize, buttonText } = useBreakpoints()
 
 /**
  * Handle start new version button click

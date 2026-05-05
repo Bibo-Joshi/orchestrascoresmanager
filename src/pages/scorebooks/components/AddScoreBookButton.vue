@@ -2,11 +2,11 @@
 	<NcButton v-if="editable"
 		:size="buttonSize"
 		variant="primary"
+		:text="buttonText(t('Add'))"
 		@click="showCreateDialog = true">
 		<template #icon>
 			<AddIcon />
 		</template>
-		{{ t('Add') }}
 	</NcButton>
 
 	<AddOrEditDialog
@@ -38,7 +38,7 @@ interface Props {
 defineProps<Props>()
 
 const scoreBooksStore = useScoreBooksStore()
-const { buttonSize } = useBreakpoints()
+const { buttonSize, buttonText } = useBreakpoints()
 
 const showCreateDialog = ref(false)
 const inputNewScoreBookTitle = ref('')

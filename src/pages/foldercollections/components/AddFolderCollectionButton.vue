@@ -2,11 +2,12 @@
 	<NcButton v-if="editable"
 		:size="buttonSize"
 		variant="primary"
+
+		:text="buttonText(t('Add'))"
 		@click="showCreateDialog = true">
 		<template #icon>
 			<AddIcon />
 		</template>
-		{{ t('Add') }}
 	</NcButton>
 
 	<AddOrEditDialog
@@ -59,7 +60,7 @@ interface Props {
 defineProps<Props>()
 
 const folderCollectionsStore = useFolderCollectionsStore()
-const { buttonSize } = useBreakpoints()
+const { buttonSize, buttonText } = useBreakpoints()
 
 interface CollectionTypeOption {
 	label: string

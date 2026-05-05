@@ -17,20 +17,20 @@
 				v-if="setlist && editable"
 				:size="buttonSize"
 				variant="primary"
+				:text="buttonText(t('Clone'))"
 				@click="showCloneDialog = true">
 				<template #icon>
 					<CloneIcon :size="20" />
 				</template>
-				{{ t('Clone') }}
 			</NcButton>
 			<NcButton
 				variant="primary"
 				:size="buttonSize"
+				:text="buttonText(t('Details'))"
 				@click="handleDetailsButtonClick()">
 				<template #icon>
 					<InfoIcon :size="20" />
 				</template>
-				{{ t('Details') }}
 			</NcButton>
 		</template>
 
@@ -100,7 +100,7 @@ const setlistEntriesStore = useSetlistEntriesStore()
 const scoreSidebarStore = useScoreSidebarStore()
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
-const { buttonSize } = useBreakpoints()
+const { buttonSize, buttonText } = useBreakpoints()
 
 const loading = ref(false)
 const loadError = ref(false)

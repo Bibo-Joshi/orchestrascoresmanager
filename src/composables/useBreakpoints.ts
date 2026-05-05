@@ -40,6 +40,9 @@ export const useBreakpoints = () => {
 	// Component helpers
 	const columnPin = computed(() => isMobile.value ? false : 'left')
 	const buttonSize = computed(() => isDesktop.value ? 'normal' : 'small')
+	function buttonText(text: string) {
+		return isMobile.value ? undefined : text
+	}
 
 	return {
 		// OrUp (reactive refs)
@@ -65,5 +68,6 @@ export const useBreakpoints = () => {
 		// Component helpers
 		columnPin,
 		buttonSize,
+		buttonText,
 	}
 }
