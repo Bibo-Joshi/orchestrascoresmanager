@@ -150,10 +150,6 @@ watch(() => props.scoreId, () => {
 <style lang="scss" scoped>
 .new-comment-container {
 	display: block;
-
-	:deep(.textarea__main-wrapper) {
-		height: auto !important;
-	}
 }
 
 .comment-actions {
