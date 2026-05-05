@@ -445,6 +445,7 @@ const columnDefs = computed<ColDef[]>(() => {
 			filter: 'agNumberColumnFilter',
 			editable: false,
 			width: 100,
+			sort: 'asc',
 			valueGetter: (params) => {
 				if (!params.data) return null
 				const score = params.data as ScoreIndexed
@@ -487,6 +488,7 @@ const columnDefs = computed<ColDef[]>(() => {
 		field: 'title',
 		pinned: 'left' as const,
 		headerName: t('Title'),
+		sort: props.isIndexedCollection ? undefined : 'asc',
 		...(props.folderCollectionScores && hasScoreBooks.value
 			? {
 				cellRenderer: markRaw(ScoreOrScoreBookTitleRenderer),
