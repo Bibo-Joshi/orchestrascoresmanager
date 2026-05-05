@@ -22,8 +22,10 @@ import { AllCommunityModule, LocaleModule } from 'ag-grid-community'
 import type { ColDef, GridOptions, GridApi, GridReadyEvent } from 'ag-grid-community'
 import { nextcloudTheme } from '../utils/agGridTheme'
 import { getAgGridLocaleText } from '../utils/agGridLocale'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 const themeMode = ref<string>(isDarkTheme ? 'dark' : 'light')
+const { isMobile } = useBreakpoints()
 
 // Get AG Grid locale texts based on Nextcloud language
 const localeText = getAgGridLocaleText()
@@ -62,6 +64,9 @@ const gridOptions: GridOptions = {
 
 	// Row dragging
 	rowDragManaged: props.rowDragManaged || false,
+
+	// Disable column moving on mobile
+	suppressMovableColumns: isMobile.value,
 
 	// Column Sizing
 	autoSizeStrategy: {

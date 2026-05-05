@@ -51,6 +51,7 @@ import { useTagsStore } from '@/stores/tagsStore'
 import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import { useBreakpoints } from '@/composables/useBreakpoints.ts'
 
 const gridModules = [TooltipModule]
 
@@ -88,6 +89,7 @@ const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
 const tagsStore = useTagsStore()
 const scoreSidebarStore = useScoreSidebarStore()
+const { columnPin } = useBreakpoints()
 
 // Ref to access FullPageTable exposed methods
 type TableExportRef = { exportAsCsv?: (fileName?: string) => boolean }
@@ -420,7 +422,7 @@ const columnDefs = computed<ColDef[]>(() => {
 	const cols: ColDef[] = [
 		{
 			headerName: '',
-			pinned: 'left' as const,
+			pinned: columnPin.value,
 			filter: false,
 			editable: false,
 			cellRenderer: markRaw(RowActionButton),
@@ -441,7 +443,7 @@ const columnDefs = computed<ColDef[]>(() => {
 		cols.push({
 			field: 'collectionIndex',
 			headerName: t('Index'),
-			pinned: 'left' as const,
+			pinned: columnPin.value,
 			filter: 'agNumberColumnFilter',
 			editable: false,
 			width: 100,
@@ -486,7 +488,7 @@ const columnDefs = computed<ColDef[]>(() => {
 	// Title column with optional icon renderer
 	const titleColumn: ColDef = {
 		field: 'title',
-		pinned: 'left' as const,
+		pinned: columnPin.value,
 		headerName: t('Title'),
 		sort: props.isIndexedCollection ? undefined : 'asc',
 		...(props.folderCollectionScores && hasScoreBooks.value

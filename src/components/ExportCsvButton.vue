@@ -1,5 +1,5 @@
 <template>
-	<NcButton variant="primary" @click="onExportClick">
+	<NcButton :size="buttonSize" variant="primary" @click="onExportClick">
 		<template #icon>
 			<DownloadIcon />
 		</template>
@@ -13,6 +13,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import { DownloadIcon } from '@/icons/vue-material'
 import { showError } from '@nextcloud/dialogs'
 import { tryShowError } from '@/utils/errorHandling'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 type TableExportRef = { exportAsCsv?: (fileName?: string) => boolean } | null
 
@@ -22,6 +23,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const { buttonSize } = useBreakpoints()
 function onExportClick() {
 	// early check for export availability
 	if (!(props.tableRef && typeof props.tableRef.exportAsCsv === 'function')) {

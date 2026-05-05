@@ -5,7 +5,7 @@
 		<NcAppContent>
 			<div class="app-content-wrapper">
 				<div class="app-content-header">
-					<h1 class="app-content-header__title">
+					<h1 class="app-content-header__title" :style="{fontSize: fontSize}">
 						{{ displayTitle }}
 					</h1>
 					<!-- Slot for right-aligned header actions (e.g. export button) -->
@@ -30,6 +30,9 @@ import NcContent from '@nextcloud/vue/components/NcContent'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import Navigation from './Navigation.vue'
 import { generateFullTitle } from '@/navigation'
+import { useBreakpoints } from '@/composables/useBreakpoints'
+
+const { screenSizeCategory } = useBreakpoints()
 
 interface Props {
 	title?: string | null
@@ -42,6 +45,17 @@ const props = withDefaults(defineProps<Props>(), {
 // Compute display title from prop or fallback to app name
 const displayTitle = computed((): string => {
 	return props.title || 'Orchestra Scores Manager'
+})
+
+const fontSize = computed(() => {
+	switch (screenSizeCategory.value) {
+	case 'mobile':
+		return '18px'
+	case 'tablet':
+		return '20px'
+	default:
+		return '24px'
+	}
 })
 
 // Update document title when title prop changes
@@ -74,7 +88,6 @@ watch(() => props.title, (newTitle) => {
 
 .app-content-header__title {
 	margin: 0;
-	font-size: 24px;
 	font-weight: 600;
 	color: var(--color-main-text);
 	flex: 1 1 auto;

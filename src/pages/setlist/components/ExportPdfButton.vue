@@ -1,5 +1,5 @@
 <template>
-	<NcButton variant="primary" @click="openDialog">
+	<NcButton variant="primary" :size="buttonSize" @click="openDialog">
 		<template #icon>
 			<DownloadIcon />
 		</template>
@@ -63,6 +63,7 @@ import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import type { Setlist, SetlistEntry, FolderCollection } from '@/api/generated/openapi/data-contracts'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	setlist: Setlist
@@ -78,6 +79,7 @@ const props = defineProps<Props>()
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
+const { buttonSize } = useBreakpoints()
 
 /** Column IDs that are enabled by default in the export dialog */
 const DEFAULT_ENABLED_IDS: ReadonlySet<PdfColumnId> = new Set([

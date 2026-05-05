@@ -1,5 +1,8 @@
 <template>
-	<NcButton v-if="editable" variant="primary" @click="showCreateDialog = true">
+	<NcButton v-if="editable"
+		:size="buttonSize"
+		variant="primary"
+		@click="showCreateDialog = true">
 		<template #icon>
 			<AddIcon />
 		</template>
@@ -76,6 +79,7 @@ import { AddIcon, ConfirmIcon, CancelIcon } from '@/icons/vue-material'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { tryShowError } from '@/utils/errorHandling'
 import { useSetlistsStore } from '@/stores/setlistsStore'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	editable: boolean
@@ -84,6 +88,7 @@ interface Props {
 defineProps<Props>()
 
 const setlistsStore = useSetlistsStore()
+const { buttonSize } = useBreakpoints()
 
 const showCreateDialog = ref(false)
 const titleError = ref(false)

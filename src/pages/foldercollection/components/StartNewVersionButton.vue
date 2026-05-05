@@ -2,6 +2,7 @@
 	<NcButton
 		:aria-label="t('Start new version')"
 		:disabled="disabled"
+		:size="buttonSize"
 		@click="handleStartNewVersion">
 		<template #icon>
 			<HistoryIcon :size="20" />
@@ -21,6 +22,7 @@ import { t } from '@/utils/l10n'
 import { useFolderCollectionVersionsStore } from '@/stores/folderCollectionVersionsStore'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import type { FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	folderCollectionId: number
@@ -37,6 +39,7 @@ const emit = defineEmits<{
 
 const versionsStore = useFolderCollectionVersionsStore()
 const folderCollectionsStore = useFolderCollectionsStore()
+const { buttonSize } = useBreakpoints()
 
 /**
  * Handle start new version button click
