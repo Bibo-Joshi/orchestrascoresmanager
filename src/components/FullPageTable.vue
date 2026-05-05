@@ -82,6 +82,9 @@ const gridOptions: GridOptions = {
 	debounceVerticalScrollbar: true,
 	suppressAnimationFrame: false,
 
+	// Cell text selection
+	enableCellTextSelection: true,
+
 	// Editing configuration
 	suppressClickEdit: false,
 	singleClickEdit: false,
