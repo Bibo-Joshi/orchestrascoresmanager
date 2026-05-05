@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { loadState } from '@nextcloud/initial-state'
 import { apiClients } from '@/api/client'
 import type { Score } from '@/api/generated/openapi/data-contracts'
+import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 
 /**
  * Pinia store for managing scores state.
@@ -15,6 +16,7 @@ export const useScoresStore = defineStore('scores', () => {
 	const scores = ref<Score[]>([])
 	const isLoaded = ref(false)
 	const isLoading = ref(false)
+	const scoreBooksStore = useScoreBooksStore()
 
 	/**
 	 * Get scores sorted by title
@@ -113,6 +115,10 @@ export const useScoresStore = defineStore('scores', () => {
 		const index = scores.value.findIndex(s => s.id === id)
 		if (index !== -1) {
 			scores.value[index] = { ...scores.value[index], scoreBook }
+		}
+
+		if (scoreBook) {
+			scoreBooksStore.updateScoreBookScoreIndex(scoreBook.id, id, scoreBook.index)
 		}
 	}
 

@@ -6,6 +6,7 @@
 		:submit-label="t('Save')"
 		@submit="handleSubmit"
 		@reset="resetForm">
+		<FocusTrap />
 		<NcSelect
 			v-model="selectedScoreBook"
 			:options="scoreBookOptions"
@@ -49,6 +50,7 @@ import {
 import { useScoresStore } from '@/stores/scoresStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import type { ScoreBook } from '@/api/generated/openapi/data-contracts'
+import FocusTrap from '@/components/FocusTrap.vue'
 
 interface Props {
 	modelValue: boolean

@@ -57,7 +57,7 @@ interface Props {
 }
 
 interface Emits {
-	(e: 'comment-deleted', commentId: number): void
+	(e: 'commentDeleted', commentId: number): void
 }
 
 const props = defineProps<Props>()
@@ -91,7 +91,7 @@ async function deleteComment() {
 		async () => {
 			await apiClients.default.commentApiDeleteComment(props.comment.id)
 			// Emit event to parent to remove the comment from the list
-			emit('comment-deleted', props.comment.id)
+			emit('commentDeleted', props.comment.id)
 		},
 		t('Failed to delete comment: '),
 	)

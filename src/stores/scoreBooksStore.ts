@@ -81,6 +81,23 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	}
 
 	/**
+	 * Update in-memory state of score book entry with new data
+	 *
+	 * @param scoreBookId - The score book ID
+	 * @param scoreId - The score ID to update
+	 * @param index - The new index of the score in the book
+	 */
+	function updateScoreBookScoreIndex(scoreBookId: number, scoreId: number, index: number): void {
+		const scores = scoreBookScores.value.get(scoreBookId)
+		if (scores) {
+			const score = scores.find(s => s.id === scoreId)
+			if (score) {
+				score.scoreBook = { id: scoreBookId, index }
+			}
+		}
+	}
+
+	/**
 	 * Update a score book field via API and update local state
 	 *
 	 * @param id - The score book ID
@@ -262,5 +279,6 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 		addScoreToBook,
 		removeScoreFromBook,
 		getOccupiedIndices,
+		updateScoreBookScoreIndex,
 	}
 })

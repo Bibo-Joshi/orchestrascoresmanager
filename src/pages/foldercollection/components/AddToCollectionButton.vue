@@ -103,8 +103,8 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-	'score-added': [score: Score | ScoreIndexed]
-	'scorebook-added': [scoreBook: ScoreBook | ScoreBookIndexed]
+	'scoreAdded': [score: Score | ScoreIndexed]
+	'scorebookAdded': [scoreBook: ScoreBook | ScoreBookIndexed]
 }>()
 
 interface TypeOption {
@@ -237,9 +237,9 @@ async function handleSubmit() {
 				const addedScore = selectedScore.value!.entity
 				if (props.isIndexed) {
 					const scoreIndexed: ScoreIndexed = { ...addedScore, index: inputIndex.value }
-					emit('score-added', scoreIndexed)
+					emit('scoreAdded', scoreIndexed)
 				} else {
-					emit('score-added', addedScore)
+					emit('scoreAdded', addedScore)
 				}
 
 				showSuccess(t('Score added to collection'))
@@ -259,9 +259,9 @@ async function handleSubmit() {
 				const addedScoreBook = selectedScoreBook.value!.entity
 				if (props.isIndexed) {
 					const scoreBookIndexed: ScoreBookIndexed = { ...addedScoreBook, index: inputIndex.value }
-					emit('scorebook-added', scoreBookIndexed)
+					emit('scorebookAdded', scoreBookIndexed)
 				} else {
-					emit('scorebook-added', addedScoreBook)
+					emit('scorebookAdded', addedScoreBook)
 				}
 
 				showSuccess(t('Score book added to collection'))

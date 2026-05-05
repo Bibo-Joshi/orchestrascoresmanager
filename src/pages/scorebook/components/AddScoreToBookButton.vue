@@ -71,7 +71,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-	'score-added': [score: Score]
+	'scoreAdded': [score: Score]
 }>()
 
 const scoresStore = useScoresStore()
@@ -164,7 +164,7 @@ async function handleSubmit() {
 					index: inputIndex.value,
 				},
 			}
-			emit('score-added', addedScore)
+			emit('scoreAdded', addedScore)
 
 			showSuccess(t('Score added to book'))
 			showDialog.value = false
