@@ -456,7 +456,7 @@ function getPdfColumns(): PdfColumnConfig[] {
 		}))
 }
 
-// Expose tableRef for export functionality and getPdfColumns for ExportPdfButton
+// Expose tableRef for export functionality and getPdfColumns for ExportMenu
 defineExpose({ tableRef, getPdfColumns })
 </script>
 

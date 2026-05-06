@@ -14,7 +14,7 @@ import { t } from '@/utils/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import { DownloadIcon } from '@/icons/vue-material'
 import { tryShowError } from '@/utils/errorHandling'
-import { exportFolderCollectionToXlsx, type CollectionEntry } from '@/utils/xlsx-exporter'
+import { exportFolderCollectionToXlsx, type CollectionEntry } from '@/utils/fcv-xlsx-exporter'
 import type { FolderCollection, FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
 import { useBreakpoints } from '@/composables/useBreakpoints'
 
