@@ -39,3 +39,21 @@ export function formatVersionDateRange(version: FolderCollectionVersion): string
 	}
 	return `${formatDateStr(version.validFrom)} - ${formatDateStr(version.validTo)}`
 }
+
+interface CollapsedVersionEntry {
+	firstVersion: FolderCollectionVersion
+	lastVersion: FolderCollectionVersion
+}
+
+/**
+ * Format version date range for display
+ *
+ * @param version - The collapsed Version
+ * @return Formatted date range string
+ */
+export function formatCollapsedVersionDateRange(version: CollapsedVersionEntry): string {
+	if (version.lastVersion.validTo === null) {
+		return `${formatDateStr(version.firstVersion.validFrom)} - ${t('Present')}`
+	}
+	return `${formatDateStr(version.firstVersion.validFrom)} - ${formatDateStr(version.lastVersion.validTo)}`
+}
