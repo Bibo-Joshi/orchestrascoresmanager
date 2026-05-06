@@ -77,6 +77,7 @@ watch(() => props.title, (newTitle) => {
 	align-items: center;
 	justify-content: space-between;
 	row-gap: 4px;
+	column-gap: 16px;
 	padding-block: var(--app-navigation-padding, 4px);
 	padding-inline: calc(var(--default-clickable-area, 44px) + 2 * var(--app-navigation-padding, 4px)) var(--app-navigation-padding, 4px);
 	border-bottom: 1px solid var(--color-border);
@@ -91,7 +92,6 @@ watch(() => props.title, (newTitle) => {
 	font-weight: 600;
 	color: var(--color-main-text);
 	flex: 1 1 auto;
-	min-width: 200px;
 }
 
 .app-content-header__actions {

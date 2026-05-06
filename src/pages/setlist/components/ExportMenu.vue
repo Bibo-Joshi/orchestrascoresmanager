@@ -1,12 +1,31 @@
 <template>
-	<NcButton variant="primary"
-		:text="buttonText(t('Export PDF'))"
+	<NcActions
+		:menu-name="buttonText(t('Export'))"
 		:size="buttonSize"
-		@click="openDialog">
+		:primary="true"
+		variant="primary"
+		:force-name="true">
 		<template #icon>
-			<DownloadIcon />
+			<DownloadIcon :size="20" />
 		</template>
-	</NcButton>
+		<NcActionButton
+			:close-after-click="true"
+			@click="openDialog">
+			<template #icon>
+				<PDFIcon :size="20" />
+			</template>
+			{{ editable ? t('PDF Export') : buttonText(t('PDF Export')) }}
+		</NcActionButton>
+		<NcActionButton
+			v-if="editable"
+			:close-after-click="true"
+			:name="t('GEMA Report')"
+			@click="onGemaExport">
+			<template #icon>
+				<ExcelIcon :size="20" />
+			</template>
+		</NcActionButton>
+	</NcActions>
 
 	<NcDialog
 		:name="t('Export PDF')"
@@ -40,7 +59,7 @@
 				</template>
 				{{ t('Cancel') }}
 			</NcButton>
-			<NcButton variant="primary" @click="onExport">
+			<NcButton variant="primary" @click="onPdfExport">
 				<template #icon>
 					<DownloadIcon />
 				</template>
@@ -53,15 +72,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { t } from '@/utils/l10n'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
-import { DownloadIcon, CancelIcon, DragVerticalIcon } from '@/icons/vue-material'
+import { DownloadIcon, CancelIcon, DragVerticalIcon, ExcelIcon, PDFIcon } from '@/icons/vue-material'
 import { tryShowError } from '@/utils/errorHandling'
 import { exportSetlistToPdf } from '@/utils/pdf-exporter'
 import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
+import { exportSetlistToGemaXlsx } from '@/utils/setlist-xlsx-exporter'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import type { Setlist, SetlistEntry, FolderCollection } from '@/api/generated/openapi/data-contracts'
@@ -70,6 +92,7 @@ import { useBreakpoints } from '@/composables/useBreakpoints'
 interface Props {
 	setlist: Setlist
 	entries: SetlistEntry[]
+	editable: boolean
 	fcvScoresMap: Map<number, number>
 	fcvScoreBookIndicesMap: Map<number, number>
 	folderCollection: FolderCollection | null
@@ -101,7 +124,7 @@ const dialogColumns = ref<DialogColumn[]>([])
 const initialOpen = ref(true)
 
 /**
- * Open the export configuration dialog, populating it with the current
+ * Open the PDF export configuration dialog, populating it with the current
  * column order from the table.
  */
 function openDialog(): void {
@@ -121,7 +144,7 @@ function openDialog(): void {
 /**
  * Export the PDF using the currently selected columns, then close the dialog.
  */
-async function onExport(): Promise<void> {
+async function onPdfExport(): Promise<void> {
 	dialogOpen.value = false
 	const selectedColumns = dialogColumns.value
 		.filter(col => col.enabled)
@@ -138,6 +161,22 @@ async function onExport(): Promise<void> {
 				fcvScoreBookIndicesMap: props.fcvScoreBookIndicesMap,
 				folderCollection: props.folderCollection,
 				columnConfigs: selectedColumns,
+			})
+		},
+		t('Export failed: '),
+	)
+}
+
+/**
+ * Export the GEMA report as an XLSX file.
+ */
+async function onGemaExport(): Promise<void> {
+	await tryShowError(
+		async () => {
+			await exportSetlistToGemaXlsx({
+				setlist: props.setlist,
+				entries: props.entries,
+				getScoreById: (id) => scoresStore.getScoreById(id),
 			})
 		},
 		t('Export failed: '),

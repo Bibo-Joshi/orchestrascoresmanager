@@ -5,10 +5,11 @@
 				v-if="setlist && editable"
 				:setlist="setlist"
 				:editable="editable" />
-			<ExportPdfButton
+			<ExportMenu
 				v-if="setlist"
 				:setlist="setlist"
 				:entries="setlistEntries"
+				:editable="editable"
 				:fcv-scores-map="fcvScoresMap"
 				:fcv-score-book-indices-map="fcvScoreBookIndicesMap"
 				:folder-collection="folderCollection"
@@ -79,7 +80,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import SetlistPageSidebar from './components/SetlistPageSidebar.vue'
 import SetlistEntriesTable from './components/SetlistEntriesTable.vue'
 import AddSetlistEntryButton from './components/AddSetlistEntryButton.vue'
-import ExportPdfButton from './components/ExportPdfButton.vue'
+import ExportMenu from './components/ExportMenu.vue'
 import CloneSetlistDialog from '@/components/CloneSetlistDialog.vue'
 import { SetlistIcon, InfoIcon, CloneIcon } from '@/icons/vue-material'
 import { useSetlistsStore } from '@/stores/setlistsStore'
@@ -110,11 +111,11 @@ const fcvScoresMap = ref<Map<number, number>>(new Map())
 const fcvScoreBookIndicesMap = ref<Map<number, number>>(new Map())
 const folderCollection = ref<FolderCollection | null>(null)
 
-/** Ref to the SetlistEntriesTable so ExportPdfButton can read the current column order */
+/** Ref to the SetlistEntriesTable so ExportMenu can read the current column order */
 const tableRef = ref<{ getPdfColumns: () => PdfColumnConfig[] } | null>(null)
 
 /**
- * Return the currently displayed PDF columns from the table, used by ExportPdfButton.
+ * Return the currently displayed PDF columns from the table, used by ExportMenu.
  */
 function getPdfColumns(): PdfColumnConfig[] {
 	return tableRef.value?.getPdfColumns() ?? []
