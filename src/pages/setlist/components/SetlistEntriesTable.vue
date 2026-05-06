@@ -66,7 +66,7 @@ const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
 const setlistEntriesStore = useSetlistEntriesStore()
 
-const { columnPin } = useBreakpoints()
+const { columnPin, isMobile } = useBreakpoints()
 
 // Ref to access FullPageTable exposed methods
 type TableExportRef = { exportAsCsv?: (fileName?: string) => boolean; getGridApi?: () => GridApi | null }
@@ -385,6 +385,7 @@ const columnDefs = computed<ColDef[]>(() => {
 		colId: 'title' satisfies PdfColumnId,
 		valueGetter: scoreInfoValueGetter('title'),
 		editable: false,
+		rowDrag: isMobile.value && props.editable,
 	})
 
 	cols.push({

@@ -1,18 +1,20 @@
 <template>
 	<NcActions
-		:menu-name="t('Export')"
+		:menu-name="buttonText(t('Export'))"
+		:size="buttonSize"
 		:primary="true"
-		variant="primary">
+		variant="primary"
+		:force-name="true">
 		<template #icon>
-			<DownloadIcon />
+			<DownloadIcon :size="20" />
 		</template>
 		<NcActionButton
 			:close-after-click="true"
-			:name="t('PDF Export')"
 			@click="openDialog">
 			<template #icon>
 				<PDFIcon :size="20" />
 			</template>
+			{{ editable ? t('PDF Export') : buttonText(t('PDF Export')) }}
 		</NcActionButton>
 		<NcActionButton
 			v-if="editable"
@@ -85,6 +87,7 @@ import { exportSetlistToGemaXlsx } from '@/utils/setlist-xlsx-exporter'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import type { Setlist, SetlistEntry, FolderCollection } from '@/api/generated/openapi/data-contracts'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	setlist: Setlist
@@ -101,6 +104,7 @@ const props = defineProps<Props>()
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
+const { buttonSize, buttonText } = useBreakpoints()
 
 /** Column IDs that are enabled by default in the export dialog */
 const DEFAULT_ENABLED_IDS: ReadonlySet<PdfColumnId> = new Set([
