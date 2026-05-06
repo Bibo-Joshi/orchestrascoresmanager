@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-03-20 09:56+0000\n"
+"POT-Creation-Date: 2026-05-06 15:30+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -716,14 +716,20 @@ msgstr "Pausendauer (HH:MM:SS)"
 msgid "e.g., 0:30 or 1:30:00"
 msgstr "z.B. 0:30 oder 1:30:00"
 
+msgid "Export"
+msgstr "Exportieren"
+
+msgid "PDF Export"
+msgstr "PDF-Export"
+
+msgid "GEMA Report"
+msgstr "GEMA-Bericht"
+
 msgid "Export PDF"
 msgstr "PDF exportieren"
 
 msgid "Select and reorder the columns to include in the PDF export."
 msgstr "Spalten für den PDF-Export auswählen und sortieren."
-
-msgid "Export"
-msgstr "Exportieren"
 
 msgid "Delete Setlist Entry"
 msgstr "Setlist-Eintrag löschen"
@@ -890,6 +896,9 @@ msgstr "Setlist"
 msgid "Value must not be empty"
 msgstr "Wert darf nicht leer sein"
 
+msgid "Contents"
+msgstr "Inhalt"
+
 msgid "h"
 msgstr "h"
 
@@ -910,9 +919,6 @@ msgstr "Gesamtdauer"
 
 msgid "Invalid duration format"
 msgstr "Ungültiges Spieldauerformat"
-
-msgid "Contents"
-msgstr "Inhalt"
 
 #~ msgid "Organize your orchestras scores database directly within NextCloud"
 #~ msgstr "Verwalten Sie Ihre Orchester-Notendatenbank direkt in NextCloud"

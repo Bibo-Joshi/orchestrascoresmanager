@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-03-20 09:56+0000\n"
+"POT-Creation-Date: 2026-05-06 15:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -728,13 +728,19 @@ msgstr ""
 msgid "e.g., 0:30 or 1:30:00"
 msgstr ""
 
+msgid "Export"
+msgstr ""
+
+msgid "PDF Export"
+msgstr ""
+
+msgid "GEMA Report"
+msgstr ""
+
 msgid "Export PDF"
 msgstr ""
 
 msgid "Select and reorder the columns to include in the PDF export."
-msgstr ""
-
-msgid "Export"
 msgstr ""
 
 msgid "Delete Setlist Entry"
@@ -902,6 +908,9 @@ msgstr ""
 msgid "Value must not be empty"
 msgstr ""
 
+msgid "Contents"
+msgstr ""
+
 msgid "h"
 msgstr ""
 
@@ -921,7 +930,4 @@ msgid "Overall Duration"
 msgstr ""
 
 msgid "Invalid duration format"
-msgstr ""
-
-msgid "Contents"
 msgstr ""
