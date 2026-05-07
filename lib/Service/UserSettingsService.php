@@ -26,7 +26,7 @@ class UserSettingsService {
 	 * Return the setlist settings for the given user.
 	 *
 	 * @param string $userId The user whose settings to load.
-	 * @return array{defaultModerationTime: string|null, defaultFolderCollectionId: int|null}
+	 * @return array{defaultModerationTime: int|null, defaultFolderCollectionId: int|null}
 	 */
 	public function getSetlistSettings(string $userId): array {
 		$moderationTime = $this->userConfig->getValueInt(
