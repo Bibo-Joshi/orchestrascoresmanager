@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { t } from '@/utils/l10n'
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { tryShowError } from '@/utils/errorHandling'
 import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
@@ -106,6 +106,8 @@ import { useSetlistsStore } from '@/stores/setlistsStore'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import type { Setlist } from '@/api/generated/openapi/data-contracts'
 import { formatDurationHHMMSS, parseDurationHHMMSS, formatDurationHHMM, parseDurationHHMM, restrictToTimeFormat as restrictInputToTimeFormat } from '@/utils/timeFormatUtils'
+import { apiClients } from '@/api/client.ts'
+import { formatDateStr } from '@/composables/useDateFormatting.ts'
 
 interface Props {
 	setlist: Setlist | undefined
@@ -139,11 +141,15 @@ const formData = ref<FormData>({
 })
 
 const selectedFolderCollectionVersion = ref<{ label: string; value: number | null } | null>(null)
+const folderCollectionVersionOptions = ref<Array<{ label: string; value: number | null }>>([])
 
 /**
  * Get active folder collection versions for the dropdown
+ *
+ * @param selectedID - The currently selected folder collection version ID (if any) to ensure it's included in options
+ * @return An array of options for the folder collection version select dropdown
  */
-const folderCollectionVersionOptions = computed(() => {
+async function getFolderCollectionVersionOptions(selectedID: number | null = null) {
 	const options: Array<{ label: string; value: number | null }> = []
 
 	for (const collection of folderCollectionsStore.folderCollectionsSorted) {
@@ -155,13 +161,25 @@ const folderCollectionVersionOptions = computed(() => {
 		}
 	}
 
+	if (selectedID && !options.some(opt => opt.value === selectedID)) {
+		// If the currently selected version is not in the options, add it
+		const fcv = (await apiClients.default.folderCollectionVersionApiGetFolderCollectionVersion(selectedID)).data.ocs.data
+		const fc = folderCollectionsStore.getFolderCollectionById(fcv.folderCollectionId)
+		if (fc) {
+			options.push({
+				label: `${fc.title} (${formatDateStr(fcv.validFrom)})`,
+				value: selectedID,
+			})
+		}
+	}
+
 	return options
-})
+}
 
 /**
  * Initialize form data from setlist
  */
-function initializeFormData() {
+async function initializeFormData() {
 	if (!props.setlist) return
 
 	formData.value = {
@@ -178,6 +196,7 @@ function initializeFormData() {
 	}
 
 	// Set selected folder collection
+	folderCollectionVersionOptions.value = await getFolderCollectionVersionOptions(props.setlist?.folderCollectionVersionId)
 	if (props.setlist.folderCollectionVersionId) {
 		const option = folderCollectionVersionOptions.value.find(
 			opt => opt.value === props.setlist.folderCollectionVersionId,
@@ -191,8 +210,10 @@ function initializeFormData() {
 /**
  * Watch for setlist changes and reinitialize form
  */
-watch(() => props.setlist, () => {
-	initializeFormData()
+watch(() => props.setlist?.id, async (newId, oldId) => {
+	if (newId !== oldId) {
+		await initializeFormData()
+	}
 }, { immediate: true })
 
 /**
