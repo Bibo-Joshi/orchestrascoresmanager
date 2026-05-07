@@ -952,7 +952,7 @@
                         }
                     },
                     "400": {
-                        "description": "If input validation fails\r",
+                        "description": "If input validation fails",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -4684,7 +4684,7 @@
                         }
                     },
                     "500": {
-                        "description": "If adding/removing tags fails\r",
+                        "description": "If adding/removing tags fails",
                         "content": {
                             "text/plain": {
                                 "schema": {

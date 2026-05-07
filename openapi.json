@@ -4380,7 +4380,7 @@
                         }
                     },
                     "500": {
-                        "description": "If adding/removing tags fails\r",
+                        "description": "If adding/removing tags fails",
                         "content": {
                             "text/plain": {
                                 "schema": {
