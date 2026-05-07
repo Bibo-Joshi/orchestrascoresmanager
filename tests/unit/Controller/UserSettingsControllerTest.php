@@ -53,7 +53,7 @@ final class UserSettingsControllerTest extends TestCase {
 	public function testGetSetlistSettingsReturnsSettings(): void {
 		$controller = $this->makeController('alice');
 
-		$expected = ['defaultModerationTime' => '1:30:00', 'defaultFolderCollectionId' => 3];
+		$expected = ['defaultModerationTime' => 5400, 'defaultFolderCollectionId' => 3];
 
 		$this->userSettingsService->expects($this->once())
 			->method('getSetlistSettings')
@@ -78,18 +78,18 @@ final class UserSettingsControllerTest extends TestCase {
 	public function testPutSetlistSettingsPersistsAndReturnsSettings(): void {
 		$controller = $this->makeController('alice');
 
-		$expected = ['defaultModerationTime' => '0:30', 'defaultFolderCollectionId' => null];
+		$expected = ['defaultModerationTime' => 1800, 'defaultFolderCollectionId' => null];
 
 		$this->userSettingsService->expects($this->once())
 			->method('updateSetlistSettings')
-			->with('alice', '0:30', null);
+			->with('alice', 1800, null);
 
 		$this->userSettingsService->expects($this->once())
 			->method('getSetlistSettings')
 			->with('alice')
 			->willReturn($expected);
 
-		$response = $controller->putSetlistSettings('0:30', null);
+		$response = $controller->putSetlistSettings(1800, null);
 
 		$this->assertInstanceOf(DataResponse::class, $response);
 		$this->assertSame(Http::STATUS_OK, $response->getStatus());
@@ -101,7 +101,7 @@ final class UserSettingsControllerTest extends TestCase {
 
 		$this->expectException(OCSForbiddenException::class);
 
-		$controller->putSetlistSettings('1:00', 5);
+		$controller->putSetlistSettings(3600, 5);
 	}
 
 	public function testPutSetlistSettingsWithNullsClears(): void {

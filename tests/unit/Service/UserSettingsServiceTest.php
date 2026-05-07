@@ -26,8 +26,8 @@ final class UserSettingsServiceTest extends TestCase {
 
 	public function testGetSetlistSettingsReturnsNullsWhenNotSet(): void {
 		$this->userConfig->expects($this->exactly(2))
-			->method('getValueString')
-			->willReturn('');
+			->method('getValueInt')
+			->willReturn(-1);
 
 		$result = $this->service->getSetlistSettings(self::USER_ID);
 
@@ -38,8 +38,8 @@ final class UserSettingsServiceTest extends TestCase {
 	public function testGetSetlistSettingsReturnsModerationTime(): void {
 		$this->userConfig->expects($this->exactly(2))
 			->method('getValueInt')
-			->willReturnCallback(function (string $userId, string $app, string $key): ?int {
-				return $key === 'setlists_default_moderation_time' ? 60 : null;
+			->willReturnCallback(function (string $userId, string $app, string $key): int {
+				return $key === 'setlists_default_moderation_time' ? 60 : -1;
 			});
 
 		$result = $this->service->getSetlistSettings(self::USER_ID);
@@ -51,8 +51,8 @@ final class UserSettingsServiceTest extends TestCase {
 	public function testGetSetlistSettingsReturnsFolderCollectionId(): void {
 		$this->userConfig->expects($this->exactly(2))
 			->method('getValueInt')
-			->willReturnCallback(function (string $userId, string $app, string $key): ?int {
-				return $key === 'setlists_default_folder_collection_id' ? 42 : null;
+			->willReturnCallback(function (string $userId, string $app, string $key): int {
+				return $key === 'setlists_default_folder_collection_id' ? 42 : -1;
 			});
 
 		$result = $this->service->getSetlistSettings(self::USER_ID);
@@ -65,14 +65,14 @@ final class UserSettingsServiceTest extends TestCase {
 		$calls = [];
 
 		$this->userConfig->expects($this->exactly(2))
-			->method('setValueString')
-			->willReturnCallback(function (string $userId, string $app, string $key, string $value, bool $lazy) use (&$calls): bool {
+			->method('setValueInt')
+			->willReturnCallback(function (string $userId, string $app, string $key, int $value, bool $lazy) use (&$calls): bool {
 				$calls[] = [$userId, $app, $key, $value, $lazy];
 				return true;
 			});
 
 		$this->userConfig->expects($this->never())
-			->method('deleteUserValue');
+			->method('deleteUserConfig');
 
 		$this->service->updateSetlistSettings(self::USER_ID, 30, 7);
 
@@ -82,7 +82,7 @@ final class UserSettingsServiceTest extends TestCase {
 
 	public function testUpdateSetlistSettingsDeletesWhenNull(): void {
 		$this->userConfig->expects($this->never())
-			->method('setValueString');
+			->method('setValueInt');
 
 		$deleteCalls = [];
 		$this->userConfig->expects($this->exactly(2))

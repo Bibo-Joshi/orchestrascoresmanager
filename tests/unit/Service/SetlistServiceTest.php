@@ -18,6 +18,7 @@ use OCA\OrchestraScoresManager\Service\UserSettingsService;
 use OCA\OrchestraScoresManager\Utility\SetlistValidationHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IL10N;
+use OCP\IUserSession;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
