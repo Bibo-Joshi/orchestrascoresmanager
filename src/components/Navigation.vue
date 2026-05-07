@@ -43,22 +43,41 @@
 				</ul>
 			</NcAppNavigationItem>
 		</template>
+		<template #footer>
+			<div v-if="editable" class="navigation__footer">
+				<NcButton wide @click="showSettings = true">
+					<template #icon>
+						<SettingsIcon :size="20" />
+					</template>
+					{{ t('Settings') }}
+				</NcButton>
+			</div>
+		</template>
 	</NcAppNavigation>
+	<AppSettings v-model:open="showSettings" />
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
 import NcAppNavigationItem from '@nextcloud/vue/components/NcAppNavigationItem'
 import NcCounterBubble from '@nextcloud/vue/components/NcCounterBubble'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import AppSettings from '@/components/AppSettings.vue'
 import { navigation } from '@/navigation'
 import { NavigationItem } from '@/types/navigation'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { t } from '@/utils/l10n'
+import { SettingsIcon } from '@/icons/vue-material'
+import { loadState } from '@nextcloud/initial-state'
 
 const route = useRoute()
 const folderCollectionsStore = useFolderCollectionsStore()
+
+const showSettings = ref(false)
+// Load initial state from the server
+const editable = ref<boolean>(!!loadState('orchestrascoresmanager', 'editable'))
 
 // Initialize folder collections store when navigation mounts
 onMounted(() => {
@@ -87,3 +106,9 @@ const isFolderCollectionsOpen = computed((): boolean => {
 	return route.name === 'foldercollection'
 })
 </script>
+
+<style lang="scss" scoped>
+.navigation__footer {
+	padding: var(--app-navigation-padding);
+}
+</style>
