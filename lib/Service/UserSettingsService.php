@@ -54,9 +54,9 @@ class UserSettingsService {
 	/**
 	 * Persist setlist settings for the given user.
 	 *
-	 * @param string      $userId                  The user whose settings to update.
-	 * @param int|null $defaultModerationTime   Time string (e.g. 60 seconds) or null to clear.
-	 * @param int|null    $defaultFolderCollectionId Folder collection ID or null to clear.
+	 * @param string $userId The user whose settings to update.
+	 * @param int|null $defaultModerationTime Time string (e.g. 60 seconds) or null to clear.
+	 * @param int|null $defaultFolderCollectionId Folder collection ID or null to clear.
 	 */
 	public function updateSetlistSettings(
 		string $userId,
@@ -96,6 +96,3 @@ class UserSettingsService {
 		}
 	}
 }
-
-
-

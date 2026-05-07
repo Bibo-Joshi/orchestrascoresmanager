@@ -123,4 +123,3 @@ final class UserSettingsControllerTest extends TestCase {
 		$this->assertSame($expected, $response->getData());
 	}
 }
-

@@ -38,7 +38,7 @@ final class UserSettingsServiceTest extends TestCase {
 	public function testGetSetlistSettingsReturnsModerationTime(): void {
 		$this->userConfig->expects($this->exactly(2))
 			->method('getValueInt')
-			->willReturnCallback(function (string $userId, string $app, string $key): int | null {
+			->willReturnCallback(function (string $userId, string $app, string $key): ?int {
 				return $key === 'setlists_default_moderation_time' ? 60 : null;
 			});
 
@@ -51,7 +51,7 @@ final class UserSettingsServiceTest extends TestCase {
 	public function testGetSetlistSettingsReturnsFolderCollectionId(): void {
 		$this->userConfig->expects($this->exactly(2))
 			->method('getValueInt')
-			->willReturnCallback(function (string $userId, string $app, string $key): int | null {
+			->willReturnCallback(function (string $userId, string $app, string $key): ?int {
 				return $key === 'setlists_default_folder_collection_id' ? 42 : null;
 			});
 
@@ -97,9 +97,3 @@ final class UserSettingsServiceTest extends TestCase {
 		$this->assertSame([self::USER_ID, self::APP_NAME, 'setlists_default_folder_collection_id'], $deleteCalls[1]);
 	}
 }
-
-
-
-
-
-

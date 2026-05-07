@@ -57,8 +57,8 @@ class UserSettingsController extends OCSController {
 	/**
 	 * Update setlist settings for the authenticated user
 	 *
-	 * @param int|null $defaultModerationTime    Time (e.g. 60 seconds) or null to clear.
-	 * @param int|null    $defaultFolderCollectionId Folder collection ID or null to clear.
+	 * @param int|null $defaultModerationTime Time (e.g. 60 seconds) or null to clear.
+	 * @param int|null $defaultFolderCollectionId Folder collection ID or null to clear.
 	 *
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerUserSetlistSettings, array{}>
 	 *
@@ -87,6 +87,3 @@ class UserSettingsController extends OCSController {
 		return new DataResponse($settings);
 	}
 }
-
-
-

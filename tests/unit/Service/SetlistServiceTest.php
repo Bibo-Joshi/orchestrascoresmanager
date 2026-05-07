@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\OrchestraScoresManager\Tests\unit\Service;
 
+use OCA\OrchestraScoresManager\Db\FolderCollection;
 use OCA\OrchestraScoresManager\Db\Setlist;
 use OCA\OrchestraScoresManager\Db\SetlistEntry;
 use OCA\OrchestraScoresManager\Db\SetlistEntryMapper;
@@ -11,7 +12,9 @@ use OCA\OrchestraScoresManager\Db\SetlistMapper;
 use OCA\OrchestraScoresManager\Policy\PolicyInterface;
 use OCA\OrchestraScoresManager\Policy\SetlistPolicy;
 use OCA\OrchestraScoresManager\Service\AuthorizationService;
+use OCA\OrchestraScoresManager\Service\FolderCollectionService;
 use OCA\OrchestraScoresManager\Service\SetlistService;
+use OCA\OrchestraScoresManager\Service\UserSettingsService;
 use OCA\OrchestraScoresManager\Utility\SetlistValidationHelper;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IL10N;
@@ -28,6 +31,9 @@ final class SetlistServiceTest extends TestCase {
 	private AuthorizationService $authorizationService;
 	private SetlistPolicy $setlistPolicy;
 	private IL10N $l10n;
+	private UserSettingsService $userSettingsService;
+	private FolderCollectionService $folderCollectionService;
+	private IUserSession $userSession;
 	private SetlistService $service;
 
 	protected function setUp(): void {
@@ -39,8 +45,12 @@ final class SetlistServiceTest extends TestCase {
 		$this->authorizationService = $this->createMock(AuthorizationService::class);
 		$this->setlistPolicy = $this->createMock(SetlistPolicy::class);
 		$this->l10n = $this->createMock(IL10N::class);
+		$this->userSettingsService = $this->createMock(UserSettingsService::class);
+		$this->folderCollectionService = $this->createMock(FolderCollectionService::class);
+		$this->userSession = $this->createMock(IUserSession::class);
 
 		$this->l10n->method('t')->willReturnCallback(fn ($text, $params = []) => vsprintf($text, $params));
+		$this->userSession->method('getUser')->willReturn(null);
 
 		$this->service = new SetlistService(
 			$this->setlistMapper,
@@ -48,6 +58,9 @@ final class SetlistServiceTest extends TestCase {
 			$this->validationHelper,
 			$this->authorizationService,
 			$this->setlistPolicy,
+			$this->userSettingsService,
+			$this->folderCollectionService,
+			$this->userSession,
 			$this->l10n
 		);
 	}
@@ -593,5 +606,139 @@ final class SetlistServiceTest extends TestCase {
 
 		$this->assertIsArray($result);
 		$this->assertSame(1, $result['id']);
+	}
+
+	public function testCreateSetlistAppliesUserDefaultsWhenInputMissing(): void {
+		$setlist = new Setlist();
+		$setlist->setTitle('New Setlist');
+
+		$folderCollection = new FolderCollection();
+		$folderCollection->setId(7);
+		$folderCollection->setActiveVersionId(70);
+
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('alice');
+
+		$this->userSession->expects($this->once())
+			->method('getUser')
+			->willReturn($user);
+
+		$this->authorizationService->expects($this->once())
+			->method('authorizePolicy')
+			->with($this->setlistPolicy, PolicyInterface::ACTION_CREATE);
+
+		$this->userSettingsService->expects($this->once())
+			->method('getSetlistSettings')
+			->with('alice')
+			->willReturn([
+				'defaultModerationTime' => 90,
+				'defaultFolderCollectionId' => 7,
+			]);
+
+		$this->folderCollectionService->expects($this->once())
+			->method('findFolderCollectionEntity')
+			->with(7)
+			->willReturn($folderCollection);
+
+		$this->setlistMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(function (Setlist $insertedSetlist): bool {
+				return $insertedSetlist->getDefaultModerationDuration() === 90
+					&& $insertedSetlist->getFolderCollectionVersionId() === 70;
+			}))
+			->willReturnCallback(function (Setlist $insertedSetlist): Setlist {
+				$insertedSetlist->setId(1);
+				return $insertedSetlist;
+			});
+
+		$result = $this->service->createSetlist($setlist);
+
+		$this->assertSame(1, $result['id']);
+		$this->assertSame(90, $result['defaultModerationDuration']);
+		$this->assertSame(70, $result['folderCollectionVersionId']);
+	}
+
+	public function testCreateSetlistDoesNotOverrideExplicitInputWithDefaults(): void {
+		$setlist = new Setlist();
+		$setlist->setTitle('New Setlist');
+		$setlist->setDefaultModerationDuration(30);
+		$setlist->setFolderCollectionVersionId(555);
+
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('alice');
+
+		$this->userSession->expects($this->once())
+			->method('getUser')
+			->willReturn($user);
+
+		$this->authorizationService->expects($this->once())
+			->method('authorizePolicy')
+			->with($this->setlistPolicy, PolicyInterface::ACTION_CREATE);
+
+		$this->userSettingsService->expects($this->never())
+			->method('getSetlistSettings');
+
+		$this->folderCollectionService->expects($this->never())
+			->method('findFolderCollectionEntity');
+
+		$this->setlistMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(function (Setlist $insertedSetlist): bool {
+				return $insertedSetlist->getDefaultModerationDuration() === 30
+					&& $insertedSetlist->getFolderCollectionVersionId() === 555;
+			}))
+			->willReturnCallback(function (Setlist $insertedSetlist): Setlist {
+				$insertedSetlist->setId(1);
+				return $insertedSetlist;
+			});
+
+		$result = $this->service->createSetlist($setlist);
+		$this->assertSame(30, $result['defaultModerationDuration']);
+		$this->assertSame(555, $result['folderCollectionVersionId']);
+	}
+
+	public function testCreateSetlistIgnoresMissingDefaultFolderCollection(): void {
+		$setlist = new Setlist();
+		$setlist->setTitle('New Setlist');
+
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('alice');
+
+		$this->userSession->expects($this->once())
+			->method('getUser')
+			->willReturn($user);
+
+		$this->authorizationService->expects($this->once())
+			->method('authorizePolicy')
+			->with($this->setlistPolicy, PolicyInterface::ACTION_CREATE);
+
+		$this->userSettingsService->expects($this->once())
+			->method('getSetlistSettings')
+			->with('alice')
+			->willReturn([
+				'defaultModerationTime' => 120,
+				'defaultFolderCollectionId' => 999,
+			]);
+
+		$this->folderCollectionService->expects($this->once())
+			->method('findFolderCollectionEntity')
+			->with(999)
+			->willThrowException(new \InvalidArgumentException('Folder collection not found'));
+
+		$this->setlistMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(function (Setlist $insertedSetlist): bool {
+				return $insertedSetlist->getDefaultModerationDuration() === 120
+					&& $insertedSetlist->getFolderCollectionVersionId() === null;
+			}))
+			->willReturnCallback(function (Setlist $insertedSetlist): Setlist {
+				$insertedSetlist->setId(1);
+				return $insertedSetlist;
+			});
+
+		$result = $this->service->createSetlist($setlist);
+		$this->assertSame(120, $result['defaultModerationDuration']);
+		$this->assertArrayHasKey('folderCollectionVersionId', $result);
+		$this->assertNull($result['folderCollectionVersionId']);
 	}
 }
