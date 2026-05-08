@@ -52,7 +52,6 @@ final class SetlistServiceTest extends TestCase {
 		$this->userSession = $this->createMock(IUserSession::class);
 
 		$this->l10n->method('t')->willReturnCallback(fn ($text, $params = []) => vsprintf($text, $params));
-		$this->userSession->method('getUser')->willReturn(null);
 
 		$this->service = new SetlistService(
 			$this->setlistMapper,
