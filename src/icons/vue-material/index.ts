@@ -20,6 +20,7 @@ export { default as OpenExternalIcon } from 'vue-material-design-icons/OpenInNew
 export { default as HistoryIcon } from 'vue-material-design-icons/History.vue'
 export { default as ExcelIcon } from 'vue-material-design-icons/MicrosoftExcel.vue'
 export { default as PDFIcon } from 'vue-material-design-icons/FilePdfBox.vue'
+export { default as SettingsIcon } from 'vue-material-design-icons/CogOutline.vue'
 
 // State icons
 export { default as ErrorIcon } from 'vue-material-design-icons/AlertCircle.vue'

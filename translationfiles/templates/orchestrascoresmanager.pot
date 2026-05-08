@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-05-06 15:30+0000\n"
+"POT-Creation-Date: 2026-05-07 20:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -222,6 +222,36 @@ msgstr ""
 msgid "Select groups..."
 msgstr ""
 
+msgid "Invalid default moderation time format. Use (HH:)MM:SS"
+msgstr ""
+
+msgid "Failed to save settings"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Setlists"
+msgstr ""
+
+msgid "Default Moderation Time (HH:MM:SS)"
+msgstr ""
+
+msgid "e.g., 0:30 or 1:30:00"
+msgstr ""
+
+msgid "Default Folder Collection"
+msgstr ""
+
+msgid "Select folder collection"
+msgstr ""
+
+msgid "Saving …"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
 msgid "Score book assignment updated"
 msgstr ""
 
@@ -229,9 +259,6 @@ msgid "Failed to update score book assignment: "
 msgstr ""
 
 msgid "Assign to Score Book"
-msgstr ""
-
-msgid "Save"
 msgstr ""
 
 msgid "Score Book"
@@ -725,9 +752,6 @@ msgstr ""
 msgid "Break Duration (HH:MM:SS)"
 msgstr ""
 
-msgid "e.g., 0:30 or 1:30:00"
-msgstr ""
-
 msgid "Export"
 msgstr ""
 
@@ -767,9 +791,6 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
-msgid "Invalid default moderation time format. Use (HH:)MM:SS"
-msgstr ""
-
 msgid "Invalid duration format. Use (HH:)MM"
 msgstr ""
 
@@ -788,12 +809,6 @@ msgstr ""
 msgid "Folder Collection"
 msgstr ""
 
-msgid "Select folder collection"
-msgstr ""
-
-msgid "Default Moderation Time (HH:MM:SS)"
-msgstr ""
-
 msgid "Duration (HH:MM)"
 msgstr ""
 
@@ -807,9 +822,6 @@ msgid "Is Published"
 msgstr ""
 
 msgid "Saving..."
-msgstr ""
-
-msgid "Setlists"
 msgstr ""
 
 msgid "Drafts"

@@ -208,6 +208,13 @@ export interface Tag {
   name: string;
 }
 
+export interface UserSetlistSettings {
+  /** @format int64 */
+  defaultModerationTime: number | null;
+  /** @format int64 */
+  defaultFolderCollectionId: number | null;
+}
+
 export interface CommentApiGetCommentData {
   ocs: {
     meta: OCSMeta;
@@ -1133,5 +1140,34 @@ export interface TagApiPostTagData {
   ocs: {
     meta: OCSMeta;
     data: Tag;
+  };
+}
+
+export interface UserSettingsGetSetlistSettingsData {
+  ocs: {
+    meta: OCSMeta;
+    data: UserSetlistSettings;
+  };
+}
+
+export interface UserSettingsPutSetlistSettingsPayload {
+  /**
+   * Time (e.g. 60 seconds) or null to clear.
+   * @format int64
+   * @default null
+   */
+  defaultModerationTime?: number | null;
+  /**
+   * Folder collection ID or null to clear.
+   * @format int64
+   * @default null
+   */
+  defaultFolderCollectionId?: number | null;
+}
+
+export interface UserSettingsPutSetlistSettingsData {
+  ocs: {
+    meta: OCSMeta;
+    data: UserSetlistSettings;
   };
 }

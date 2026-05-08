@@ -82,6 +82,9 @@ import {
   TagApiGetTagsData,
   TagApiPostTagData,
   TagApiPostTagPayload,
+  UserSettingsGetSetlistSettingsData,
+  UserSettingsPutSetlistSettingsData,
+  UserSettingsPutSetlistSettingsPayload,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
@@ -1512,6 +1515,61 @@ export class Ocs<
     >({
       path: `/ocs/v2.php/apps/orchestrascoresmanager/tags`,
       method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags user_settings
+   * @name UserSettingsGetSetlistSettings
+   * @summary Get setlist settings for the authenticated user
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/settings/user/setlists
+   * @secure
+   */
+  userSettingsGetSetlistSettings = (params: RequestParams = {}) =>
+    this.request<
+      UserSettingsGetSetlistSettingsData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/settings/user/setlists`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags user_settings
+   * @name UserSettingsPutSetlistSettings
+   * @summary Update setlist settings for the authenticated user
+   * @request PUT:/ocs/v2.php/apps/orchestrascoresmanager/settings/user/setlists
+   * @secure
+   */
+  userSettingsPutSetlistSettings = (
+    data?: UserSettingsPutSetlistSettingsPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      UserSettingsPutSetlistSettingsData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/settings/user/setlists`,
+      method: "PUT",
       body: data,
       secure: true,
       type: ContentType.Json,
