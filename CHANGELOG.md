@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.8.0] - 2026-05-08
+## [0.9.0] - 2026-05-10
+
+### Added
+
+- Add a Compact View Mode for Setlists (#57)
+
+### Security
+
+- Fix npm Audit (#56)
+
+## [0.9.0.] - 2026-05-08
 
 ### Added
 
