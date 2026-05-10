@@ -199,8 +199,8 @@ jobs:
         shell: bash
         run: rm -rf "$HOME/.nextcloud/certificates"
 
-  publish:
-    name: Publish App Store and GitHub Release
+  release:
+    name: Publish GitHub Release
     runs-on: ubuntu-latest
     needs:
       - prepare
@@ -227,6 +227,18 @@ jobs:
             build/artifacts/${{ needs.prepare.outputs.cert_name }}
             build/artifacts/${{ needs.prepare.outputs.checksum_name }}
 
+  publish:
+    # Separate job so that we can re-run the publishing to NC independently of
+    # creating the GitHub release in case of App Store upload issues etc.
+    # GH release can't be re-created due to immutable releases
+    name: Deploy to NextCloud App Store
+    runs-on: ubuntu-latest
+    needs:
+        - prepare
+        - release
+    if: ${{ !inputs.dry_run }}
+    environment: nextcloud-appstore
+    steps:
       - name: Upload app to Nextcloud App Store
         uses: R0Wi/nextcloud-appstore-push-action@9244bb5445776688cfe90fa1903ea8dff95b0c28 # v1.0.4
         with:
