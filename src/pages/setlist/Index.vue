@@ -33,6 +33,7 @@
 					<InfoIcon :size="20" />
 				</template>
 			</NcButton>
+			<ViewModeMenu v-if="setlistEntries.length > 0" v-model:view-mode="viewMode" />
 		</template>
 
 		<template #content>
@@ -47,6 +48,7 @@
 				<SetlistEntriesTable
 					v-if="setlist && setlistEntries.length > 0"
 					ref="tableRef"
+					:view-mode="viewMode"
 					:setlist="setlist"
 					:entries="setlistEntries"
 					:fcv-scores-map="fcvScoresMap"
@@ -93,6 +95,7 @@ import type { Setlist, Score, ScoreIndexed, FolderCollection, ScoreBookIndexed }
 import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import type { PdfColumnConfig } from '@/utils/pdf-exporter'
 import { useBreakpoints } from '@/composables/useBreakpoints'
+import ViewModeMenu from './components/ViewModeMenu.vue'
 
 const route = useRoute()
 const setlistsStore = useSetlistsStore()
@@ -101,11 +104,12 @@ const setlistEntriesStore = useSetlistEntriesStore()
 const scoreSidebarStore = useScoreSidebarStore()
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
-const { buttonSize, buttonText } = useBreakpoints()
+const { buttonSize, buttonText, isDesktop } = useBreakpoints()
 
 const loading = ref(false)
 const loadError = ref(false)
 const editable = ref<boolean>(!!loadState('orchestrascoresmanager', 'editable'))
+const viewMode = ref<'full' | 'compact'>(isDesktop.value ? 'full' : 'compact')
 const showCloneDialog = ref(false)
 const fcvScoresMap = ref<Map<number, number>>(new Map())
 const fcvScoreBookIndicesMap = ref<Map<number, number>>(new Map())

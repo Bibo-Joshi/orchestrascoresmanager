@@ -1,4 +1,4 @@
-import { computed, type Ref, ref, onUnmounted } from 'vue'
+import { computed, type Ref, ref, onUnmounted, ComputedRef } from 'vue'
 
 const useMediaQueryComposable = (query: string): Ref<boolean> => {
 	const matches = ref(window.matchMedia(query).matches)
@@ -38,7 +38,7 @@ export const useBreakpoints = () => {
 	)
 
 	// Component helpers
-	const columnPin = computed(() => isMobile.value ? false : 'left')
+	const columnPin: ComputedRef<false | 'left'> = computed((): false | 'left' => isMobile.value ? false : 'left')
 	const buttonSize = computed(() => isDesktop.value ? 'normal' : 'small')
 	function buttonText(text: string) {
 		return isMobile.value ? undefined : text
