@@ -1,6 +1,6 @@
 <template>
 	<NcActions
-		:menu-name="buttonText(t('Ansicht'))"
+		:menu-name="buttonText(t('View Mode'))"
 		:size="buttonSize"
 		:primary="true"
 		variant="primary"

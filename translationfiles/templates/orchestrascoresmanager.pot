@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-05-07 20:10+0000\n"
+"POT-Creation-Date: 2026-05-10 08:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -822,6 +822,15 @@ msgid "Is Published"
 msgstr ""
 
 msgid "Saving..."
+msgstr ""
+
+msgid "View Mode"
+msgstr ""
+
+msgid "Full View"
+msgstr ""
+
+msgid "Compact View"
 msgstr ""
 
 msgid "Drafts"
