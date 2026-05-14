@@ -3,9 +3,57 @@
  * Generates an XLSX file with the setlist entries for GEMA reporting.
  */
 import { Workbook } from 'exceljs'
-import { t } from '@/utils/l10n'
+import { linkTo } from '@nextcloud/router'
 import type { Setlist, SetlistEntry, Score } from '@/api/generated/openapi/data-contracts'
 import { isBreakEntry } from '@/utils/setlistScoreUtils'
+
+const TEMPLATE_URL = linkTo('orchestrascoresmanager', 'public/gema-template.xlsx')
+const DATA_START_ROW = 21
+
+interface PersonNameParts {
+	firstName: string
+	lastName: string
+}
+
+/**
+ * Split a person name into first and last name using the final space as separator.
+ * If no separator exists, the full value is treated as last name.
+ * @param rawName - The raw name string to split
+ * @return An object containing the first and last name parts
+ */
+function splitPersonName(rawName: string | null | undefined): PersonNameParts {
+	const normalizedName = (rawName ?? '').trim()
+	if (normalizedName.length === 0) {
+		return { firstName: '', lastName: '' }
+	}
+
+	const lastSpaceIndex = normalizedName.lastIndexOf(' ')
+	if (lastSpaceIndex < 0) {
+		return { firstName: '', lastName: normalizedName }
+	}
+
+	return {
+		firstName: normalizedName.slice(0, lastSpaceIndex).trim(),
+		lastName: normalizedName.slice(lastSpaceIndex + 1).trim(),
+	}
+}
+
+/**
+ * Split potential multiple composers by comma and return primary/secondary names.
+ * @param rawComposer - The raw composer string which may contain multiple names separated by commas
+ * @return An object containing the primary and secondary composer name parts
+ */
+function splitComposers(rawComposer: string | null | undefined): { primary: PersonNameParts; secondary: PersonNameParts } {
+	const composers = (rawComposer ?? '')
+		.split(',')
+		.map((value) => value.trim())
+		.filter((value) => value.length > 0)
+
+	const primary = splitPersonName(composers[0] ?? '')
+	const secondary = splitPersonName(composers[1] ?? '')
+
+	return { primary, secondary }
+}
 
 /**
  * Input data for generating the GEMA report
@@ -36,75 +84,48 @@ export async function exportSetlistToGemaXlsx(data: GemaReportData): Promise<voi
 	const { setlist, entries, getScoreById } = data
 
 	const workbook = new Workbook()
-	const worksheet = workbook.addWorksheet(setlist.title)
+	const response = await fetch(TEMPLATE_URL)
+	if (!response.ok) {
+		throw new Error(`Failed to load GEMA template from ${TEMPLATE_URL}`)
+	}
 
-	// Configure column widths
-	worksheet.columns = [
-		{ width: 8 },
-		{ width: 40 },
-		{ width: 25 },
-		{ width: 8 },
-		{ width: 25 },
-		{ width: 25 },
-		{ width: 30 },
-		{ width: 40 },
-	]
+	const templateArrayBuffer = await response.arrayBuffer()
+	await workbook.xlsx.load(templateArrayBuffer)
 
-	// Add header row
-	const headerRow = worksheet.addRow([
-		t('Index'),
-		t('Title'),
-		t('Publisher'),
-		t('Year'),
-		t('Composer'),
-		t('Arranger'),
-		t('GEMA IDs'),
-		t('Medley Contents'),
-	])
-	headerRow.font = { bold: true }
+	const worksheet = workbook.worksheets[0]
+	if (!worksheet) {
+		throw new Error('GEMA template worksheet is missing')
+	}
 
-	// Add data rows for non-break entries
-	let setlistIndex = 1
+	let targetRowNumber = DATA_START_ROW
 	for (const entry of entries) {
 		if (isBreakEntry(entry)) {
 			continue
 		}
 
 		const score = entry.scoreId !== null ? getScoreById(entry.scoreId) : undefined
+		const currentRow = worksheet.getRow(targetRowNumber)
 
-		let title = ''
-		let publisher = ''
-		let year = ''
-		let composer = ''
-		let arranger = ''
-		let gemaIds = ''
-		let medleyContents = ''
+		const gemaIds = score?.gemaIds ? score.gemaIds.join(', ') : ''
+		const title = score?.title ?? ''
+		const publisher = score?.publisher ?? ''
+		const { primary: primaryComposer, secondary: secondaryComposer } = splitComposers(score?.composer)
+		const arranger = splitPersonName(score?.arranger)
 
-		if (score) {
-			title = score.title
-			publisher = score.publisher ?? ''
-			year = score.year !== null && score.year !== undefined ? String(score.year) : ''
-			composer = score.composer ?? ''
-			arranger = score.arranger ?? ''
-			gemaIds = score.gemaIds ? score.gemaIds.join(', ') : ''
-			medleyContents = score.medleyContents ? score.medleyContents.join(', ') : ''
-		}
+		currentRow.getCell('A').value = gemaIds
+		currentRow.getCell('B').value = title
+		currentRow.getCell('F').value = primaryComposer.lastName
+		currentRow.getCell('G').value = primaryComposer.firstName
+		currentRow.getCell('J').value = publisher
+		currentRow.getCell('P').value = arranger.lastName
+		currentRow.getCell('Q').value = arranger.firstName
+		currentRow.getCell('R').value = secondaryComposer.lastName
+		currentRow.getCell('S').value = secondaryComposer.firstName
+		currentRow.commit()
 
-		worksheet.addRow([
-			setlistIndex,
-			title,
-			publisher,
-			year,
-			composer,
-			arranger,
-			gemaIds,
-			medleyContents,
-		])
-
-		setlistIndex++
+		targetRowNumber++
 	}
 
-	// Generate and download the file
 	const buffer = await workbook.xlsx.writeBuffer()
 	const blob = new Blob([buffer], {
 		type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -113,8 +134,6 @@ export async function exportSetlistToGemaXlsx(data: GemaReportData): Promise<voi
 
 	const link = document.createElement('a')
 	link.href = url
-	// Sanitize filename: replace characters that are problematic in filenames
-	// while preserving Unicode letters (including umlauts, accented chars, etc.)
 	const sanitizedTitle = setlist.title.replace(/[<>:"/\\|?*]/g, '_')
 	link.download = `${sanitizedTitle}.xlsx`
 	document.body.appendChild(link)

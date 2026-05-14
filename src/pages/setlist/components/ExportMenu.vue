@@ -18,11 +18,13 @@
 		</NcActionButton>
 		<NcActionButton
 			v-if="editable"
-			:close-after-click="true"
+			:close-after-click="false"
 			:name="t('GEMA Report')"
+			:disabled="gemaExporting"
 			@click="onGemaExport">
 			<template #icon>
-				<ExcelIcon :size="20" />
+				<LoadingIcon v-if="gemaExporting" :size="20" class="spin" />
+				<ExcelIcon v-else :size="20" />
 			</template>
 		</NcActionButton>
 	</NcActions>
@@ -79,7 +81,7 @@ import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
-import { DownloadIcon, CancelIcon, DragVerticalIcon, ExcelIcon, PDFIcon } from '@/icons/vue-material'
+import { DownloadIcon, CancelIcon, DragVerticalIcon, ExcelIcon, LoadingIcon, PDFIcon } from '@/icons/vue-material'
 import { tryShowError } from '@/utils/errorHandling'
 import { exportSetlistToPdf } from '@/utils/pdf-exporter'
 import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
@@ -122,6 +124,7 @@ interface DialogColumn extends PdfColumnConfig {
 const dialogOpen = ref(false)
 const dialogColumns = ref<DialogColumn[]>([])
 const initialOpen = ref(true)
+const gemaExporting = ref(false)
 
 /**
  * Open the PDF export configuration dialog, populating it with the current
@@ -171,6 +174,7 @@ async function onPdfExport(): Promise<void> {
  * Export the GEMA report as an XLSX file.
  */
 async function onGemaExport(): Promise<void> {
+	gemaExporting.value = true
 	await tryShowError(
 		async () => {
 			await exportSetlistToGemaXlsx({
@@ -181,11 +185,21 @@ async function onGemaExport(): Promise<void> {
 		},
 		t('Export failed: '),
 	)
+	gemaExporting.value = false
 }
 </script>
 
 <style lang="scss" scoped>
 .column-list {
 	padding: 1ex 0;
+}
+
+.spin {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
 }
 </style>
