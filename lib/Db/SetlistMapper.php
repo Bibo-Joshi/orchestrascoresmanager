@@ -38,41 +38,43 @@ class SetlistMapper extends QBMapper {
 	}
 
 	/**
-	 * Find all future setlists (start_date_time >= now)
+	 * Find all future setlists (start_date_time + duration >= now)
 	 * @param bool|null $isDraft Filter by draft status
 	 * @param bool|null $isPublished Filter by published status
 	 * @return Setlist[]
 	 * @throws Exception
 	 */
 	public function findFuture(?bool $isDraft = null, ?bool $isPublished = null): array {
-		$qb = $this->db->getQueryBuilder();
 		$now = new \DateTimeImmutable();
-		$qb->select('*')->from($this->getTableName())
-			->where($qb->expr()->gte('start_date_time', $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATE_IMMUTABLE)));
-
-		$this->applyStatusFilters($qb, $isDraft, $isPublished);
-
-		$qb->orderBy('start_date_time', 'ASC');
-		return $this->findEntities($qb);
+		$setlists = $this->findAll($isDraft, $isPublished);
+		return array_values(array_filter($setlists, fn(Setlist $s) => $this->getEndDateTime($s) >= $now));
 	}
 
 	/**
-	 * Find all past setlists (start_date_time < now)
+	 * Find all past setlists (start_date_time + duration < now), ordered by start date descending.
 	 * @param bool|null $isDraft Filter by draft status
 	 * @param bool|null $isPublished Filter by published status
 	 * @return Setlist[]
 	 * @throws Exception
 	 */
 	public function findPast(?bool $isDraft = null, ?bool $isPublished = null): array {
-		$qb = $this->db->getQueryBuilder();
 		$now = new \DateTimeImmutable();
-		$qb->select('*')->from($this->getTableName())
-			->where($qb->expr()->lt('start_date_time', $qb->createNamedParameter($now, IQueryBuilder::PARAM_DATE_IMMUTABLE)));
+		$setlists = $this->findAll($isDraft, $isPublished);
+		$past = array_values(array_filter($setlists, fn(Setlist $s) => $this->getEndDateTime($s) < $now));
+		return array_reverse($past);
+	}
 
-		$this->applyStatusFilters($qb, $isDraft, $isPublished);
-
-		$qb->orderBy('start_date_time', 'DESC');
-		return $this->findEntities($qb);
+	/**
+	 * Calculate the end date/time of a setlist as start_date_time + duration seconds.
+	 * Falls back to start_date_time when duration is null, and to the Unix epoch when start is null.
+	 *
+	 * @param Setlist $setlist
+	 * @return \DateTimeImmutable
+	 */
+	private function getEndDateTime(Setlist $setlist): \DateTimeImmutable {
+		$start = $setlist->getStartDateTime() ?? new \DateTimeImmutable('@0');
+		$duration = $setlist->getDuration() ?? 0;
+		return $start->modify("+{$duration} seconds");
 	}
 
 	/**
