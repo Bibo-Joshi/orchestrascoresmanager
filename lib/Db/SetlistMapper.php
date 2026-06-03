@@ -47,7 +47,7 @@ class SetlistMapper extends QBMapper {
 	public function findFuture(?bool $isDraft = null, ?bool $isPublished = null): array {
 		$now = new \DateTimeImmutable();
 		$setlists = $this->findAll($isDraft, $isPublished);
-		return array_values(array_filter($setlists, fn(Setlist $s) => $this->getEndDateTime($s) >= $now));
+		return array_values(array_filter($setlists, fn (Setlist $s) => $this->getEndDateTime($s) >= $now));
 	}
 
 	/**
@@ -60,7 +60,7 @@ class SetlistMapper extends QBMapper {
 	public function findPast(?bool $isDraft = null, ?bool $isPublished = null): array {
 		$now = new \DateTimeImmutable();
 		$setlists = $this->findAll($isDraft, $isPublished);
-		$past = array_values(array_filter($setlists, fn(Setlist $s) => $this->getEndDateTime($s) < $now));
+		$past = array_values(array_filter($setlists, fn (Setlist $s) => $this->getEndDateTime($s) < $now));
 		return array_reverse($past);
 	}
 
