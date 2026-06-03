@@ -26,6 +26,9 @@ export default createAppConfig(
   		build: {
   			cssCodeSplit: true,
   		},
+		// don't copy contents of the /public folder as we just include the
+		// /public folder in the distribution and don't want to have duplicates
+		publicDir: false,
   	},
   	minify: isProduction,
     createEmptyCSSEntryPoints: true,
