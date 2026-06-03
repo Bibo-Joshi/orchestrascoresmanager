@@ -139,6 +139,7 @@ jobs:
             "l10n"
             "lib"
             "templates"
+            "public"
             "openapi.json"
             "openapi-administration.json"
             "openapi-full.json"
