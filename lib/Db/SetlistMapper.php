@@ -74,7 +74,8 @@ class SetlistMapper extends QBMapper {
 	private function getEndDateTime(Setlist $setlist): \DateTimeImmutable {
 		$start = $setlist->getStartDateTime() ?? new \DateTimeImmutable('@0');
 		$duration = $setlist->getDuration() ?? 0;
-		return $start->modify("+{$duration} seconds");
+		$modified = $start->modify("+{$duration} seconds");
+		return $modified === false ? $start : $modified;
 	}
 
 	/**
