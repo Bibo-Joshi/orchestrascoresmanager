@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-06-03
+
+### Fixed
+
+- Use the GEMA-Excel-Template for Setlist Exports (#63)
+- Consider End Time for Setlist Future/Past Filter (#64)
+
 ## [0.9.0] - 2026-05-10
 
 ### Added
