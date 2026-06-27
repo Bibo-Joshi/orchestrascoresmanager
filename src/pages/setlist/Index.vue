@@ -5,31 +5,35 @@
 				v-if="setlist && editable"
 				:setlist="setlist"
 				:editable="editable" />
-			<ExportPdfButton
+			<ExportMenu
 				v-if="setlist"
 				:setlist="setlist"
 				:entries="setlistEntries"
+				:editable="editable"
 				:fcv-scores-map="fcvScoresMap"
 				:fcv-score-book-indices-map="fcvScoreBookIndicesMap"
 				:folder-collection="folderCollection"
 				:get-columns="getPdfColumns" />
 			<NcButton
 				v-if="setlist && editable"
+				:size="buttonSize"
 				variant="primary"
+				:text="buttonText(t('Clone'))"
 				@click="showCloneDialog = true">
 				<template #icon>
 					<CloneIcon :size="20" />
 				</template>
-				{{ t('Clone') }}
 			</NcButton>
 			<NcButton
 				variant="primary"
+				:size="buttonSize"
+				:text="buttonText(t('Details'))"
 				@click="handleDetailsButtonClick()">
 				<template #icon>
 					<InfoIcon :size="20" />
 				</template>
-				{{ t('Details') }}
 			</NcButton>
+			<ViewModeMenu v-if="setlistEntries.length > 0" v-model:view-mode="viewMode" />
 		</template>
 
 		<template #content>
@@ -44,6 +48,7 @@
 				<SetlistEntriesTable
 					v-if="setlist && setlistEntries.length > 0"
 					ref="tableRef"
+					:view-mode="viewMode"
 					:setlist="setlist"
 					:entries="setlistEntries"
 					:fcv-scores-map="fcvScoresMap"
@@ -77,7 +82,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import SetlistPageSidebar from './components/SetlistPageSidebar.vue'
 import SetlistEntriesTable from './components/SetlistEntriesTable.vue'
 import AddSetlistEntryButton from './components/AddSetlistEntryButton.vue'
-import ExportPdfButton from './components/ExportPdfButton.vue'
+import ExportMenu from './components/ExportMenu.vue'
 import CloneSetlistDialog from '@/components/CloneSetlistDialog.vue'
 import { SetlistIcon, InfoIcon, CloneIcon } from '@/icons/vue-material'
 import { useSetlistsStore } from '@/stores/setlistsStore'
@@ -89,6 +94,8 @@ import { apiClients } from '@/api/client'
 import type { Setlist, Score, ScoreIndexed, FolderCollection, ScoreBookIndexed } from '@/api/generated/openapi/data-contracts'
 import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import type { PdfColumnConfig } from '@/utils/pdf-exporter'
+import { useBreakpoints } from '@/composables/useBreakpoints'
+import ViewModeMenu from './components/ViewModeMenu.vue'
 
 const route = useRoute()
 const setlistsStore = useSetlistsStore()
@@ -97,20 +104,22 @@ const setlistEntriesStore = useSetlistEntriesStore()
 const scoreSidebarStore = useScoreSidebarStore()
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
+const { buttonSize, buttonText, isDesktop } = useBreakpoints()
 
 const loading = ref(false)
 const loadError = ref(false)
 const editable = ref<boolean>(!!loadState('orchestrascoresmanager', 'editable'))
+const viewMode = ref<'full' | 'compact'>(isDesktop.value ? 'full' : 'compact')
 const showCloneDialog = ref(false)
 const fcvScoresMap = ref<Map<number, number>>(new Map())
 const fcvScoreBookIndicesMap = ref<Map<number, number>>(new Map())
 const folderCollection = ref<FolderCollection | null>(null)
 
-/** Ref to the SetlistEntriesTable so ExportPdfButton can read the current column order */
+/** Ref to the SetlistEntriesTable so ExportMenu can read the current column order */
 const tableRef = ref<{ getPdfColumns: () => PdfColumnConfig[] } | null>(null)
 
 /**
- * Return the currently displayed PDF columns from the table, used by ExportPdfButton.
+ * Return the currently displayed PDF columns from the table, used by ExportMenu.
  */
 function getPdfColumns(): PdfColumnConfig[] {
 	return tableRef.value?.getPdfColumns() ?? []

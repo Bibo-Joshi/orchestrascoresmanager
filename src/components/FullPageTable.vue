@@ -1,6 +1,7 @@
 <template>
 	<div ref="tableContainer" class="full-page-table" :data-ag-theme-mode="themeMode">
 		<AgGridVue
+			:modules="resolvedModules"
 			:row-data="props.data"
 			:column-defs="props.columnDefs"
 			:default-col-def="defaultColDef"
@@ -15,17 +16,16 @@
 
 <script setup lang="ts">
 import { isDarkTheme } from '@nextcloud/vue/functions/isDarkTheme'
-import { ref, defineProps, watch, defineEmits, defineExpose } from 'vue'
+import { ref, defineProps, watch, defineEmits, defineExpose, computed } from 'vue'
 import { AgGridVue } from 'ag-grid-vue3'
-import { ModuleRegistry, AllCommunityModule, LocaleModule } from 'ag-grid-community'
+import { AllCommunityModule, LocaleModule } from 'ag-grid-community'
 import type { ColDef, GridOptions, GridApi, GridReadyEvent } from 'ag-grid-community'
 import { nextcloudTheme } from '../utils/agGridTheme'
 import { getAgGridLocaleText } from '../utils/agGridLocale'
-
-// Register AG Grid modules (required for v34+)
-ModuleRegistry.registerModules([AllCommunityModule, LocaleModule])
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 const themeMode = ref<string>(isDarkTheme ? 'dark' : 'light')
+const { isMobile } = useBreakpoints()
 
 // Get AG Grid locale texts based on Nextcloud language
 const localeText = getAgGridLocaleText()
@@ -39,12 +39,13 @@ interface Props {
 	data: TableData[]
 	columnDefs: ColDef[]
 	editable: boolean
+	modules?: Module[]
 	rowDragManaged?: boolean
 	context?: Record<string, unknown>
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits(['cell-value-changed', 'cell-double-clicked', 'row-drag-end'] as const)
+const emit = defineEmits(['cellValueChanged', 'cellDoubleClicked', 'rowDragEnd'] as const)
 
 // Container ref for dynamic sizing
 const tableContainer = ref<HTMLElement>()
@@ -64,6 +65,9 @@ const gridOptions: GridOptions = {
 	// Row dragging
 	rowDragManaged: props.rowDragManaged || false,
 
+	// Disable column moving on mobile
+	suppressMovableColumns: isMobile.value,
+
 	// Column Sizing
 	autoSizeStrategy: {
 		type: 'fitCellContents',
@@ -78,23 +82,26 @@ const gridOptions: GridOptions = {
 	debounceVerticalScrollbar: true,
 	suppressAnimationFrame: false,
 
+	// Cell text selection
+	enableCellTextSelection: true,
+
 	// Editing configuration
 	suppressClickEdit: false,
 	singleClickEdit: false,
 
 	// Emit cell value changes to parent so it can persist via API
 	onCellValueChanged: (event) => {
-		emit('cell-value-changed', event)
+		emit('cellValueChanged', event)
 	},
 
 	// Emit cell double-click events to parent for custom handling (e.g., opening dialogs)
 	onCellDoubleClicked: (event) => {
-		emit('cell-double-clicked', event)
+		emit('cellDoubleClicked', event)
 	},
 
 	// Emit row drag end events to parent
 	onRowDragEnd: (event) => {
-		emit('row-drag-end', event)
+		emit('rowDragEnd', event)
 	},
 }
 
@@ -145,6 +152,13 @@ watch(() => props.data, () => {
 watch(() => props.columnDefs, () => {
 	// Grid will automatically update when columnDefs changes
 }, { deep: true })
+
+const defaultModules: Module[] = [AllCommunityModule, LocaleModule]
+
+const resolvedModules = computed<Module[]>(() => {
+	const additionalModules = props.modules ?? []
+	return [...defaultModules, ...additionalModules]
+})
 </script>
 
 <style lang="scss" scoped>

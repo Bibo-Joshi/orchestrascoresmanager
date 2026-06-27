@@ -16,6 +16,7 @@ use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
 use OCP\IL10N;
+use OCP\IUserSession;
 
 /**
  * Service for managing Setlists and their entries.
@@ -28,6 +29,9 @@ class SetlistService {
 		private readonly SetlistValidationHelper $validationHelper,
 		private readonly AuthorizationService $authorizationService,
 		private readonly SetlistPolicy $setlistPolicy,
+		private readonly UserSettingsService $userSettingsService,
+		private readonly FolderCollectionService $folderCollectionService,
+		private readonly IUserSession $userSession,
 		private readonly IL10N $l,
 	) {
 	}
@@ -100,6 +104,36 @@ class SetlistService {
 	 */
 	public function createSetlist(Setlist $setlist): array {
 		$this->authorizationService->authorizePolicy($this->setlistPolicy, PolicyInterface::ACTION_CREATE);
+
+		$user = $this->userSession->getUser();
+		$userId = $user?->getUID();
+
+		if ($userId !== null && ($setlist->getDefaultModerationDuration() === null || $setlist->getFolderCollectionVersionId() === null)) {
+			$settings = $this->userSettingsService->getSetlistSettings($userId);
+
+			if ($setlist->getDefaultModerationDuration() === null) {
+				$defaultModerationTime = $settings['defaultModerationTime'] ?? null;
+				if (is_int($defaultModerationTime)) {
+					$setlist->setDefaultModerationDuration($defaultModerationTime);
+				}
+			}
+
+			if ($setlist->getFolderCollectionVersionId() === null) {
+				$defaultFolderCollectionId = $settings['defaultFolderCollectionId'] ?? null;
+				if (is_int($defaultFolderCollectionId)) {
+					try {
+						$folderCollection = $this->folderCollectionService->findFolderCollectionEntity($defaultFolderCollectionId);
+						$activeVersionId = $folderCollection->getActiveVersionId();
+						if ($activeVersionId !== null) {
+							$setlist->setFolderCollectionVersionId($activeVersionId);
+						}
+					} catch (InvalidArgumentException) {
+						// Ignore missing default folder collections.
+					}
+				}
+			}
+		}
+
 		$created = $this->setlistMapper->insert($setlist);
 		return $this->serializeSetlist($created);
 	}

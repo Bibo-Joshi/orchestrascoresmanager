@@ -137,6 +137,10 @@ namespace OCA\OrchestraScoresManager;
  *     breakDuration: int|null,
  *     scoreId: int|null
  * }
+ * @psalm-type OrchestraScoresManagerUserSetlistSettings = array{
+ *     defaultModerationTime: int|null,
+ *     defaultFolderCollectionId: int|null
+ * }
  * @psalm-suppress UnusedClass - Used for OpenAPI response type definitions
  */
 class ResponseDefinitions {

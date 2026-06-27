@@ -1,9 +1,12 @@
 <template>
-	<NcButton v-if="editable" variant="primary" @click="openDialog">
+	<NcButton v-if="editable"
+		:size="buttonSize"
+		variant="primary"
+		:text="buttonText(t('Add'))"
+		@click="openDialog">
 		<template #icon>
 			<AddIcon />
 		</template>
-		{{ t('Add') }}
 	</NcButton>
 
 	<AddOrEditDialog
@@ -56,6 +59,7 @@ import {
 import { useScoresStore } from '@/stores/scoresStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import type { Score } from '@/api/generated/openapi/data-contracts'
+import { useBreakpoints } from '@/composables/useBreakpoints.ts'
 
 interface Props {
 	editable: boolean
@@ -67,11 +71,12 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-	'score-added': [score: Score]
+	'scoreAdded': [score: Score]
 }>()
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
+const { buttonSize, buttonText } = useBreakpoints()
 
 const showDialog = ref(false)
 const loadingScores = ref(false)
@@ -159,7 +164,7 @@ async function handleSubmit() {
 					index: inputIndex.value,
 				},
 			}
-			emit('score-added', addedScore)
+			emit('scoreAdded', addedScore)
 
 			showSuccess(t('Score added to book'))
 			showDialog.value = false

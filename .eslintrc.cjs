@@ -6,8 +6,7 @@ module.exports = {
 		requireConfigFile: false,
 	},
 	extends: [
-		'@nextcloud',
-		'@nextcloud/eslint-config/typescript',
+		'@nextcloud/eslint-config/vue3',
 	],
 	rules: {
 		'jsdoc/require-jsdoc': 'off',

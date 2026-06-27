@@ -1,9 +1,12 @@
 <template>
-	<NcButton v-if="editable" variant="primary" @click="openDialog">
+	<NcButton v-if="editable"
+		:size="buttonSize"
+		variant="primary"
+		:text="buttonText(t('Add'))"
+		@click="openDialog">
 		<template #icon>
 			<AddIcon />
 		</template>
-		{{ t('Add') }}
 	</NcButton>
 
 	<AddOrEditDialog
@@ -86,6 +89,7 @@ import {
 import { useScoresStore } from '@/stores/scoresStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import type { Score, ScoreIndexed, ScoreBook, ScoreBookIndexed } from '@/api/generated/openapi/data-contracts'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	editable: boolean
@@ -99,8 +103,8 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-	'score-added': [score: Score | ScoreIndexed]
-	'scorebook-added': [scoreBook: ScoreBook | ScoreBookIndexed]
+	'scoreAdded': [score: Score | ScoreIndexed]
+	'scorebookAdded': [scoreBook: ScoreBook | ScoreBookIndexed]
 }>()
 
 interface TypeOption {
@@ -110,6 +114,7 @@ interface TypeOption {
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
+const { buttonSize, buttonText } = useBreakpoints()
 
 const showDialog = ref(false)
 const loadingData = ref(false)
@@ -232,9 +237,9 @@ async function handleSubmit() {
 				const addedScore = selectedScore.value!.entity
 				if (props.isIndexed) {
 					const scoreIndexed: ScoreIndexed = { ...addedScore, index: inputIndex.value }
-					emit('score-added', scoreIndexed)
+					emit('scoreAdded', scoreIndexed)
 				} else {
-					emit('score-added', addedScore)
+					emit('scoreAdded', addedScore)
 				}
 
 				showSuccess(t('Score added to collection'))
@@ -254,9 +259,9 @@ async function handleSubmit() {
 				const addedScoreBook = selectedScoreBook.value!.entity
 				if (props.isIndexed) {
 					const scoreBookIndexed: ScoreBookIndexed = { ...addedScoreBook, index: inputIndex.value }
-					emit('scorebook-added', scoreBookIndexed)
+					emit('scorebookAdded', scoreBookIndexed)
 				} else {
-					emit('scorebook-added', addedScoreBook)
+					emit('scorebookAdded', addedScoreBook)
 				}
 
 				showSuccess(t('Score book added to collection'))

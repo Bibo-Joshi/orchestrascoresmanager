@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-03-16 20:56+0000\n"
+"POT-Creation-Date: 2026-05-10 08:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -183,9 +183,7 @@ msgid "Manage your orchestra's sheet music database directly within Nextcloud"
 msgstr ""
 
 msgid ""
-"⚠️ Early development phase – expect rough edges and breaking changes. Source "
-"code and issue tracker at https://github.com/Bibo-Joshi/"
-"orchestrascoresmanager\n"
+"⚠️ Early development phase – expect rough edges and breaking changes.\n"
 "\n"
 "Orchestra Scores Manager lets you maintain a structured database of your "
 "orchestra's sheet music (scores) inside Nextcloud.\n"
@@ -224,6 +222,36 @@ msgstr ""
 msgid "Select groups..."
 msgstr ""
 
+msgid "Invalid default moderation time format. Use (HH:)MM:SS"
+msgstr ""
+
+msgid "Failed to save settings"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Setlists"
+msgstr ""
+
+msgid "Default Moderation Time (HH:MM:SS)"
+msgstr ""
+
+msgid "e.g., 0:30 or 1:30:00"
+msgstr ""
+
+msgid "Default Folder Collection"
+msgstr ""
+
+msgid "Select folder collection"
+msgstr ""
+
+msgid "Saving …"
+msgstr ""
+
+msgid "Save"
+msgstr ""
+
 msgid "Score book assignment updated"
 msgstr ""
 
@@ -231,9 +259,6 @@ msgid "Failed to update score book assignment: "
 msgstr ""
 
 msgid "Assign to Score Book"
-msgstr ""
-
-msgid "Save"
 msgstr ""
 
 msgid "Score Book"
@@ -727,16 +752,19 @@ msgstr ""
 msgid "Break Duration (HH:MM:SS)"
 msgstr ""
 
-msgid "e.g., 0:30 or 1:30:00"
+msgid "Export"
+msgstr ""
+
+msgid "PDF Export"
+msgstr ""
+
+msgid "GEMA Report"
 msgstr ""
 
 msgid "Export PDF"
 msgstr ""
 
 msgid "Select and reorder the columns to include in the PDF export."
-msgstr ""
-
-msgid "Export"
 msgstr ""
 
 msgid "Delete Setlist Entry"
@@ -763,9 +791,6 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
-msgid "Invalid default moderation time format. Use (HH:)MM:SS"
-msgstr ""
-
 msgid "Invalid duration format. Use (HH:)MM"
 msgstr ""
 
@@ -784,12 +809,6 @@ msgstr ""
 msgid "Folder Collection"
 msgstr ""
 
-msgid "Select folder collection"
-msgstr ""
-
-msgid "Default Moderation Time (HH:MM:SS)"
-msgstr ""
-
 msgid "Duration (HH:MM)"
 msgstr ""
 
@@ -805,7 +824,13 @@ msgstr ""
 msgid "Saving..."
 msgstr ""
 
-msgid "Setlists"
+msgid "View Mode"
+msgstr ""
+
+msgid "Full View"
+msgstr ""
+
+msgid "Compact View"
 msgstr ""
 
 msgid "Drafts"
@@ -904,6 +929,9 @@ msgstr ""
 msgid "Value must not be empty"
 msgstr ""
 
+msgid "Contents"
+msgstr ""
+
 msgid "h"
 msgstr ""
 
@@ -923,7 +951,4 @@ msgid "Overall Duration"
 msgstr ""
 
 msgid "Invalid duration format"
-msgstr ""
-
-msgid "Contents"
 msgstr ""

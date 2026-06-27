@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-03-16 20:56+0000\n"
+"POT-Creation-Date: 2026-05-10 08:54+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -176,7 +176,7 @@ msgid "Manage your orchestra's sheet music database directly within Nextcloud"
 msgstr "Verwalte die Notendatenbank Deines Orchesters direkt in Nextcloud"
 
 msgid ""
-"⚠️ Early development phase – expect rough edges and breaking changes. Source code and issue tracker at https://github.com/Bibo-Joshi/orchestrascoresmanager\n"
+"⚠️ Early development phase – expect rough edges and breaking changes.\n"
 "\n"
 "Orchestra Scores Manager lets you maintain a structured database of your orchestra's sheet music (scores) inside Nextcloud.\n"
 "\n"
@@ -188,7 +188,7 @@ msgid ""
 "- Categorize scores with tags\n"
 "- Add comments to scores"
 msgstr ""
-"⚠️ Frühe Entwicklungsphase – erwarten Sie raue Kanten und breaking changes. Quellcode und Issue-Tracker unter https://github.com/Bibo-Joshi/orchestrascoresmanager\n"
+"⚠️ Frühe Entwicklungsphase – Bugs und Breaking Changes möglich.\n"
 "\n"
 "Orchestra Scores Manager ermöglicht es Dir, eine strukturierte Datenbank der Noten Deines Orchesters innerhalb von Nextcloud zu pflegen.\n"
 "\n"
@@ -224,6 +224,36 @@ msgstr "Erlaubte Gruppen"
 msgid "Select groups..."
 msgstr "Gruppen auswählen..."
 
+msgid "Invalid default moderation time format. Use (HH:)MM:SS"
+msgstr "Ungültiges Format für Standard-Moderationszeit. Verwenden Sie (HH:)MM:SS"
+
+msgid "Failed to save settings"
+msgstr "Einstellungen speichern fehlgeschlagen"
+
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgid "Setlists"
+msgstr "Setlisten"
+
+msgid "Default Moderation Time (HH:MM:SS)"
+msgstr "Standard-Moderationszeit (HH:MM:SS)"
+
+msgid "e.g., 0:30 or 1:30:00"
+msgstr "z.B. 0:30 oder 1:30:00"
+
+msgid "Default Folder Collection"
+msgstr "Standard-Ordnersammlung"
+
+msgid "Select folder collection"
+msgstr "Ordnersammlung auswählen"
+
+msgid "Saving …"
+msgstr "Speichern …"
+
+msgid "Save"
+msgstr "Speichern"
+
 msgid "Score book assignment updated"
 msgstr "Notenbuch-Zuweisung aktualisiert"
 
@@ -232,9 +262,6 @@ msgstr "Aktualisieren der Notenbuch-Zuweisung fehlgeschlagen: "
 
 msgid "Assign to Score Book"
 msgstr "Notenbuch zuweisen"
-
-msgid "Save"
-msgstr "Speichern"
 
 msgid "Score Book"
 msgstr "Notenbuch"
@@ -713,17 +740,20 @@ msgstr "Partitur auswählen"
 msgid "Break Duration (HH:MM:SS)"
 msgstr "Pausendauer (HH:MM:SS)"
 
-msgid "e.g., 0:30 or 1:30:00"
-msgstr "z.B. 0:30 oder 1:30:00"
+msgid "Export"
+msgstr "Exportieren"
+
+msgid "PDF Export"
+msgstr "PDF-Export"
+
+msgid "GEMA Report"
+msgstr "GEMA-Bericht"
 
 msgid "Export PDF"
 msgstr "PDF exportieren"
 
 msgid "Select and reorder the columns to include in the PDF export."
 msgstr "Spalten für den PDF-Export auswählen und sortieren."
-
-msgid "Export"
-msgstr "Exportieren"
 
 msgid "Delete Setlist Entry"
 msgstr "Setlist-Eintrag löschen"
@@ -749,9 +779,6 @@ msgstr "Moderation"
 msgid "Comment"
 msgstr "Kommentar"
 
-msgid "Invalid default moderation time format. Use (HH:)MM:SS"
-msgstr "Ungültiges Format für Standard-Moderationszeit. Verwenden Sie (HH:)MM:SS"
-
 msgid "Invalid duration format. Use (HH:)MM"
 msgstr "Ungültiges Dauerformat. Verwenden Sie (HH:)MM"
 
@@ -770,12 +797,6 @@ msgstr "Beschreibung eingeben"
 msgid "Folder Collection"
 msgstr "Ordnersammlung"
 
-msgid "Select folder collection"
-msgstr "Ordnersammlung auswählen"
-
-msgid "Default Moderation Time (HH:MM:SS)"
-msgstr "Standard-Moderationszeit (HH:MM:SS)"
-
 msgid "Duration (HH:MM)"
 msgstr "Dauer (HH:MM)"
 
@@ -791,8 +812,14 @@ msgstr "Ist veröffentlicht"
 msgid "Saving..."
 msgstr "Speichern..."
 
-msgid "Setlists"
-msgstr "Setlisten"
+msgid "View Mode"
+msgstr "Ansicht"
+
+msgid "Full View"
+msgstr "Erweiterte Ansicht"
+
+msgid "Compact View"
+msgstr "Kompakte Ansicht"
 
 msgid "Drafts"
 msgstr "Entwürfe"
@@ -890,6 +917,9 @@ msgstr "Setlist"
 msgid "Value must not be empty"
 msgstr "Wert darf nicht leer sein"
 
+msgid "Contents"
+msgstr "Inhalt"
+
 msgid "h"
 msgstr "h"
 
@@ -910,9 +940,6 @@ msgstr "Gesamtdauer"
 
 msgid "Invalid duration format"
 msgstr "Ungültiges Spieldauerformat"
-
-msgid "Contents"
-msgstr "Inhalt"
 
 #~ msgid "Organize your orchestras scores database directly within NextCloud"
 #~ msgstr "Verwalten Sie Ihre Orchester-Notendatenbank direkt in NextCloud"

@@ -5,6 +5,7 @@
 			:data="scores"
 			:column-defs="columnDefs"
 			:editable="editable"
+			:modules="gridModules"
 			:context="gridContext"
 			@cell-value-changed="handleCellValueChanged"
 			@cell-double-clicked="handleCellDoubleClicked" />
@@ -34,7 +35,9 @@ import type {
 	CellValueChangedEvent,
 	ColDef,
 } from 'ag-grid-community'
-import { ModuleRegistry, TooltipModule } from 'ag-grid-community'
+import {
+	TooltipModule,
+} from 'ag-grid-community'
 import type {
 	Score,
 	ScoreBook,
@@ -48,9 +51,9 @@ import { useTagsStore } from '@/stores/tagsStore'
 import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import { useBreakpoints } from '@/composables/useBreakpoints.ts'
 
-// Register tooltip module for score book tooltips
-ModuleRegistry.registerModules([TooltipModule])
+const gridModules = [TooltipModule]
 
 interface Props {
 	editable: boolean
@@ -86,6 +89,7 @@ const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
 const tagsStore = useTagsStore()
 const scoreSidebarStore = useScoreSidebarStore()
+const { columnPin } = useBreakpoints()
 
 // Ref to access FullPageTable exposed methods
 type TableExportRef = { exportAsCsv?: (fileName?: string) => boolean }
@@ -418,7 +422,7 @@ const columnDefs = computed<ColDef[]>(() => {
 	const cols: ColDef[] = [
 		{
 			headerName: '',
-			pinned: 'left' as const,
+			pinned: columnPin.value,
 			filter: false,
 			editable: false,
 			cellRenderer: markRaw(RowActionButton),
@@ -439,10 +443,11 @@ const columnDefs = computed<ColDef[]>(() => {
 		cols.push({
 			field: 'collectionIndex',
 			headerName: t('Index'),
-			pinned: 'left' as const,
+			pinned: columnPin.value,
 			filter: 'agNumberColumnFilter',
 			editable: false,
 			width: 100,
+			sort: 'asc',
 			valueGetter: (params) => {
 				if (!params.data) return null
 				const score = params.data as ScoreIndexed
@@ -483,8 +488,9 @@ const columnDefs = computed<ColDef[]>(() => {
 	// Title column with optional icon renderer
 	const titleColumn: ColDef = {
 		field: 'title',
-		pinned: 'left' as const,
+		pinned: columnPin.value,
 		headerName: t('Title'),
+		sort: props.isIndexedCollection ? undefined : 'asc',
 		...(props.folderCollectionScores && hasScoreBooks.value
 			? {
 				cellRenderer: markRaw(ScoreOrScoreBookTitleRenderer),

@@ -2,11 +2,13 @@
 	<NcButton
 		:aria-label="t('Start new version')"
 		:disabled="disabled"
+		:size="buttonSize"
+
+		:text="buttonText(t('New Version'))"
 		@click="handleStartNewVersion">
 		<template #icon>
 			<HistoryIcon :size="20" />
 		</template>
-		{{ t('New Version') }}
 	</NcButton>
 </template>
 
@@ -21,6 +23,7 @@ import { t } from '@/utils/l10n'
 import { useFolderCollectionVersionsStore } from '@/stores/folderCollectionVersionsStore'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import type { FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	folderCollectionId: number
@@ -32,11 +35,12 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-	'version-created': [version: FolderCollectionVersion]
+	'versionCreated': [version: FolderCollectionVersion]
 }>()
 
 const versionsStore = useFolderCollectionVersionsStore()
 const folderCollectionsStore = useFolderCollectionsStore()
+const { buttonSize, buttonText } = useBreakpoints()
 
 /**
  * Handle start new version button click
@@ -64,7 +68,7 @@ async function handleStartNewVersion() {
 				// Update folder collection active version in store
 				folderCollectionsStore.updateFolderCollectionActiveVersion(props.folderCollectionId, newVersion.id)
 				showSuccess(t('New version started successfully'))
-				emit('version-created', newVersion)
+				emit('versionCreated', newVersion)
 			},
 			t('Failed to start new version: '),
 		)

@@ -18,6 +18,11 @@ export { default as CancelIcon } from 'vue-material-design-icons/Cancel.vue'
 export { default as DownloadIcon } from 'vue-material-design-icons/FileDownload.vue'
 export { default as OpenExternalIcon } from 'vue-material-design-icons/OpenInNew.vue'
 export { default as HistoryIcon } from 'vue-material-design-icons/History.vue'
+export { default as ExcelIcon } from 'vue-material-design-icons/MicrosoftExcel.vue'
+export { default as LoadingIcon } from 'vue-material-design-icons/Loading.vue'
+export { default as PDFIcon } from 'vue-material-design-icons/FilePdfBox.vue'
+export { default as SettingsIcon } from 'vue-material-design-icons/CogOutline.vue'
+export { default as TableViewIcon } from 'vue-material-design-icons/TableHeadersEye.vue'
 
 // State icons
 export { default as ErrorIcon } from 'vue-material-design-icons/AlertCircle.vue'

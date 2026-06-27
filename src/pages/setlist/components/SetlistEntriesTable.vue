@@ -5,6 +5,7 @@
 			:data="tableData"
 			:column-defs="columnDefs"
 			:editable="false"
+			:modules="gridModules"
 			:context="gridContext"
 			:row-drag-managed="props.editable"
 			@cell-value-changed="handleCellValueChanged"
@@ -22,7 +23,10 @@ import FullPageTable from '@/components/FullPageTable.vue'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
-import { RowDragModule, ModuleRegistry, ClientSideRowModelModule } from 'ag-grid-community'
+import {
+	RowDragModule,
+	ClientSideRowModelModule,
+} from 'ag-grid-community'
 import type { ColDef, CellValueChangedEvent, RowDragEndEvent, GridApi } from 'ag-grid-community'
 import type { Score, Setlist, SetlistEntry, FolderCollection } from '@/api/generated/openapi/data-contracts'
 import { parseArrayValue } from '@/utils/arrayUtils'
@@ -30,13 +34,19 @@ import RowActionButton from './RowActionButton.vue'
 import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
 import { isBreakEntry, resolveScoreField } from '@/utils/setlistScoreUtils'
 import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
+import { showError } from '@nextcloud/dialogs'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
-ModuleRegistry.registerModules([RowDragModule, ClientSideRowModelModule])
+const gridModules = [
+	ClientSideRowModelModule,
+	RowDragModule,
+]
 
 interface Props {
 	setlist: Setlist
 	entries: SetlistEntry[]
 	editable: boolean
+	viewMode: 'full' | 'compact'
 	/**
 	 * Map of score ID to FCV index (only for direct scores, not via score books)
 	 */
@@ -56,6 +66,8 @@ const props = defineProps<Props>()
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
 const setlistEntriesStore = useSetlistEntriesStore()
+
+const { columnPin, isMobile } = useBreakpoints()
 
 // Ref to access FullPageTable exposed methods
 type TableExportRef = { exportAsCsv?: (fileName?: string) => boolean; getGridApi?: () => GridApi | null }
@@ -297,7 +309,7 @@ const columnDefs = computed<ColDef[]>(() => {
 	const cols: ColDef[] = [
 		{
 			headerName: '',
-			pinned: 'left' as const,
+			pinned: columnPin.value,
 			filter: false,
 			editable: false,
 			sortable: false,
@@ -316,46 +328,51 @@ const columnDefs = computed<ColDef[]>(() => {
 			suppressMovable: true,
 			rowDrag: props.editable,
 		},
-		{
-			...createDurationColumn('startTime', t('Start Time'), false),
-			colId: 'startTime' satisfies PdfColumnId,
-			editable: false,
-		},
-		{
-			...createDurationColumn('endTime', t('End Time'), false),
-			colId: 'endTime' satisfies PdfColumnId,
-			cellClass: (params) => {
-				const entry = params.data as TableEntry
-				return entry.isEndTimeOverflow ? 'end-time-overflow' : ''
-			},
-			editable: false,
-		},
-		{
-			...createDurationColumn('moderationDuration', t('Moderation'), props.editable),
-			colId: 'moderation' satisfies PdfColumnId,
-			// Show effective value (entry value or default)
-			valueGetter: (params) => {
-				const entry = params.data as TableEntry
-				return entry?.moderationDuration ?? props.setlist.defaultModerationDuration ?? null
-			},
-			editable: props.editable,
-		},
-		{
-			...createDurationColumn('breakDuration', t('Duration'), props.editable, false),
-			colId: 'duration' satisfies PdfColumnId,
-			// Show effective duration (break duration for breaks, score duration for scores)
-			valueGetter: (params) => {
-				const entry = params.data as TableEntry
-				const score = getScoreForEntry(entry)
-				return entry?.breakDuration ?? score?.duration ?? null
-			},
-			// Only editable for break entries
-			editable: (params) => {
-				const entry = params.data as TableEntry
-				return props.editable && isBreakEntry(entry)
-			},
-		},
 	]
+
+	if (props.viewMode === 'full') {
+		cols.push(...[
+			{
+				...createDurationColumn('startTime', t('Start Time'), false),
+				colId: 'startTime' satisfies PdfColumnId,
+				editable: false,
+			},
+			{
+				...createDurationColumn('endTime', t('End Time'), false),
+				colId: 'endTime' satisfies PdfColumnId,
+				cellClass: (params) => {
+					const entry = params.data as TableEntry
+					return entry.isEndTimeOverflow ? 'end-time-overflow' : ''
+				},
+				editable: false,
+			},
+			{
+				...createDurationColumn('moderationDuration', t('Moderation'), props.editable),
+				colId: 'moderation' satisfies PdfColumnId,
+				// Show effective value (entry value or default)
+				valueGetter: (params) => {
+					const entry = params.data as TableEntry
+					return entry?.moderationDuration ?? props.setlist.defaultModerationDuration ?? null
+				},
+				editable: props.editable,
+			},
+			{
+				...createDurationColumn('breakDuration', t('Duration'), props.editable, false),
+				colId: 'duration' satisfies PdfColumnId,
+				// Show effective duration (break duration for breaks, score duration for scores)
+				valueGetter: (params) => {
+					const entry = params.data as TableEntry
+					const score = getScoreForEntry(entry)
+					return entry?.breakDuration ?? score?.duration ?? null
+				},
+				// Only editable for break entries
+				editable: (params) => {
+					const entry = params.data as TableEntry
+					return props.editable && isBreakEntry(entry)
+				},
+			},
+		])
+	}
 
 	// Add FCV index column if setlist has an indexed folder collection version
 	if (hasFolderCollectionVersion.value && isIndexedCollection.value) {
@@ -374,6 +391,7 @@ const columnDefs = computed<ColDef[]>(() => {
 		colId: 'title' satisfies PdfColumnId,
 		valueGetter: scoreInfoValueGetter('title'),
 		editable: false,
+		rowDrag: isMobile.value && props.viewMode === 'full' && props.editable,
 	})
 
 	cols.push({
@@ -411,12 +429,14 @@ const columnDefs = computed<ColDef[]>(() => {
 	})
 
 	// gema ids
-	cols.push({
-		headerName: t('GEMA IDs'),
-		colId: 'gemaIds' satisfies PdfColumnId,
-		valueGetter: scoreInfoValueGetter('gemaIds'),
-		valueParser: params => parseArrayValue(params.newValue),
-	})
+	if (props.viewMode === 'full') {
+		cols.push({
+			headerName: t('GEMA IDs'),
+			colId: 'gemaIds' satisfies PdfColumnId,
+			valueGetter: scoreInfoValueGetter('gemaIds'),
+			valueParser: params => parseArrayValue(params.newValue),
+		})
+	}
 
 	return cols
 })
@@ -445,7 +465,7 @@ function getPdfColumns(): PdfColumnConfig[] {
 		}))
 }
 
-// Expose tableRef for export functionality and getPdfColumns for ExportPdfButton
+// Expose tableRef for export functionality and getPdfColumns for ExportMenu
 defineExpose({ tableRef, getPdfColumns })
 </script>
 

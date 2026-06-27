@@ -1,9 +1,11 @@
 <template>
-	<NcButton variant="primary" @click="onExportClick">
+	<NcButton variant="primary"
+		:size="buttonSize"
+		:text="buttonText(t('Export ToC & Index'))"
+		@click="onExportClick">
 		<template #icon>
 			<DownloadIcon />
 		</template>
-		{{ t('Export ToC & Index') }}
 	</NcButton>
 </template>
 
@@ -12,8 +14,9 @@ import { t } from '@/utils/l10n'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import { DownloadIcon } from '@/icons/vue-material'
 import { tryShowError } from '@/utils/errorHandling'
-import { exportFolderCollectionToXlsx, type CollectionEntry } from '@/utils/xlsx-exporter'
+import { exportFolderCollectionToXlsx, type CollectionEntry } from '@/utils/fcv-xlsx-exporter'
 import type { FolderCollection, FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 
 interface Props {
 	folderCollection: FolderCollection
@@ -22,6 +25,8 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const { buttonSize, buttonText } = useBreakpoints()
 
 /**
  * Handle export button click
