@@ -74,7 +74,7 @@ The `.github/workflows/phpunit-sqlite.yml` workflow runs backend unit tests on p
 
 **Current configuration:**
 - Supported NC versions: stable33, stable34, master
-- PHP versions tested: 8.1, 8.2, 8.3, 8.4
+- PHP versions tested: 8.2, 8.3, 8.4, 8.5
 - Databases: SQLite, MySQL 8.4, MariaDB 11.4, PostgreSQL 16
 - All databases are defined as services and matrix selects which one to use
 
