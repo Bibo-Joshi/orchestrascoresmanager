@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-26
+
+### Added
+
+- Add Support for NC34 (#12)
+
+### Changed
+
+- Bump `nextcloud/ocp` package (#66)
+
+### Removed
+
+- Drop Support for NC32 (#12)
+
+### Security
+
+- Fix npm Audit (#67)
+- Fix npm Audit (#61)
+
 ## [0.9.1] - 2026-06-03
 
 ### Fixed
