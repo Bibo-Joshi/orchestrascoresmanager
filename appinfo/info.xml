@@ -28,7 +28,7 @@ Key features:
 	<screenshot>https://raw.githubusercontent.com/Bibo-Joshi/orchestrascoresmanager/main/screenshots/setlist.webp</screenshot>
 	<screenshot>https://raw.githubusercontent.com/Bibo-Joshi/orchestrascoresmanager/main/screenshots/setlists.webp</screenshot>
 	<dependencies>
-		<nextcloud min-version="32" max-version="33"/>
+		<nextcloud min-version="33" max-version="34"/>
 	</dependencies>
 	<settings>
 		<admin>OCA\OrchestraScoresManager\Settings\AdminSettings</admin>
