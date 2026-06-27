@@ -20,8 +20,8 @@ Source code, issue tracker and releases: https://github.com/Bibo-Joshi/orchestra
 
 ## Requirements
 
-- Nextcloud 32 or later
-- PHP 8.1 or later
+- Nextcloud 33 or later
+- PHP 8.2 or later
 
 ## Architecture
 
