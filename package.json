@@ -50,7 +50,7 @@
     "@nextcloud/eslint-config": "^8.4.2",
     "@nextcloud/stylelint-config": "^3.2.2",
     "@nextcloud/vite-config": "^2.5.2",
-    "@types/node": "^25.5.0",
+    "@types/node": "^26.0.1",
     "@vue/tsconfig": "^0.9.1",
     "ag-mcp": "^1.0.0",
     "eslint": "^8.57.1",
