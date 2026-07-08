@@ -175,7 +175,6 @@ final class ScoreServiceTest extends TestCase {
 		$this->service->getScoresByIds([1, 2]);
 	}
 
-
 	public function testDeleteScoreByIdRequiresAuthorization(): void {
 		$score = new Score();
 		$score->setId(1);

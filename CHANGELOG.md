@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-08
+
+### Fixed
+
+- Make Router History Independent of App Path Settings (#83)
+
+### Changed
+
+- Bump `nextcloud/ocp` package (#69)
+- Bump @types/node from 25.5.0 to 26.0.1 (#75)
+- Bump vite-plugin-stylelint from 6.1.0 to 6.3.0 (#74)
+- Bump swagger-typescript-api from 13.6.6 to 13.12.3 (#76)
+- Bump @nextcloud/stylelint-config from 3.2.1 to 3.2.2 (#77)
+- Bump @nextcloud/auth from 2.5.3 to 2.6.0 (#78)
+- Bump @nextcloud/dialogs from 7.3.0 to 7.4.0 (#79)
+- Bump nextcloud/coding-standard in /vendor-bin/cs-fixer (#70)
+
+### Security
+
+- Fix npm Audit (#81)
+
 ## [1.0.0] - 2026-07-26
 
 ### Added

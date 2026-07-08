@@ -51,7 +51,6 @@ final class ScoreMapperTest extends MapperTestCase {
 		return $this->scoreBookMapper->insert($scoreBook);
 	}
 
-
 	public function testFindAttachesTags(): void {
 		$tag1 = $this->createTestTag('classical');
 		$tag2 = $this->createTestTag('modern');

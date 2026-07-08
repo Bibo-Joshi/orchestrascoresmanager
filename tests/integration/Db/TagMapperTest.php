@@ -103,7 +103,6 @@ final class TagMapperTest extends MapperTestCase {
 		$this->mapper->find(999999);
 	}
 
-
 	public static function provideFindMultipleIds(): array {
 		return [
 			'single tag' => [
@@ -197,7 +196,6 @@ final class TagMapperTest extends MapperTestCase {
 		$this->assertSame($foundLower->getId(), $foundUpper->getId());
 		$this->assertSame($foundLower->getId(), $foundMixed->getId());
 	}
-
 
 	public function testConcurrentNameCollision(): void {
 		// Insert first tag

@@ -47,7 +47,6 @@ final class SetlistMapperTest extends MapperTestCase {
 		$this->assertContains($setlist3->getId(), $ids);
 	}
 
-
 	public function testFindFuture(): void {
 		$past = $this->createTestSetlist('Past Setlist', new \DateTimeImmutable('-1 day'));
 		$future1 = $this->createTestSetlist('Future Setlist 1', new \DateTimeImmutable('+1 day'));
