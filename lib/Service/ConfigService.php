@@ -49,5 +49,4 @@ class ConfigService {
 		return in_array($groupId, $allowedGroups, true);
 	}
 
-
 }
