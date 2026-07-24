@@ -4,6 +4,8 @@
 		v-model="setlistSidebarStore.isOpen"
 		:name="setlist.title"
 		:force-tabs="false"
+		:name-editable="editable"
+		@submit-name="onNameSubmit"
 		@close="setlistSidebarStore.closeSidebar()">
 		<NcAppSidebarTab
 			id="details"
@@ -239,6 +241,22 @@ function handleFolderCollectionChange(option: { label: string; value: number | n
  */
 function restrictToTimeFormat(event: Event) {
 	restrictInputToTimeFormat(event)
+}
+
+/**
+ * Update the setlist title
+ * @param event - The submit event
+ */
+async function onNameSubmit(event: SubmitEvent) {
+	await tryShowError(
+		async () => {
+			// Apparently event is undefined when moving focus away from
+			// text field
+			if (!event) return
+			await setlistsStore.updateSetlist(props.setlist.id, { title: event.target?.querySelector('input')?.value.trim() })
+		},
+		t('Failed to update setlist title: '),
+	)
 }
 
 /**
