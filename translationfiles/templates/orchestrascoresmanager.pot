@@ -791,6 +791,9 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
+msgid "Failed to update setlist title: "
+msgstr ""
+
 msgid "Invalid duration format. Use (HH:)MM"
 msgstr ""
 
