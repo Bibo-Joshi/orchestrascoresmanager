@@ -243,6 +243,7 @@ OC.L10N.register(
     "End Time" : "Endzeit",
     "Moderation" : "Moderation",
     "Comment" : "Kommentar",
+    "Failed to update setlist title: " : "Setlist-Titel konnte nicht aktualisiert werden: ",
     "Invalid duration format. Use (HH:)MM" : "Ungültiges Dauerformat. Verwenden Sie (HH:)MM",
     "Setlist updated successfully" : "Setliste erfolgreich aktualisiert",
     "Failed to update setlist: " : "Setliste konnte nicht aktualisiert werden: ",
