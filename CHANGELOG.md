@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-07-25
+
+### Fixed
+
+- Make Columns Available for Setlist PDF Export Independently of View Mode (#87)
+
+### Added
+-
+- Allow Editing Setlist Title (#88)
+
+### Changed
+
+- Bump `nextcloud/ocp` package (#86)
+
 ## [1.0.1] - 2026-07-08
 
 ### Fixed
