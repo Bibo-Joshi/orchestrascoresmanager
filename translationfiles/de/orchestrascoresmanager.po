@@ -779,6 +779,9 @@ msgstr "Moderation"
 msgid "Comment"
 msgstr "Kommentar"
 
+msgid "Failed to update setlist title: "
+msgstr "Setlist-Titel konnte nicht aktualisiert werden: "
+
 msgid "Invalid duration format. Use (HH:)MM"
 msgstr "Ungültiges Dauerformat. Verwenden Sie (HH:)MM"
 
