@@ -94,20 +94,27 @@ function getScoreForEntry(entry: SetlistEntry | null | undefined): Score | null 
 }
 
 /**
+ * The setlists start time in seconds from midnight or 0 if not set
+ */
+const setlistStartTimeSeconds = computed<number>(() => {
+	if (props.setlist.startDateTime) {
+		const startDate = new Date(props.setlist.startDateTime)
+		// Calculate seconds from start of day
+		return startDate.getHours() * 3600 + startDate.getMinutes() * 60 + startDate.getSeconds()
+	}
+	return 0
+})
+
+/**
  * Cache for cumulative times to avoid recomputation
  * Reactive - will be recomputed when entries change
  * Includes one extra entry at the end for simplified endTime calculation
  */
 const cumulativeTimes = computed<number[]>(() => {
 	const times: number[] = []
-	let cumulativeTime = 0
 
 	// If setlist has a start time, begin cumulative time at that offset
-	if (props.setlist.startDateTime) {
-		const startDate = new Date(props.setlist.startDateTime)
-		// Calculate seconds from start of day
-		cumulativeTime = startDate.getHours() * 3600 + startDate.getMinutes() * 60 + startDate.getSeconds()
-	}
+	let cumulativeTime = setlistStartTimeSeconds.value
 
 	props.entries.forEach((entry) => {
 		times.push(cumulativeTime)
@@ -127,7 +134,7 @@ const cumulativeTimes = computed<number[]>(() => {
  * Table data with computed start/end times
  */
 const tableData = computed<TableEntry[]>(() => {
-	const setlistDuration = props.setlist.duration
+	const setlistEndTime = props.setlist.duration ? props.setlist.duration + setlistStartTimeSeconds.value : null
 
 	return props.entries.map((entry, index) => {
 		const startTime = cumulativeTimes.value[index]
@@ -143,7 +150,7 @@ const tableData = computed<TableEntry[]>(() => {
 			endTime,
 			effectiveModerationDuration: modDuration,
 			effectiveDuration: duration,
-			isEndTimeOverflow: setlistDuration !== null && endTime > setlistDuration,
+			isEndTimeOverflow: setlistEndTime !== null && endTime > setlistEndTime,
 		}
 	})
 })
