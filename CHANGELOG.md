@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-02
+
+### Fixed
+
+- Fix False Positive Overtime Highlights in Setlists (#92)
+
+### Changed
+
+- Save Setlist Details Directly Without Save Button (#95)
+
 ## [1.1.0] - 2026-07-25
 
 ### Fixed
@@ -14,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make Columns Available for Setlist PDF Export Independently of View Mode (#87)
 
 ### Added
--
+
 - Allow Editing Setlist Title (#88)
 
 ### Changed
