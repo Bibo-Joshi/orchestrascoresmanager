@@ -2,10 +2,10 @@
 	<NcAppSidebar
 		v-if="setlistSidebarStore.isOpen && setlist"
 		v-model="setlistSidebarStore.isOpen"
-		:name="setlist.title"
+		:name="formData.title"
 		:force-tabs="false"
 		:name-editable="editable"
-		@submit-name="onNameSubmit"
+		@update:name="formData.title = $event"
 		@close="setlistSidebarStore.closeSidebar()">
 		<NcAppSidebarTab
 			id="details"
@@ -36,8 +36,7 @@
 					:placeholder="t('Select folder collection')"
 					:clearable="true"
 					label="label"
-					track-by="value"
-					@update:model-value="handleFolderCollectionChange" />
+					track-by="value" />
 
 				<NcTextField
 					v-model="formData.defaultModerationTimeStr"
@@ -70,17 +69,11 @@
 					</NcCheckboxRadioSwitch>
 				</div>
 
-				<div v-if="editable" class="save-button-container">
-					<NcButton
-						variant="secondary"
-						:disabled="isSaving"
-						@click="handleSave">
-						<template #icon>
-							<NcLoadingIcon v-if="isSaving" :size="20" />
-							<ConfirmIcon v-else :size="20" />
-						</template>
-						{{ isSaving ? t('Saving...') : t('Save') }}
-					</NcButton>
+				<div v-if="editable" class="save-icon-container">
+					<NcSavingIndicatorIcon
+						:name="isSaving ? t('Saving...') : t('Saved')"
+						:saving="isSaving"
+						:error="isSavingError" />
 				</div>
 			</NcFormGroup>
 		</NcAppSidebarTab>
@@ -90,8 +83,10 @@
 <script setup lang="ts">
 import { t } from '@/utils/l10n'
 import { ref, watch, onMounted } from 'vue'
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showError } from '@nextcloud/dialogs'
 import { tryShowError } from '@/utils/errorHandling'
+import debounce from 'lodash.debounce'
+import NcSavingIndicatorIcon from '@nextcloud/vue/components/NcSavingIndicatorIcon'
 import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
 import NcFormGroup from '@nextcloud/vue/components/NcFormGroup'
@@ -100,9 +95,7 @@ import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
-import NcButton from '@nextcloud/vue/components/NcButton'
-import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
-import { InfoIcon, ConfirmIcon } from '@/icons/vue-material'
+import { InfoIcon } from '@/icons/vue-material'
 import { useSetlistSidebarStore } from '@/stores/setlistSidebarStore'
 import { useSetlistsStore } from '@/stores/setlistsStore'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
@@ -123,8 +116,11 @@ const setlistsStore = useSetlistsStore()
 const folderCollectionsStore = useFolderCollectionsStore()
 
 const isSaving = ref(false)
+const isSavingError = ref(false)
+const skipNextSave = ref(false)
 
 interface FormData {
+	title: string
 	startDateTime: Date | null
 	description: string | null
 	defaultModerationTimeStr: string
@@ -134,6 +130,7 @@ interface FormData {
 }
 
 const formData = ref<FormData>({
+	title: '',
 	startDateTime: null,
 	description: null,
 	defaultModerationTimeStr: '',
@@ -184,7 +181,10 @@ async function getFolderCollectionVersionOptions(selectedID: number | null = nul
 async function initializeFormData() {
 	if (!props.setlist) return
 
+	skipNextSave.value = true
+
 	formData.value = {
+		title: props.setlist.title,
 		startDateTime: props.setlist.startDateTime ? new Date(props.setlist.startDateTime) : null,
 		description: props.setlist.description,
 		defaultModerationTimeStr: props.setlist.defaultModerationDuration !== null
@@ -219,20 +219,33 @@ watch(() => props.setlist?.id, async (newId, oldId) => {
 }, { immediate: true })
 
 /**
+ * Create debounced save function to avoid multiple rapid requests
+ */
+const debouncedSave = debounce(handleSave, 800)
+/**
+ * Watch all form fields and auto-save with debounce
+ */
+watch(
+	() => ({
+		formData: formData.value,
+		selectedFolderCollection: selectedFolderCollectionVersion.value,
+	}),
+	() => {
+		if (skipNextSave.value) {
+			skipNextSave.value = false
+			return
+		}
+		debouncedSave()
+	},
+	{ deep: true },
+)
+
+/**
  * Initialize folder collections store when component mounts
  */
 onMounted(async () => {
 	await folderCollectionsStore.initialize()
 })
-
-/**
- * Handle folder collection selection change
- *
- * @param option - The selected folder collection option
- */
-function handleFolderCollectionChange(option: { label: string; value: number | null } | null) {
-	selectedFolderCollectionVersion.value = option
-}
 
 /**
  * Restrict input to time format characters
@@ -241,22 +254,6 @@ function handleFolderCollectionChange(option: { label: string; value: number | n
  */
 function restrictToTimeFormat(event: Event) {
 	restrictInputToTimeFormat(event)
-}
-
-/**
- * Update the setlist title
- * @param event - The submit event
- */
-async function onNameSubmit(event: SubmitEvent) {
-	await tryShowError(
-		async () => {
-			// Apparently event is undefined when moving focus away from
-			// text field
-			if (!event) return
-			await setlistsStore.updateSetlist(props.setlist.id, { title: event.target?.querySelector('input')?.value.trim() })
-		},
-		t('Failed to update setlist title: '),
-	)
 }
 
 /**
@@ -292,6 +289,7 @@ async function handleSave() {
 	await tryShowError(
 		async () => {
 			await setlistsStore.updateSetlist(props.setlist.id, {
+				title: formData.value.title.trim(),
 				startDateTime: formData.value.startDateTime?.toISOString() ?? null,
 				description: formData.value.description,
 				defaultModerationDuration,
@@ -300,11 +298,12 @@ async function handleSave() {
 				isDraft: formData.value.isDraft,
 				isPublished: formData.value.isPublished,
 			})
-			showSuccess(t('Setlist updated successfully'))
+			isSavingError.value = false
 		},
 		t('Failed to update setlist: '),
 		() => {
 			isSaving.value = false
+			isSavingError.value = true
 		},
 	)
 
@@ -319,7 +318,7 @@ async function handleSave() {
 	gap: 8px;
 }
 
-.save-button-container {
+.save-icon-container {
 	display: flex;
 	justify-content: flex-end;
 	margin-top: 16px;
