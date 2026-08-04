@@ -4,9 +4,24 @@
 		v-model="setlistSidebarStore.isOpen"
 		:name="formData.title"
 		:force-tabs="false"
-		:name-editable="editable"
-		@update:name="formData.title = $event"
+		:name-editable="nameEditable"
+		@update:name="(event) => {
+			formData.title = event
+		}"
+		@submit-name="nameEditable = false"
+		@dismiss-editing="nameEditable = false"
 		@close="setlistSidebarStore.closeSidebar()">
+		<template #tertiary-actions>
+			<NcButton
+				v-if="editable"
+				variant="tertiary-no-background"
+				:size="buttonSize"
+				@click="nameEditable = true">
+				<template #icon>
+					<EditIcon :size="20" />
+				</template>
+			</NcButton>
+		</template>
 		<NcAppSidebarTab
 			id="details"
 			:name="t('Details')">
@@ -95,7 +110,7 @@ import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
-import { InfoIcon } from '@/icons/vue-material'
+import { InfoIcon, EditIcon } from '@/icons/vue-material'
 import { useSetlistSidebarStore } from '@/stores/setlistSidebarStore'
 import { useSetlistsStore } from '@/stores/setlistsStore'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
@@ -103,6 +118,8 @@ import type { Setlist } from '@/api/generated/openapi/data-contracts'
 import { formatDurationHHMMSS, parseDurationHHMMSS, formatDurationHHMM, parseDurationHHMM, restrictToTimeFormat as restrictInputToTimeFormat } from '@/utils/timeFormatUtils'
 import { apiClients } from '@/api/client.ts'
 import { formatDateStr } from '@/composables/useDateFormatting.ts'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import { useBreakpoints } from '@/composables/useBreakpoints.ts'
 
 interface Props {
 	setlist: Setlist | undefined
@@ -114,7 +131,9 @@ const props = defineProps<Props>()
 const setlistSidebarStore = useSetlistSidebarStore()
 const setlistsStore = useSetlistsStore()
 const folderCollectionsStore = useFolderCollectionsStore()
+const { buttonSize } = useBreakpoints()
 
+const nameEditable = ref(false)
 const isSaving = ref(false)
 const isSavingError = ref(false)
 const skipNextSave = ref(false)
