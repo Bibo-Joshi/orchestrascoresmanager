@@ -314,9 +314,11 @@ async function handleCellValueChanged(event: CellValueChangedEvent): Promise<voi
  */
 const fullModeColumnIsHidden = computed<boolean>(() => props.viewMode !== 'full')
 const columnDefs = computed<ColDef[]>(() => {
+	console.warn('recomputing columnDef')
 	const cols: ColDef[] = [
 		{
 			headerName: '',
+			colId: 'menu',
 			pinned: columnPin.value,
 			filter: false,
 			editable: false,
@@ -331,7 +333,7 @@ const columnDefs = computed<ColDef[]>(() => {
 					showDeleteButton: props.editable,
 				}
 			},
-			width: props.editable ? 50 : 60,
+			width: props.editable ? 90 : 50,
 			resizable: false,
 			suppressMovable: true,
 			rowDrag: props.editable,
@@ -442,6 +444,12 @@ const columnDefs = computed<ColDef[]>(() => {
 		valueGetter: scoreInfoValueGetter('gemaIds'),
 		valueParser: params => parseArrayValue(params.newValue),
 		hide: fullModeColumnIsHidden.value,
+	})
+
+	console.warn('props.editable', props.editable, props.editable)
+	cols.forEach(col => {
+		if (col.colId !== 'menu') return
+		console.warn('column width', col.width)
 	})
 
 	return cols
