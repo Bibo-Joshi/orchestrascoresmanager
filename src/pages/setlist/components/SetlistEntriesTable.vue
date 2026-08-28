@@ -317,6 +317,7 @@ const columnDefs = computed<ColDef[]>(() => {
 	const cols: ColDef[] = [
 		{
 			headerName: '',
+			colId: 'menu',
 			pinned: columnPin.value,
 			filter: false,
 			editable: false,
@@ -331,7 +332,7 @@ const columnDefs = computed<ColDef[]>(() => {
 					showDeleteButton: props.editable,
 				}
 			},
-			width: props.editable ? 50 : 60,
+			width: props.editable ? 90 : 50,
 			resizable: false,
 			suppressMovable: true,
 			rowDrag: props.editable,
