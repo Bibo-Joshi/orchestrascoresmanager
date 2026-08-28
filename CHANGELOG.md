@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-08-28
+
+### Fixed
+
+- Ensure Visibility of Setlist Entry Menu (#102)
+
+### Changed
+
+- Fix npm Audit (#100)
+- Bump `nextcloud/ocp` package (#93)
+
+### Security
+
+- Fix npm Audit (#94)
+
 ## [1.2.1] - 2026-08-04
 
 ### Changed
