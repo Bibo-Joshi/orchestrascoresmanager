@@ -314,7 +314,6 @@ async function handleCellValueChanged(event: CellValueChangedEvent): Promise<voi
  */
 const fullModeColumnIsHidden = computed<boolean>(() => props.viewMode !== 'full')
 const columnDefs = computed<ColDef[]>(() => {
-	console.warn('recomputing columnDef')
 	const cols: ColDef[] = [
 		{
 			headerName: '',
@@ -444,12 +443,6 @@ const columnDefs = computed<ColDef[]>(() => {
 		valueGetter: scoreInfoValueGetter('gemaIds'),
 		valueParser: params => parseArrayValue(params.newValue),
 		hide: fullModeColumnIsHidden.value,
-	})
-
-	console.warn('props.editable', props.editable, props.editable)
-	cols.forEach(col => {
-		if (col.colId !== 'menu') return
-		console.warn('column width', col.width)
 	})
 
 	return cols
