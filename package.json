@@ -52,7 +52,7 @@
     "@nextcloud/stylelint-config": "^3.2.2",
     "@nextcloud/vite-config": "^2.5.2",
     "@types/lodash.debounce": "^4.0.9",
-    "@types/node": "^26.0.1",
+    "@types/node": "^26.6.3",
     "@vue/tsconfig": "^0.9.1",
     "ag-mcp": "^1.0.0",
     "eslint": "^8.57.1",
