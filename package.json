@@ -40,7 +40,7 @@
     "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.7",
     "lodash.debounce": "^4.0.8",
-    "pinia": "^3.0.4",
+    "pinia": "^4.0.3",
     "vue": "^3.5.43",
     "vue-draggable-next": "^2.3.0",
     "vue-material-design-icons": "^5.3.1",
