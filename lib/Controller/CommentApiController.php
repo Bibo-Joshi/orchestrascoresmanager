@@ -42,8 +42,8 @@ class CommentApiController extends OCSController {
 	 * 200: Successful response with the comment
 	 * 400: Bad request
 	 * 403: Forbidden
-	 * @throws OCSBadRequestException if the request is invalid
-	 * @throws OCSForbiddenException if the user does not have permission
+	 * @throws { OCSBadRequestException } if the request is invalid
+	 * @throws { OCSForbiddenException } if the user does not have permission
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/comments/{id}')]
@@ -62,8 +62,8 @@ class CommentApiController extends OCSController {
 	 * 200: Successful deletion of the comment
 	 * 400: Bad request
 	 * 403: Forbidden
-	 * @throws OCSBadRequestException if the request is invalid
-	 * @throws OCSForbiddenException if the user does not have permission
+	 * @throws { OCSBadRequestException } if the request is invalid
+	 * @throws { OCSForbiddenException } if the user does not have permission
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'DELETE', url: '/comments/{id}')]

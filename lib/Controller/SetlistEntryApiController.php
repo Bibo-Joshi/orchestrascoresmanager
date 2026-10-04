@@ -40,8 +40,8 @@ class SetlistEntryApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerSetlistEntry, array{}> the entry
 	 *
 	 * 200: Successful response with the entry
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/setlistentries/{id}')]
@@ -63,8 +63,8 @@ class SetlistEntryApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerSetlistEntry, array{}> the updated entry
 	 *
 	 * 200: Successfully updated setlist entry
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 *
 	 * @psalm-suppress PossiblyUnusedParam - extracted from request params
 	 */
@@ -106,8 +106,8 @@ class SetlistEntryApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}> empty response
 	 *
 	 * 200: Successfully deleted setlist entry
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'DELETE', url: '/setlistentries/{id}')]
@@ -124,8 +124,8 @@ class SetlistEntryApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerSetlistEntry>, array{}> the updated entries
 	 *
 	 * 200: Successfully updated entries
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/setlistentries/batch')]

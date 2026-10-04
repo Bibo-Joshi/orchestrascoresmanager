@@ -2,29 +2,30 @@
 	<NcDialog
 		v-model:open="showDialog"
 		:name="name"
-		is-form
-		:close-on-click-outside="true"
+		isForm
+		:closeOnClickOutside="true"
 		:buttons="dialogButtons"
 		@reset="handleReset">
 		<NcLoadingIcon v-if="loading" :size="32" />
 		<NcNoteCard v-else-if="error" type="error">
 			{{ error }}
 		</NcNoteCard>
-		<NcFormGroup v-else hide-label>
+		<NcFormGroup v-else hideLabel>
 			<slot />
 		</NcFormGroup>
 	</NcDialog>
 </template>
 
 <script setup lang="ts">
+import type { NcDialogButtonProps } from '@nextcloud/vue/components/NcDialog'
+
 import { computed } from 'vue'
-import { t } from '@/utils/l10n'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcFormGroup from '@nextcloud/vue/components/NcFormGroup'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import { CancelIconRaw, ConfirmIconRaw } from '@/icons/mdi'
-import type { NcDialogButtonProps } from '@nextcloud/vue/components/NcDialog'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	/** Dialog title */
@@ -44,14 +45,15 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
 	loading: false,
 	error: '',
+	// eslint-disable-next-line vue/no-boolean-default
 	isInputValid: true,
 	submitLabel: '',
 })
 
 const emit = defineEmits<{
 	'update:isOpen': [value: boolean]
-	'submit': []
-	'reset': []
+	submit: []
+	reset: []
 }>()
 
 const showDialog = computed({

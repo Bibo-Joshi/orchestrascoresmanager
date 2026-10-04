@@ -295,7 +295,7 @@ class FolderCollectionVersionService {
 	 * @param int $folderCollectionId
 	 * @return int The latest version ID
 	 * @throws \InvalidArgumentException
-	 * @throws DoesNotExistException if no version exists
+	 * @throws { DoesNotExistException } if no version exists
 	 * @psalm-suppress PossiblyUnusedMethod - Public API for potential use
 	 */
 	public function getLatestVersionId(int $folderCollectionId): int {

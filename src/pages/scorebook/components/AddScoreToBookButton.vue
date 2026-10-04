@@ -10,20 +10,20 @@
 	</NcButton>
 
 	<AddOrEditDialog
-		v-model:is-open="showDialog"
+		v-model:isOpen="showDialog"
 		:name="t('Add score to book')"
 		:loading="loadingScores"
 		:error="loadScoresError ? t('Failed to load scores. Please try again.') : ''"
-		:is-input-valid="isFormValid"
-		:submit-label="t('Add')"
+		:isInputValid="isFormValid"
+		:submitLabel="t('Add')"
 		@submit="handleSubmit"
 		@reset="resetForm">
 		<NcSelect
 			v-model="selectedScore"
 			:options="scoreOptions"
-			:input-label="t('Score')"
+			:inputLabel="t('Score')"
 			:placeholder="t('Select a score')"
-			:filter-by="filterScores"
+			:filterBy="filterScores"
 			:selectable="isScoreSelectable"
 			required />
 
@@ -33,33 +33,34 @@
 			:placeholder="t('Enter index position')"
 			:error="!!indexValidation.error.value"
 			:success="indexValidation.isValid.value"
-			:helper-text="indexValidation.helperText.value"
+			:helperText="indexValidation.helperText.value"
 			type="number"
 			required />
 	</AddOrEditDialog>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { t } from '@/utils/l10n'
+import type { Score } from '@/api/generated/openapi/data-contracts'
+import type { EntityOption } from '@/composables/useEntitySelect'
+
+import { showSuccess } from '@nextcloud/dialogs'
+import { computed, onMounted, ref } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
-import { AddIcon } from '@/icons/vue-material'
-import { showSuccess } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
 import AddOrEditDialog from '@/components/AddOrEditDialog.vue'
-import { useIndexValidation } from '@/composables/useIndexValidation'
+import { useBreakpoints } from '@/composables/useBreakpoints.ts'
 import {
 	createScoreOptions,
-	filterScores,
 	createScoreSelectable,
-	type EntityOption,
+	filterScores,
 } from '@/composables/useEntitySelect'
-import { useScoresStore } from '@/stores/scoresStore'
+import { useIndexValidation } from '@/composables/useIndexValidation'
+import { AddIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
-import type { Score } from '@/api/generated/openapi/data-contracts'
-import { useBreakpoints } from '@/composables/useBreakpoints.ts'
+import { useScoresStore } from '@/stores/scoresStore'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	editable: boolean
@@ -71,7 +72,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-	'scoreAdded': [score: Score]
+	scoreAdded: [score: Score]
 }>()
 
 const scoresStore = useScoresStore()
@@ -95,7 +96,9 @@ const scoreOptions = computed(() => createScoreOptions(scoresStore.scores, false
 const isScoreSelectable = computed(() => createScoreSelectable(props.existingScoreIds))
 
 const isFormValid = computed<boolean>(() => {
-	if (!selectedScore.value) return false
+	if (!selectedScore.value) {
+		return false
+	}
 	return indexValidation.isValid.value
 })
 
@@ -103,7 +106,9 @@ const isFormValid = computed<boolean>(() => {
  * Ensure scores are loaded in the store
  */
 async function ensureScoresLoaded() {
-	if (scoresStore.isLoaded) return
+	if (scoresStore.isLoaded) {
+		return
+	}
 
 	loadingScores.value = true
 	loadScoresError.value = false

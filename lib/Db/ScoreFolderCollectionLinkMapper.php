@@ -25,7 +25,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 *
 	 * @param int $scoreId
 	 * @return array<array{versionId: int, index: int|null}> Array of version info with optional index
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findVersionsForScore(int $scoreId): array {
 		$qb = $this->db->getQueryBuilder();
@@ -54,7 +54,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 *
 	 * @param int $scoreBookId
 	 * @return array<array{versionId: int, index: int|null}> Array of version info with optional index
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findVersionsForScoreBook(int $scoreBookId): array {
 		$qb = $this->db->getQueryBuilder();
@@ -78,7 +78,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 *
 	 * @param int $versionId
 	 * @return array<array{id: int, index: int|null}> Array of score info with optional index
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findScoresForVersion(int $versionId): array {
 		$qb = $this->db->getQueryBuilder();
@@ -107,7 +107,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 *
 	 * @param int $versionId
 	 * @return array<array{id: int, index: int|null}> Array of score book info with optional index
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findScoreBooksForVersion(int $versionId): array {
 		$qb = $this->db->getQueryBuilder();
@@ -137,7 +137,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 * @param int $scoreId
 	 * @param int $versionId
 	 * @param int|null $index
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function addScoreToVersion(int $scoreId, int $versionId, ?int $index = null): void {
 		$qb = $this->db->getQueryBuilder();
@@ -157,7 +157,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 * @param int $scoreBookId
 	 * @param int $versionId
 	 * @param int|null $index
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function addScoreBookToVersion(int $scoreBookId, int $versionId, ?int $index = null): void {
 		$qb = $this->db->getQueryBuilder();
@@ -176,7 +176,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 *
 	 * @param int $scoreId
 	 * @param int $versionId
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function removeScoreFromVersion(int $scoreId, int $versionId): void {
 		$qb = $this->db->getQueryBuilder();
@@ -195,7 +195,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 *
 	 * @param int $scoreBookId
 	 * @param int $versionId
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function removeScoreBookFromVersion(int $scoreBookId, int $versionId): void {
 		$qb = $this->db->getQueryBuilder();
@@ -214,7 +214,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 *
 	 * @param int $versionId
 	 * @return int
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function countScoresInVersion(int $versionId): int {
 		$qb = $this->db->getQueryBuilder();
@@ -234,7 +234,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 *
 	 * @param int $versionId
 	 * @return int
-	 * @throws Exception
+	 * @throws { Exception }
 	 * @psalm-suppress PossiblyUnusedMethod - Public API for potential future use
 	 */
 	public function countScoreBooksInVersion(int $versionId): int {
@@ -256,7 +256,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 * @param int $scoreId
 	 * @param int $versionId
 	 * @return bool
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function isScoreDirectlyInVersion(int $scoreId, int $versionId): bool {
 		$qb = $this->db->getQueryBuilder();
@@ -278,7 +278,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 * @param int[] $scoreIds
 	 * @param int $versionId
 	 * @return int[] Score IDs that are directly in the version
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findScoresDirectlyInVersion(array $scoreIds, int $versionId): array {
 		$scoreIds = array_map('intval', $scoreIds);
@@ -306,7 +306,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 * @param int $scoreBookId
 	 * @param int $versionId
 	 * @return bool
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function isScoreBookInVersion(int $scoreBookId, int $versionId): bool {
 		$qb = $this->db->getQueryBuilder();
@@ -326,7 +326,7 @@ class ScoreFolderCollectionLinkMapper extends QBMapper {
 	 *
 	 * @param int $sourceVersionId
 	 * @param int $targetVersionId
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function copyLinksToVersion(int $sourceVersionId, int $targetVersionId): void {
 		// Get all links from source version

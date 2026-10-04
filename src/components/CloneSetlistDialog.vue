@@ -2,33 +2,34 @@
 	<NcDialog
 		v-model:open="showDialog"
 		:name="t('Clone setlist')"
-		is-form
-		:close-on-click-outside="true"
+		isForm
+		:closeOnClickOutside="true"
 		:buttons="dialogButtons"
 		@reset="handleReset">
-		<NcFormGroup hide-label>
+		<NcFormGroup hideLabel>
 			<NcTextField
 				v-model="title"
 				:label="t('Title')"
 				required
 				:error="titleError"
-				@update:model-value="validateTitle" />
+				@update:modelValue="validateTitle" />
 		</NcFormGroup>
 	</NcDialog>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import type { NcDialogButtonProps } from '@nextcloud/vue/components/NcDialog'
+
+import { showSuccess } from '@nextcloud/dialogs'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { t } from '@/utils/l10n'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcFormGroup from '@nextcloud/vue/components/NcFormGroup'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import { CancelIconRaw, ConfirmIconRaw } from '@/icons/mdi'
-import type { NcDialogButtonProps } from '@nextcloud/vue/components/NcDialog'
-import { showSuccess } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
 import { useSetlistsStore } from '@/stores/setlistsStore'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	/** Whether the dialog is open */

@@ -1,8 +1,10 @@
+import type { Ref } from 'vue'
+
 /**
  * Composable for validating index inputs in score books and folder collections.
  * Provides consistent index validation logic across add/edit dialogs.
  */
-import { computed, type Ref } from 'vue'
+import { computed } from 'vue'
 import { t } from '@/utils/l10n'
 
 export interface IndexValidationOptions {
@@ -44,12 +46,16 @@ export function useIndexValidation(options: IndexValidationOptions): IndexValida
 	} = options
 
 	const isUnchanged = computed<boolean>(() => {
-		if (currentIndex === undefined) return false
+		if (currentIndex === undefined) {
+			return false
+		}
 		return index.value === currentIndex.value
 	})
 
 	const error = computed<string>(() => {
-		if (!enabled.value) return ''
+		if (!enabled.value) {
+			return ''
+		}
 		if (isNaN(index.value) || index.value < 0) {
 			return t('Index must be a non-negative integer')
 		}
@@ -64,17 +70,32 @@ export function useIndexValidation(options: IndexValidationOptions): IndexValida
 	})
 
 	const isValid = computed<boolean>(() => {
-		if (!enabled.value) return true
-		if (isUnchanged.value) return false // Not "valid" in the sense of allowing submission for unchanged
+		if (!enabled.value) {
+			return true
+		}
+		if (isUnchanged.value) {
+			// Not "valid" in the sense of allowing submission for unchanged
+			return false
+		}
 		return !error.value && !isNaN(index.value)
 	})
 
 	const helperText = computed<string>(() => {
-		if (!enabled.value) return ''
-		if (loading.value) return t('Loading occupied indices...')
-		if (isUnchanged.value) return t('Index is unchanged')
-		if (error.value) return error.value
-		if (isValid.value) return t('Index is valid')
+		if (!enabled.value) {
+			return ''
+		}
+		if (loading.value) {
+			return t('Loading occupied indices…')
+		}
+		if (isUnchanged.value) {
+			return t('Index is unchanged')
+		}
+		if (error.value) {
+			return error.value
+		}
+		if (isValid.value) {
+			return t('Index is valid')
+		}
 		return t('Enter the position index in the collection')
 	})
 

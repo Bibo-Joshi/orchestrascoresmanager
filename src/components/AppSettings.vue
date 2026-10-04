@@ -1,7 +1,7 @@
 <template>
 	<NcAppSettingsDialog v-model:open="open" :name="t('Settings')">
 		<NcAppSettingsSection id="setlists" :name="t('Setlists')">
-			<NcFormGroup hide-label>
+			<NcFormGroup hideLabel>
 				<NcTextField
 					v-model="selectedDefaultModerationTimeString"
 					:label="t('Default Moderation Time (HH:MM:SS)')"
@@ -12,11 +12,11 @@
 				<NcSelect
 					v-model="selectedFolderCollection"
 					:options="activeFolderCollectionOptions"
-					:input-label="t('Default Folder Collection')"
+					:inputLabel="t('Default Folder Collection')"
 					:placeholder="t('Select folder collection')"
 					:clearable="true"
 					label="label"
-					track-by="value" />
+					trackBy="value" />
 
 				<div class="save-button-container">
 					<NcButton
@@ -27,7 +27,7 @@
 							<NcLoadingIcon v-if="isSaving" :size="20" />
 							<ConfirmIcon v-else :size="20" />
 						</template>
-						{{ isSaving ? t('Saving …') : t('Save') }}
+						{{ isSaving ? t('Saving …') : t('Save') }}
 					</NcButton>
 				</div>
 			</NcFormGroup>
@@ -36,24 +36,25 @@
 </template>
 
 <script setup lang="ts">
+import { showError } from '@nextcloud/dialogs'
 import { computed, defineModel, onMounted, ref } from 'vue'
 import NcAppSettingsDialog from '@nextcloud/vue/components/NcAppSettingsDialog'
 import NcAppSettingsSection from '@nextcloud/vue/components/NcAppSettingsSection'
-import NcFormGroup from '@nextcloud/vue/components/NcFormGroup'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
-import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcFormGroup from '@nextcloud/vue/components/NcFormGroup'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
+import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 import { ConfirmIcon } from '@/icons/vue-material'
-import { t } from '@/utils/l10n'
-import {
-	formatDurationHHMMSS, parseDurationHHMMSS,
-	restrictToTimeFormat as restrictInputToTimeFormat,
-} from '@/utils/timeFormatUtils'
 import { useAppSettingsStore } from '@/stores/appSettingsStore'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { tryShowError } from '@/utils/errorHandling'
-import { showError } from '@nextcloud/dialogs'
+import { t } from '@/utils/l10n'
+import {
+	formatDurationHHMMSS,
+	parseDurationHHMMSS,
+	restrictToTimeFormat as restrictInputToTimeFormat,
+} from '@/utils/timeFormatUtils'
 
 const open = defineModel<boolean>({ default: false })
 const appSettingsStore = useAppSettingsStore()
@@ -61,17 +62,17 @@ const folderCollectionsStore = useFolderCollectionsStore()
 
 const isSaving = ref(false)
 
-const activeFolderCollectionOptions = computed((): Array<{ label: string; value: number }> => {
+const activeFolderCollectionOptions = computed((): Array<{ label: string, value: number }> => {
 	return folderCollectionsStore.folderCollectionsSorted
-		.filter(collection => collection.activeVersionId !== null)
-		.map(collection => ({
+		.filter((collection) => collection.activeVersionId !== null)
+		.map((collection) => ({
 			label: collection.title,
 			value: collection.id,
 		}))
 })
 
 const selectedDefaultModerationTimeString = ref<string>('')
-const selectedFolderCollection = ref<{ label: string; value: number } | null>(null)
+const selectedFolderCollection = ref<{ label: string, value: number } | null>(null)
 
 onMounted(async () => {
 	await Promise.all([
@@ -84,8 +85,10 @@ onMounted(async () => {
 		: ''
 	selectedFolderCollection.value = (() => {
 		const id = appSettingsStore.defaultFolderCollectionId
-		if (id === null) return null
-		return activeFolderCollectionOptions.value.find(option => option.value === id) ?? null
+		if (id === null) {
+			return null
+		}
+		return activeFolderCollectionOptions.value.find((option) => option.value === id) ?? null
 	})()
 })
 
@@ -109,7 +112,7 @@ async function handleSave() {
 		if (selectedDefaultModerationTimeString.value.trim()) {
 			defaultModerationDuration = parseDurationHHMMSS(selectedDefaultModerationTimeString.value)
 		}
-	} catch (e) {
+	} catch {
 		showError(t('Invalid default moderation time format. Use (HH:)MM:SS'))
 		return
 	}

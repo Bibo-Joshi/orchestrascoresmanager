@@ -28,9 +28,9 @@
 	<!-- Clone dialog -->
 	<CloneSetlistDialog
 		v-if="showCloneDialog"
-		:is-open="showCloneDialog"
-		:setlist-id="setlist.id"
-		@update:is-open="showCloneDialog = $event" />
+		:isOpen="showCloneDialog"
+		:setlistId="setlist.id"
+		@update:isOpen="showCloneDialog = $event" />
 
 	<!-- Delete confirmation dialog -->
 	<ConfirmationDialog
@@ -42,18 +42,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { t } from '@/utils/l10n'
-import NcListItem from '@nextcloud/vue/components/NcListItem'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import { DeleteIcon, CloneIcon, PencilCircleIcon } from '@/icons/vue-material'
-import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import CloneSetlistDialog from '@/components/CloneSetlistDialog.vue'
-import { formatDateTimeStr } from '@/composables/useDateFormatting'
-import { useSetlistsStore } from '@/stores/setlistsStore'
-import { showSuccess } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
 import type { Setlist } from '@/api/generated/openapi/data-contracts'
+
+import { showSuccess } from '@nextcloud/dialogs'
+import { computed, ref } from 'vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcListItem from '@nextcloud/vue/components/NcListItem'
+import CloneSetlistDialog from '@/components/CloneSetlistDialog.vue'
+import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import { formatDateTimeStr } from '@/composables/useDateFormatting'
+import { CloneIcon, DeleteIcon, PencilCircleIcon } from '@/icons/vue-material'
+import { useSetlistsStore } from '@/stores/setlistsStore'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	setlist: Setlist
@@ -62,11 +63,11 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const emit = defineEmits<Emits>()
+
 interface Emits {
 	(e: 'delete', id: number): void
 }
-
-const emit = defineEmits<Emits>()
 
 const setlistsStore = useSetlistsStore()
 const showDeleteDialog = ref(false)

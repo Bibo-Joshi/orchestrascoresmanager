@@ -3,7 +3,7 @@
 	<NcListItem
 		:name="name"
 		:bold="bold"
-		:counter-number="counterNumber"
+		:counterNumber="counterNumber"
 		:details="details"
 		:to="to"
 		:active="active"
@@ -31,9 +31,10 @@
 </template>
 
 <script setup lang="ts">
-import NcListItem from '@nextcloud/vue/components/NcListItem'
-import { ExpandedIcon, CollapsedIcon } from '@/icons/vue-material'
 import type { RouteLocationRaw } from 'vue-router'
+
+import NcListItem from '@nextcloud/vue/components/NcListItem'
+import { CollapsedIcon, ExpandedIcon } from '@/icons/vue-material'
 
 interface Props {
 	name: string

@@ -1,19 +1,21 @@
+import type { Worksheet } from 'exceljs'
+import type {
+	FolderCollection,
+	FolderCollectionVersion,
+	Score,
+	ScoreBook,
+	ScoreBookIndexed,
+	ScoreIndexed,
+} from '@/api/generated/openapi/data-contracts'
+
 /**
  * XLSX exporter for folder collection Table of Contents and Index export.
  * Generates an XLSX file with two sheets: "Contents" (ToC) and "Index".
  *
  * This module is designed to be easily adaptable for formatting changes.
  */
-import { Workbook, type Worksheet } from 'exceljs'
+import { Workbook } from 'exceljs'
 import { t } from '@/utils/l10n'
-import type {
-	FolderCollection,
-	FolderCollectionVersion,
-	Score,
-	ScoreIndexed,
-	ScoreBook,
-	ScoreBookIndexed,
-} from '@/api/generated/openapi/data-contracts'
 
 /**
  * Entry type for collection items with their data
@@ -66,7 +68,7 @@ export const defaultFormatConfig: XlsxFormatConfig = {
  */
 interface GroupedItem {
 	groupLabel: string
-	items: { leftColumn: string; rightColumn: string }[]
+	items: { leftColumn: string, rightColumn: string }[]
 }
 
 /**
@@ -77,7 +79,9 @@ interface GroupedItem {
  * @return The uppercase first character or empty string for non-Latin
  */
 function getFirstCharGroup(text: string): string {
-	if (!text) return ''
+	if (!text) {
+		return ''
+	}
 	const firstChar = text.charAt(0).toUpperCase()
 	// Check if it's a Latin letter (A-Z)
 	if (firstChar >= 'A' && firstChar <= 'Z') {
@@ -113,8 +117,8 @@ function getIndexGroup(index: number): string {
 function flattenEntries(
 	entries: CollectionEntry[],
 	isIndexed: boolean,
-): { title: string; shortTitle: string | null; index?: number; indexDisplay?: string }[] {
-	const result: { title: string; shortTitle: string | null; index?: number; indexDisplay?: string }[] = []
+): { title: string, shortTitle: string | null, index?: number, indexDisplay?: string }[] {
+	const result: { title: string, shortTitle: string | null, index?: number, indexDisplay?: string }[] = []
 
 	for (const entry of entries) {
 		if (entry.type === 'scorebook' && entry.scoreBook && entry.scores) {
@@ -167,15 +171,21 @@ function createTocData(
 	if (isIndexed) {
 		// Sort by index for indexed collections
 		flatItems.sort((a, b) => {
-			if (a.index === undefined) return 1
-			if (b.index === undefined) return -1
+			if (a.index === undefined) {
+				return 1
+			}
+			if (b.index === undefined) {
+				return -1
+			}
 			return a.index - b.index
 		})
 
 		// Group by tens
-		const groups = new Map<string, { leftColumn: string; rightColumn: string }[]>()
+		const groups = new Map<string, { leftColumn: string, rightColumn: string }[]>()
 		for (const item of flatItems) {
-			if (item.index === undefined) continue
+			if (item.index === undefined) {
+				continue
+			}
 			const groupLabel = getIndexGroup(item.index)
 			if (!groups.has(groupLabel)) {
 				groups.set(groupLabel, [])
@@ -202,7 +212,7 @@ function createTocData(
 		flatItems.sort((a, b) => a.title.localeCompare(b.title))
 
 		// Group by first character
-		const groups = new Map<string, { leftColumn: string; rightColumn: string }[]>()
+		const groups = new Map<string, { leftColumn: string, rightColumn: string }[]>()
 		for (const item of flatItems) {
 			const groupLabel = getFirstCharGroup(item.title)
 			if (!groups.has(groupLabel)) {
@@ -246,10 +256,16 @@ function createIndexData(
 
 	if (isIndexed) {
 		// For indexed: list both title and short title with the index
-		const indexItems: { text: string; index: number; indexDisplay: string }[] = []
+		const indexItems: {
+			text: string
+			index: number
+			indexDisplay: string
+		}[] = []
 
 		for (const item of flatItems) {
-			if (item.index === undefined || !item.indexDisplay) continue
+			if (item.index === undefined || !item.indexDisplay) {
+				continue
+			}
 
 			// Add title
 			indexItems.push({
@@ -272,7 +288,7 @@ function createIndexData(
 		indexItems.sort((a, b) => a.text.localeCompare(b.text))
 
 		// Group by first character
-		const groups = new Map<string, { leftColumn: string; rightColumn: string }[]>()
+		const groups = new Map<string, { leftColumn: string, rightColumn: string }[]>()
 		for (const item of indexItems) {
 			const groupLabel = getFirstCharGroup(item.text)
 			if (!groups.has(groupLabel)) {
@@ -298,7 +314,7 @@ function createIndexData(
 		return result
 	} else {
 		// For alphabetical: list short titles with the long title to look under
-		const indexItems: { shortTitle: string; longTitle: string }[] = []
+		const indexItems: { shortTitle: string, longTitle: string }[] = []
 
 		for (const item of flatItems) {
 			if (item.shortTitle && item.shortTitle !== item.title) {
@@ -313,7 +329,7 @@ function createIndexData(
 		indexItems.sort((a, b) => a.shortTitle.localeCompare(b.shortTitle))
 
 		// Group by first character
-		const groups = new Map<string, { leftColumn: string; rightColumn: string }[]>()
+		const groups = new Map<string, { leftColumn: string, rightColumn: string }[]>()
 		for (const item of indexItems) {
 			const groupLabel = getFirstCharGroup(item.shortTitle)
 			if (!groups.has(groupLabel)) {

@@ -30,9 +30,9 @@ class ScoreMapper extends QBMapper {
 	 *
 	 * @param int $id
 	 * @return Score
-	 * @throws MultipleObjectsReturnedException
-	 * @throws DoesNotExistException
-	 * @throws Exception
+	 * @throws { MultipleObjectsReturnedException }
+	 * @throws { DoesNotExistException }
+	 * @throws { Exception }
 	 */
 	public function find(int $id): Score {
 		$qb = $this->db->getQueryBuilder();
@@ -49,9 +49,9 @@ class ScoreMapper extends QBMapper {
 	 * Get all scores with tags and score book info attached.
 	 *
 	 * @return array<Score> Scores
-	 * @throws DoesNotExistException
-	 * @throws Exception
-	 * @throws MultipleObjectsReturnedException
+	 * @throws { DoesNotExistException }
+	 * @throws { Exception }
+	 * @throws { MultipleObjectsReturnedException }
 	 */
 	public function findAll(): array {
 		$qb = $this->db->getQueryBuilder();
@@ -110,7 +110,7 @@ class ScoreMapper extends QBMapper {
 	 *
 	 * @param int[] $ids
 	 * @return Score[]
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findMultiple(array $ids): array {
 		$ids = array_map('intval', array_values($ids));
@@ -163,9 +163,9 @@ class ScoreMapper extends QBMapper {
 	 * Attach tags to a single score.
 	 *
 	 * @param Score $score
-	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
-	 * @throws Exception
+	 * @throws { DoesNotExistException }
+	 * @throws { MultipleObjectsReturnedException }
+	 * @throws { Exception }
 	 */
 	private function attachTags(Score $score): void {
 		$ids = $this->scoreTagLinkMapper->findTagIdsForScore($score->getId());
@@ -181,7 +181,7 @@ class ScoreMapper extends QBMapper {
 	 * Attach score book info to a single score.
 	 *
 	 * @param Score $score
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	private function attachScoreBookInfo(Score $score): void {
 		$bookInfo = $this->scoreBookScoreLinkMapper->findScoreBookForScore($score->getId());

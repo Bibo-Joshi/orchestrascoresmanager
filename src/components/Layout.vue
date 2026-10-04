@@ -1,5 +1,5 @@
 <template>
-	<NcContent app-name="orchestrascoresmanager">
+	<NcContent appName="orchestrascoresmanager">
 		<Navigation />
 
 		<NcAppContent>
@@ -10,7 +10,7 @@
 					</h1>
 					<!-- Slot for right-aligned header actions (e.g. export button) -->
 					<div class="app-content-header__actions">
-						<slot name="header-actions" />
+						<slot name="headerActions" />
 					</div>
 				</div>
 
@@ -26,21 +26,21 @@
 
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import NcContent from '@nextcloud/vue/components/NcContent'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
+import NcContent from '@nextcloud/vue/components/NcContent'
 import Navigation from './Navigation.vue'
-import { generateFullTitle } from '@/navigation'
 import { useBreakpoints } from '@/composables/useBreakpoints'
+import { generateFullTitle } from '@/navigation'
+
+const props = withDefaults(defineProps<Props>(), {
+	title: null,
+})
 
 const { screenSizeCategory } = useBreakpoints()
 
 interface Props {
 	title?: string | null
 }
-
-const props = withDefaults(defineProps<Props>(), {
-	title: null,
-})
 
 // Compute display title from prop or fallback to app name
 const displayTitle = computed((): string => {
@@ -49,12 +49,12 @@ const displayTitle = computed((): string => {
 
 const fontSize = computed(() => {
 	switch (screenSizeCategory.value) {
-	case 'mobile':
-		return '18px'
-	case 'tablet':
-		return '20px'
-	default:
-		return '24px'
+		case 'mobile':
+			return '18px'
+		case 'tablet':
+			return '20px'
+		default:
+			return '24px'
 	}
 })
 

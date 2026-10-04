@@ -2,19 +2,19 @@
 	<ContentStateWrapper
 		:loading="loading"
 		:error="loadError"
-		:is-empty="comments.length === 0"
-		:error-text="t('Failed to fetch comments. Please reload the page.')"
-		:empty-text="t('No comments yet')"
-		:show-above-content-on-empty="true">
-		<template #empty-icon>
+		:isEmpty="comments.length === 0"
+		:errorText="t('Failed to fetch comments. Please reload the page.')"
+		:emptyText="t('No comments yet')"
+		:showAboveContentOnEmpty="true">
+		<template #emptyIcon>
 			<CommentIcon />
 		</template>
-		<template #above-content>
+		<template #aboveContent>
 			<!-- New Comment Input -->
 			<div class="new-comment-container">
 				<NcTextArea
 					v-model="newCommentContent"
-					:placeholder="t('Write a new comment …')"
+					:placeholder="t('Write a new comment …')"
 					:rows="1"
 					resize="vertical"
 					class="comment-textarea"
@@ -46,25 +46,26 @@
 				v-for="comment in comments"
 				:key="comment.id"
 				:comment="comment"
-				@comment-deleted="handleCommentDeleted" />
+				@commentDeleted="handleCommentDeleted" />
 		</template>
 	</ContentStateWrapper>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { t } from '@/utils/l10n.ts'
-import { showError } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
+import type { Comment } from '@/api/generated/openapi/data-contracts'
+
 import { getCurrentUser } from '@nextcloud/auth'
+import { showError } from '@nextcloud/dialogs'
+import { ref, watch } from 'vue'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
-import NcButton from '@nextcloud/vue/components/NcButton'
-import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
-import { CommentIcon, ConfirmIcon, OpenExternalIcon } from '@/icons/vue-material'
 import CommentsItem from './CommentsItem.vue'
-import type { Comment } from '@/api/generated/openapi/data-contracts'
+import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
 import { apiClients } from '@/api/client'
+import { CommentIcon, ConfirmIcon, OpenExternalIcon } from '@/icons/vue-material'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n.ts'
 
 interface Props {
 	scoreId: number | null
@@ -136,7 +137,7 @@ async function submitComment() {
 }
 
 function handleCommentDeleted(commentId: number) {
-	comments.value = comments.value.filter(comment => comment.id !== commentId)
+	comments.value = comments.value.filter((comment) => comment.id !== commentId)
 }
 
 // Watch for scoreId changes and fetch comments

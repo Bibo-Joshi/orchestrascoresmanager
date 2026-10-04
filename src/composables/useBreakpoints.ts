@@ -1,6 +1,9 @@
-import { computed, type Ref, ref, onUnmounted, ComputedRef } from 'vue'
+import type { ComputedRef } from 'vue'
+import type { Ref } from 'vue'
 
-const useMediaQueryComposable = (query: string): Ref<boolean> => {
+import { computed, onUnmounted, ref } from 'vue'
+
+function useMediaQueryComposable(query: string): Ref<boolean> {
 	const matches = ref(window.matchMedia(query).matches)
 	const mq = window.matchMedia(query)
 
@@ -14,7 +17,7 @@ const useMediaQueryComposable = (query: string): Ref<boolean> => {
 	return matches
 }
 
-export const useBreakpoints = () => {
+export function useBreakpoints() {
 	// Base OrUp refs (matchMedia)
 	const isSmOrUp = useMediaQueryComposable('(min-width: 640px)')
 	const isMdOrUp = useMediaQueryComposable('(min-width: 768px)')
@@ -33,9 +36,7 @@ export const useBreakpoints = () => {
 	const isMobile = computed(() => isMdOrDown.value)
 	const isTablet = computed(() => isLgOrDown.value && !isMobile.value)
 	const isDesktop = computed(() => isLgOrUp.value)
-	const screenSizeCategory = computed(() =>
-		isMobile.value ? 'mobile' : isTablet.value ? 'tablet' : 'desktop',
-	)
+	const screenSizeCategory = computed(() => isMobile.value ? 'mobile' : isTablet.value ? 'tablet' : 'desktop')
 
 	// Component helpers
 	const columnPin: ComputedRef<false | 'left'> = computed((): false | 'left' => isMobile.value ? false : 'left')

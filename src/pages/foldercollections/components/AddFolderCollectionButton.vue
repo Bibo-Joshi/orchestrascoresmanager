@@ -11,9 +11,9 @@
 	</NcButton>
 
 	<AddOrEditDialog
-		v-model:is-open="showCreateDialog"
+		v-model:isOpen="showCreateDialog"
 		:name="t('Create folder collection')"
-		:is-input-valid="isFormValid"
+		:isInputValid="isFormValid"
 		@submit="handleSubmit"
 		@reset="resetForm">
 		<NcTextField
@@ -23,7 +23,7 @@
 			:placeholder="t('Enter a name')"
 			:success="isNameValid"
 			:error="!isNameValid"
-			:helper-text="isNameValid ? '' : t('Name is required')" />
+			:helperText="isNameValid ? '' : t('Name is required')" />
 		<NcTextArea
 			v-model="inputDescription"
 			resize="none"
@@ -32,7 +32,7 @@
 		<NcSelect
 			v-model="inputCollectionType"
 			:options="collectionTypeOptions"
-			:input-label="t('Collection type')"
+			:inputLabel="t('Collection type')"
 			:placeholder="t('Select collection type')"
 			:searchable="false"
 			required />
@@ -40,18 +40,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { t } from '@/utils/l10n'
-import NcButton from '@nextcloud/vue/components/NcButton'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
-import NcTextArea from '@nextcloud/vue/components/NcTextArea'
-import NcSelect from '@nextcloud/vue/components/NcSelect'
-import { AddIcon } from '@/icons/vue-material'
 import { showError, showSuccess } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
+import { computed, ref } from 'vue'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcTextArea from '@nextcloud/vue/components/NcTextArea'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 import AddOrEditDialog from '@/components/AddOrEditDialog.vue'
-import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { useBreakpoints } from '@/composables/useBreakpoints'
+import { AddIcon } from '@/icons/vue-material'
+import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	editable: boolean

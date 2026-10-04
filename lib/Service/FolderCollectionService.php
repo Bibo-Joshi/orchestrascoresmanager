@@ -173,7 +173,7 @@ class FolderCollectionService {
 	 * @param FolderCollection $folderCollection
 	 * @param string|null $validFrom Optional start date for initial version (Y-m-d format), defaults to today
 	 * @return array Folder collection data with scoreCount
-	 * @throws Exception
+	 * @throws { Exception }
 	 * @throws \Exception
 	 */
 	public function createFolderCollection(FolderCollection $folderCollection, ?string $validFrom = null): array {
@@ -217,7 +217,7 @@ class FolderCollectionService {
 	 *
 	 * @param FolderCollection $folderCollection
 	 * @return array Folder collection data with scoreCount
-	 * @throws Exception
+	 * @throws { Exception }
 	 * @throws \Exception
 	 */
 	public function updateFolderCollection(FolderCollection $folderCollection): array {
@@ -247,7 +247,7 @@ class FolderCollectionService {
 	 * Delete a folder collection.
 	 *
 	 * @param int $id
-	 * @throws Exception
+	 * @throws { Exception }
 	 * @throws \Exception
 	 */
 	public function deleteFolderCollection(int $id): void {
@@ -655,7 +655,7 @@ class FolderCollectionService {
 	 *
 	 * @param int $versionId
 	 * @return int
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function getTotalScoreCountForVersion(int $versionId): int {
 		// Count directly linked scores

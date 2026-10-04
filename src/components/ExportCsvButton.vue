@@ -10,12 +10,12 @@
 </template>
 
 <script setup lang="ts">
-import { t } from '@/utils/l10n'
-import NcButton from '@nextcloud/vue/components/NcButton'
-import { DownloadIcon } from '@/icons/vue-material'
 import { showError } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import { useBreakpoints } from '@/composables/useBreakpoints'
+import { DownloadIcon } from '@/icons/vue-material'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 type TableExportRef = { exportAsCsv?: (fileName?: string) => boolean } | null
 

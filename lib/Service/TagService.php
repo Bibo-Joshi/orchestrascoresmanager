@@ -34,9 +34,9 @@ class TagService {
 	 * Create a new tag if authorized.
 	 * Default-deny: if authorization fails, an exception is thrown.
 	 *
-	 * @throws Exception
-	 * @throws MultipleObjectsReturnedException
-	 * @throws InvalidArgumentException if tag exists or params invalid
+	 * @throws { Exception }
+	 * @throws { MultipleObjectsReturnedException }
+	 * @throws { InvalidArgumentException } if tag exists or params invalid
 	 */
 	public function createTag(string $name): Tag {
 		// use policy-based authorization

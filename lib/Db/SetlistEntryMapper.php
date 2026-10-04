@@ -24,9 +24,9 @@ class SetlistEntryMapper extends QBMapper {
 	 * Find setlist entry by id
 	 * @param int $id
 	 * @return SetlistEntry
-	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
-	 * @throws Exception
+	 * @throws { DoesNotExistException }
+	 * @throws { MultipleObjectsReturnedException }
+	 * @throws { Exception }
 	 * @psalm-suppress PossiblyUnusedMethod - May be used by external callers
 	 */
 	public function find(int $id): SetlistEntry {
@@ -40,7 +40,7 @@ class SetlistEntryMapper extends QBMapper {
 	 * Find all setlist entries for a given setlist id
 	 * @param int $setlistId
 	 * @return SetlistEntry[]
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findBySetlistId(int $setlistId): array {
 		$qb = $this->db->getQueryBuilder();
@@ -56,7 +56,7 @@ class SetlistEntryMapper extends QBMapper {
 	 *
 	 * @param SetlistEntry[] $entries Entries to update
 	 * @return SetlistEntry[] Updated entries
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function batchUpdate(array $entries): array {
 		if (empty($entries)) {
@@ -97,7 +97,7 @@ class SetlistEntryMapper extends QBMapper {
 	 * Delete a setlist entry by id
 	 * @param int $id
 	 * @return void
-	 * @throws Exception
+	 * @throws { Exception }
 	 * @psalm-suppress PossiblyUnusedMethod - May be used by external callers
 	 */
 	public function deleteById(int $id): void {

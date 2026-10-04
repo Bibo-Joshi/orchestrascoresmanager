@@ -10,10 +10,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { ScoreIcon, ScoreBookIcon } from '@/icons/vue-material'
 import type { ICellRendererParams } from 'ag-grid-community'
 import type { Score, ScoreIndexed } from '@/api/generated/openapi/data-contracts.ts'
+
+import { computed } from 'vue'
+import { ScoreBookIcon, ScoreIcon } from '@/icons/vue-material'
 
 interface Props {
 	params: ICellRendererParams

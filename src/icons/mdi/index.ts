@@ -1,4 +1,4 @@
-/**
+/*
  * Icon aliases for @mdi/svg raw SVG icons.
  * Usage-based naming for consistent icon usage across the app.
  * These are raw SVG strings for use with NcButton and similar components.

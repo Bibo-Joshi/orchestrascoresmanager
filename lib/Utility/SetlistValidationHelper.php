@@ -34,8 +34,8 @@ class SetlistValidationHelper {
 	 *
 	 * @param int $scoreId The ID of the score to validate
 	 * @param int $versionId The ID of the folder collection version
-	 * @throws InvalidArgumentException If the score does not belong to the version
-	 * @throws Exception
+	 * @throws { InvalidArgumentException } If the score does not belong to the version
+	 * @throws { Exception }
 	 */
 	public function validateScoreInFolderCollectionVersion(int $scoreId, int $versionId): void {
 		// Check if score is directly in the version

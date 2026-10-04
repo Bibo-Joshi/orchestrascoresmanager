@@ -2,15 +2,15 @@
 	<ContentStateWrapper
 		:loading="loading"
 		:error="error"
-		:is-empty="scores.length === 0"
-		:error-text="t('Failed to load scores')"
-		:empty-text="t('No scores in this book')"
-		:icon-size="32"
-		:show-above-content-on-empty="true">
-		<template #empty-icon>
+		:isEmpty="scores.length === 0"
+		:errorText="t('Failed to load scores')"
+		:emptyText="t('No scores in this book')"
+		:iconSize="32"
+		:showAboveContentOnEmpty="true">
+		<template #emptyIcon>
 			<ScoreIcon :size="32" />
 		</template>
-		<template #above-content>
+		<template #aboveContent>
 			<!-- Header with button -->
 			<div class="scores-header">
 				<h4>{{ t('Show detailed list') }}</h4>
@@ -30,7 +30,7 @@
 				:key="score.id"
 				:name="score.title"
 				:bold="false"
-				:counter-number="score.scoreBook?.index ?? undefined"
+				:counterNumber="score.scoreBook?.index ?? undefined"
 				:to="{ name: 'scorebook', params: { id: scoreBookId } }">
 				<template #subname>
 					{{ score.composer || '' }}
@@ -41,13 +41,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { t } from '@/utils/l10n'
-import NcListItem from '@nextcloud/vue/components/NcListItem'
+import { computed, onMounted, ref, watch } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcListItem from '@nextcloud/vue/components/NcListItem'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
-import { ScoreIcon, OpenExternalIcon } from '@/icons/vue-material'
+import { OpenExternalIcon, ScoreIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	scoreBookId: number

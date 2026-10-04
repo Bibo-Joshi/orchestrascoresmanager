@@ -44,8 +44,8 @@ class SetlistService {
 	 * @param bool|null $isDraft Filter by draft status
 	 * @param bool|null $isPublished Filter by published status
 	 * @return array[] Array of setlist data
-	 * @throws Exception
-	 * @throws InvalidArgumentException
+	 * @throws { Exception }
+	 * @throws { InvalidArgumentException }
 	 */
 	public function getSetlists(string $filter = 'all', ?bool $isDraft = null, ?bool $isPublished = null): array {
 		$setlists = match ($filter) {
@@ -72,7 +72,7 @@ class SetlistService {
 	 *
 	 * @param int $id
 	 * @return array Setlist data
-	 * @throws InvalidArgumentException
+	 * @throws { InvalidArgumentException }
 	 */
 	public function getSetlistById(int $id): array {
 		$setlist = $this->findSetlistEntity($id);
@@ -85,7 +85,7 @@ class SetlistService {
 	 *
 	 * @param int $id
 	 * @return Setlist
-	 * @throws InvalidArgumentException
+	 * @throws { InvalidArgumentException }
 	 */
 	public function findSetlistEntity(int $id): Setlist {
 		try {
@@ -100,7 +100,7 @@ class SetlistService {
 	 *
 	 * @param Setlist $setlist
 	 * @return array Created setlist data
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function createSetlist(Setlist $setlist): array {
 		$this->authorizationService->authorizePolicy($this->setlistPolicy, PolicyInterface::ACTION_CREATE);
@@ -145,8 +145,8 @@ class SetlistService {
 	 *
 	 * @param Setlist $setlist
 	 * @return array Updated setlist data
-	 * @throws Exception
-	 * @throws InvalidArgumentException
+	 * @throws { Exception }
+	 * @throws { InvalidArgumentException }
 	 */
 	public function updateSetlist(Setlist $setlist): array {
 		$this->authorizationService->authorizePolicy($this->setlistPolicy, PolicyInterface::ACTION_UPDATE, $setlist);
@@ -179,8 +179,8 @@ class SetlistService {
 	 *
 	 * @param int $id
 	 * @return void
-	 * @throws Exception
-	 * @throws InvalidArgumentException
+	 * @throws { Exception }
+	 * @throws { InvalidArgumentException }
 	 */
 	public function deleteSetlist(int $id): void {
 		$setlist = $this->findSetlistEntity($id);
@@ -194,8 +194,8 @@ class SetlistService {
 	 *
 	 * @param int $setlistId
 	 * @return array[] Array of entry data
-	 * @throws Exception
-	 * @throws InvalidArgumentException
+	 * @throws { Exception }
+	 * @throws { InvalidArgumentException }
 	 */
 	public function getSetlistEntries(int $setlistId): array {
 		$setlist = $this->findSetlistEntity($setlistId);
@@ -213,8 +213,8 @@ class SetlistService {
 	 * @param int $setlistId
 	 * @param SetlistEntry $entry
 	 * @return array Created entry data
-	 * @throws Exception
-	 * @throws InvalidArgumentException
+	 * @throws { Exception }
+	 * @throws { InvalidArgumentException }
 	 */
 	public function createSetlistEntry(int $setlistId, SetlistEntry $entry): array {
 		$setlist = $this->findSetlistEntity($setlistId);
@@ -263,8 +263,8 @@ class SetlistService {
 	 * @param int $id The ID of the setlist to clone
 	 * @param string $title The title for the cloned setlist
 	 * @return array Created setlist data
-	 * @throws Exception
-	 * @throws InvalidArgumentException
+	 * @throws { Exception }
+	 * @throws { InvalidArgumentException }
 	 */
 	public function cloneSetlist(int $id, string $title): array {
 		$source = $this->findSetlistEntity($id);

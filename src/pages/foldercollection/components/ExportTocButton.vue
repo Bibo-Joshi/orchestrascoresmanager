@@ -10,13 +10,15 @@
 </template>
 
 <script setup lang="ts">
-import { t } from '@/utils/l10n'
+import type { FolderCollection, FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
+import type { CollectionEntry } from '@/utils/fcv-xlsx-exporter'
+
 import NcButton from '@nextcloud/vue/components/NcButton'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 import { DownloadIcon } from '@/icons/vue-material'
 import { tryShowError } from '@/utils/errorHandling'
-import { exportFolderCollectionToXlsx, type CollectionEntry } from '@/utils/fcv-xlsx-exporter'
-import type { FolderCollection, FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
-import { useBreakpoints } from '@/composables/useBreakpoints'
+import { exportFolderCollectionToXlsx } from '@/utils/fcv-xlsx-exporter'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	folderCollection: FolderCollection

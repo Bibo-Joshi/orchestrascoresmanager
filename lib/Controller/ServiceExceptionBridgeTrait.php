@@ -16,8 +16,8 @@ trait ServiceExceptionBridgeTrait {
 	 * @template T
 	 * @param callable(): T $callable
 	 * @return T
-	 * @throws OCSForbiddenException
-	 * @throws OCSBadRequestException
+	 * @throws { OCSForbiddenException }
+	 * @throws { OCSBadRequestException }
 	 */
 	private function callService(callable $callable) {
 		try {

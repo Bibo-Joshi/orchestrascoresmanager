@@ -13,17 +13,18 @@
 </template>
 
 <script setup lang="ts">
+import type { FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
+
 import { showError, showSuccess } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import NcButton from '@nextcloud/vue/components/NcButton'
-import { HistoryIcon } from '@/icons/vue-material'
 import StartNewVersionDialog from './StartNewVersionDialog.vue'
-import { t } from '@/utils/l10n'
-import { useFolderCollectionVersionsStore } from '@/stores/folderCollectionVersionsStore'
-import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
-import type { FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
 import { useBreakpoints } from '@/composables/useBreakpoints'
+import { HistoryIcon } from '@/icons/vue-material'
+import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
+import { useFolderCollectionVersionsStore } from '@/stores/folderCollectionVersionsStore'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	folderCollectionId: number
@@ -35,7 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-	'versionCreated': [version: FolderCollectionVersion]
+	versionCreated: [version: FolderCollectionVersion]
 }>()
 
 const versionsStore = useFolderCollectionVersionsStore()

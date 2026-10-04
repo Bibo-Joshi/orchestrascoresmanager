@@ -27,9 +27,9 @@ class FolderCollectionVersionMapper extends QBMapper {
 	 *
 	 * @param int $id
 	 * @return FolderCollectionVersion
-	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
-	 * @throws Exception
+	 * @throws { DoesNotExistException }
+	 * @throws { MultipleObjectsReturnedException }
+	 * @throws { Exception }
 	 */
 	public function find(int $id): FolderCollectionVersion {
 		$qb = $this->db->getQueryBuilder();
@@ -44,7 +44,7 @@ class FolderCollectionVersionMapper extends QBMapper {
 	 *
 	 * @param int $folderCollectionId
 	 * @return FolderCollectionVersion[]
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findAllForFolderCollection(int $folderCollectionId): array {
 		$qb = $this->db->getQueryBuilder();
@@ -60,8 +60,8 @@ class FolderCollectionVersionMapper extends QBMapper {
 	 *
 	 * @param int $folderCollectionId
 	 * @return FolderCollectionVersion|null
-	 * @throws Exception
-	 * @throws MultipleObjectsReturnedException
+	 * @throws { Exception }
+	 * @throws { MultipleObjectsReturnedException }
 	 */
 	public function findActiveVersion(int $folderCollectionId): ?FolderCollectionVersion {
 		$qb = $this->db->getQueryBuilder();
@@ -82,8 +82,8 @@ class FolderCollectionVersionMapper extends QBMapper {
 	 *
 	 * @param int $folderCollectionId
 	 * @return FolderCollectionVersion
-	 * @throws Exception
-	 * @throws DoesNotExistException if no version exists for this folder collection
+	 * @throws { Exception }
+	 * @throws { DoesNotExistException } if no version exists for this folder collection
 	 */
 	public function findLatestVersion(int $folderCollectionId): FolderCollectionVersion {
 		$qb = $this->db->getQueryBuilder();
@@ -105,7 +105,7 @@ class FolderCollectionVersionMapper extends QBMapper {
 	 * @param \DateTimeImmutable|null $validTo End date (should be normalized to midnight UTC, null = open-ended)
 	 * @param int|null $excludeVersionId Version ID to exclude (for updates)
 	 * @return bool True if there is an overlap
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function hasOverlappingVersion(int $folderCollectionId, \DateTimeImmutable $validFrom, ?\DateTimeImmutable $validTo, ?int $excludeVersionId = null): bool {
 		$qb = $this->db->getQueryBuilder();
@@ -146,7 +146,7 @@ class FolderCollectionVersionMapper extends QBMapper {
 	 * Delete all versions for a folder collection.
 	 *
 	 * @param int $folderCollectionId
-	 * @throws Exception
+	 * @throws { Exception }
 	 * @psalm-suppress PossiblyUnusedMethod - Public API for potential use
 	 */
 	public function deleteAllForFolderCollection(int $folderCollectionId): void {

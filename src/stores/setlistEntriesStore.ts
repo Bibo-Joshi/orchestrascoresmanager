@@ -1,7 +1,8 @@
+import type { SetlistEntry } from '@/api/generated/openapi/data-contracts'
+
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { apiClients } from '@/api/client'
-import type { SetlistEntry } from '@/api/generated/openapi/data-contracts'
 
 /**
  * Pinia store for managing setlist entries state.
@@ -25,7 +26,7 @@ export const useSetlistEntriesStore = defineStore('setlistEntries', () => {
 	/**
 	 * Load entries for a specific setlist from API
 	 * @param setlistId - The setlist ID
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function loadEntries(setlistId: number): Promise<void> {
 		const response = await apiClients.default.setlistApiGetSetlistEntries(setlistId)
@@ -42,7 +43,7 @@ export const useSetlistEntriesStore = defineStore('setlistEntries', () => {
 	 * @param moderationDuration - The moderation duration in seconds (optional)
 	 * @param comment - Optional comment for the entry
 	 * @return The created setlist entry
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function createEntry(
 		setlistId: number,
@@ -71,7 +72,7 @@ export const useSetlistEntriesStore = defineStore('setlistEntries', () => {
 	 * @param entryId - The entry ID
 	 * @param updates - Partial entry data to update
 	 * @return The updated setlist entry
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function updateEntry(
 		entryId: number,
@@ -83,7 +84,7 @@ export const useSetlistEntriesStore = defineStore('setlistEntries', () => {
 		// Update in store
 		const setlistEntries = entries.value.get(updated.setlistId)
 		if (setlistEntries) {
-			const index = setlistEntries.findIndex(e => e.id === entryId)
+			const index = setlistEntries.findIndex((e) => e.id === entryId)
 			if (index !== -1) {
 				setlistEntries[index] = updated
 			}
@@ -96,13 +97,13 @@ export const useSetlistEntriesStore = defineStore('setlistEntries', () => {
 	 * Delete a setlist entry via API and remove from store
 	 * @param entryId - The entry ID to remove
 	 * @param setlistId - The setlist ID (needed to update the correct list)
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function deleteEntry(entryId: number, setlistId: number): Promise<void> {
 		await apiClients.default.setlistEntryApiDeleteSetlistEntry(entryId)
 		const setlistEntries = entries.value.get(setlistId)
 		if (setlistEntries) {
-			entries.value.set(setlistId, setlistEntries.filter(e => e.id !== entryId))
+			entries.value.set(setlistId, setlistEntries.filter((e) => e.id !== entryId))
 		}
 	}
 
@@ -110,18 +111,16 @@ export const useSetlistEntriesStore = defineStore('setlistEntries', () => {
 	 * Batch update setlist entries via API
 	 * @param updates - Array of entry updates with IDs
 	 * @return The updated setlist entries
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
-	async function batchUpdateEntries(
-		updates: Array<{
-			id: number
-			index?: number
-			comment?: string | null
-			moderationDuration?: number | null
-			breakDuration?: number | null
-			scoreId?: number | null
-		}>,
-	): Promise<SetlistEntry[]> {
+	async function batchUpdateEntries(updates: Array<{
+		id: number
+		index?: number
+		comment?: string | null
+		moderationDuration?: number | null
+		breakDuration?: number | null
+		scoreId?: number | null
+	}>): Promise<SetlistEntry[]> {
 		const response = await apiClients.default.setlistEntryApiPostSetlistEntriesBatch({
 			entries: updates,
 		})
@@ -131,8 +130,8 @@ export const useSetlistEntriesStore = defineStore('setlistEntries', () => {
 		if (updated.length > 0) {
 			const setlistId = updated[0].setlistId
 			const setlistEntries = entries.value.get(setlistId) || []
-			updated.forEach(updatedEntry => {
-				const index = setlistEntries.findIndex(e => e.id === updatedEntry.id)
+			updated.forEach((updatedEntry) => {
+				const index = setlistEntries.findIndex((e) => e.id === updatedEntry.id)
 				if (index !== -1) {
 					setlistEntries[index] = updatedEntry
 				}

@@ -55,8 +55,8 @@ class ScoreApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerScore>, array{}> the list of scores
 	 *
 	 * 200: Successful response with the list of scores
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/scores')]
@@ -92,7 +92,7 @@ class ScoreApiController extends OCSController {
 	 *
 	 * 201: Successful creation of the score
 	 *
-	 * @throws Exception if DB insertion fails
+	 * @throws { Exception } if DB insertion fails
 	 * @throws \Throwable
 	 */
 	#[NoAdminRequired]
@@ -166,8 +166,8 @@ class ScoreApiController extends OCSController {
 	 *
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerScore, array{}> the updated score
 	 *
-	 * @throws OCSBadRequestException If the score is not found
-	 * @throws Exception
+	 * @throws { OCSBadRequestException } If the score is not found
+	 * @throws { Exception }
 	 * @throws \Throwable If adding/removing tags fails
 	 *
 	 * 200: Successful update of the score
@@ -248,8 +248,8 @@ class ScoreApiController extends OCSController {
 	 * 204: Successful deletion of the score
 	 * 400: Bad request
 	 * 403: Forbidden
-	 * @throws OCSBadRequestException if the score does not exist
-	 * @throws OCSForbiddenException if the user does not have permission
+	 * @throws { OCSBadRequestException } if the score does not exist
+	 * @throws { OCSForbiddenException } if the user does not have permission
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'DELETE', url: '/scores/{id}')]
@@ -268,8 +268,8 @@ class ScoreApiController extends OCSController {
 	 * 200: Successful response with the list of comments
 	 * 400: Bad request
 	 * 403: Forbidden
-	 * @throws OCSBadRequestException if the request is invalid
-	 * @throws OCSForbiddenException if the user does not have permission
+	 * @throws { OCSBadRequestException } if the request is invalid
+	 * @throws { OCSForbiddenException } if the user does not have permission
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/scores/{id}/comments')]
@@ -291,8 +291,8 @@ class ScoreApiController extends OCSController {
 	 * 201: Successful creation of the comment
 	 * 400: Bad request
 	 * 403: Forbidden
-	 * @throws OCSBadRequestException if the request is invalid
-	 * @throws OCSForbiddenException if the user does not have permission
+	 * @throws { OCSBadRequestException } if the request is invalid
+	 * @throws { OCSForbiddenException } if the user does not have permission
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/scores/{id}/comments')]
@@ -318,8 +318,8 @@ class ScoreApiController extends OCSController {
 	 * 200: Successful response with the list of folder collections
 	 * 400: Bad request
 	 * 403: Forbidden
-	 * @throws OCSBadRequestException if the request is invalid
-	 * @throws OCSForbiddenException if the user does not have permission
+	 * @throws { OCSBadRequestException } if the request is invalid
+	 * @throws { OCSForbiddenException } if the user does not have permission
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/scores/{id}/foldercollections')]

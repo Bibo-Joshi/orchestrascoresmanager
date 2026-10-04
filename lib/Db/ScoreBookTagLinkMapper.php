@@ -25,7 +25,7 @@ class ScoreBookTagLinkMapper extends QBMapper {
 	 *
 	 * @param int $scoreBookId
 	 * @return int[] tag ids
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findTagIdsForScoreBook(int $scoreBookId): array {
 		$qb = $this->db->getQueryBuilder();
@@ -45,7 +45,7 @@ class ScoreBookTagLinkMapper extends QBMapper {
 	 *
 	 * @param int[] $scoreBookIds
 	 * @return array<int, int[]> map of score book id to tag ids
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findTagIdsForScoreBooks(array $scoreBookIds): array {
 		$scoreBookIds = array_map('intval', array_values($scoreBookIds));
@@ -74,7 +74,7 @@ class ScoreBookTagLinkMapper extends QBMapper {
 	 *
 	 * @param int $scoreBookId
 	 * @param int[] $tagIds
-	 * @throws Exception
+	 * @throws { Exception }
 	 * @throws \Throwable
 	 */
 	public function setTagsForScoreBook(int $scoreBookId, array $tagIds): void {
@@ -128,7 +128,7 @@ class ScoreBookTagLinkMapper extends QBMapper {
 	 * Delete all tag links for a score book.
 	 *
 	 * @param int $scoreBookId
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function deleteAllTagsForScoreBook(int $scoreBookId): void {
 		$qb = $this->db->getQueryBuilder();

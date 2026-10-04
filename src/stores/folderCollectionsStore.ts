@@ -1,8 +1,9 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { loadState } from '@nextcloud/initial-state'
-import { apiClients } from '@/api/client'
 import type { FolderCollection } from '@/api/generated/openapi/data-contracts'
+
+import { loadState } from '@nextcloud/initial-state'
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { apiClients } from '@/api/client'
 
 /**
  * Pinia store for managing folder collections state.
@@ -20,7 +21,9 @@ export const useFolderCollectionsStore = defineStore('folderCollections', () => 
 	 * Initialize the store by loading data from initial state or API
 	 */
 	async function initialize(): Promise<void> {
-		if (isLoaded.value || isLoading.value) return
+		if (isLoaded.value || isLoading.value) {
+			return
+		}
 
 		isLoading.value = true
 
@@ -49,9 +52,7 @@ export const useFolderCollectionsStore = defineStore('folderCollections', () => 
 	 * Get folder collections sorted by title
 	 */
 	const folderCollectionsSorted = computed(() => {
-		return [...folderCollections.value].sort((a, b) =>
-			a.title.localeCompare(b.title),
-		)
+		return [...folderCollections.value].sort((a, b) => a.title.localeCompare(b.title))
 	})
 
 	/**
@@ -60,7 +61,7 @@ export const useFolderCollectionsStore = defineStore('folderCollections', () => 
 	 * @param id - The folder collection ID
 	 */
 	function getFolderCollectionById(id: number): FolderCollection | undefined {
-		return folderCollections.value.find(fc => fc.id === id)
+		return folderCollections.value.find((fc) => fc.id === id)
 	}
 
 	/**
@@ -70,7 +71,7 @@ export const useFolderCollectionsStore = defineStore('folderCollections', () => 
 	 * @param collectionType - The collection type ('alphabetical' or 'indexed')
 	 * @param description - Optional description
 	 * @return The created folder collection
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function createFolderCollection(
 		title: string,
@@ -93,11 +94,11 @@ export const useFolderCollectionsStore = defineStore('folderCollections', () => 
 	 * Delete a folder collection via API and remove from store
 	 *
 	 * @param id - The folder collection ID to remove
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function deleteFolderCollection(id: number): Promise<void> {
 		await apiClients.default.folderCollectionApiDeleteFolderCollection(id)
-		folderCollections.value = folderCollections.value.filter(fc => fc.id !== id)
+		folderCollections.value = folderCollections.value.filter((fc) => fc.id !== id)
 	}
 
 	/**
@@ -106,7 +107,7 @@ export const useFolderCollectionsStore = defineStore('folderCollections', () => 
 	 * @param id - The folder collection ID
 	 */
 	function incrementScoreCount(id: number): void {
-		const fc = folderCollections.value.find(fc => fc.id === id)
+		const fc = folderCollections.value.find((fc) => fc.id === id)
 		if (fc) {
 			fc.scoreCount = fc.scoreCount + 1
 		}
@@ -118,7 +119,7 @@ export const useFolderCollectionsStore = defineStore('folderCollections', () => 
 	 * @param id - The folder collection ID
 	 */
 	function decrementScoreCount(id: number): void {
-		const fc = folderCollections.value.find(fc => fc.id === id)
+		const fc = folderCollections.value.find((fc) => fc.id === id)
 		if (fc && fc.scoreCount > 0) {
 			fc.scoreCount = fc.scoreCount - 1
 		}
@@ -131,7 +132,7 @@ export const useFolderCollectionsStore = defineStore('folderCollections', () => 
 	 * @param activeVersionId - The new active version ID
 	 */
 	function updateFolderCollectionActiveVersion(id: number, activeVersionId: number | null): void {
-		const fc = folderCollections.value.find(fc => fc.id === id)
+		const fc = folderCollections.value.find((fc) => fc.id === id)
 		if (fc) {
 			fc.activeVersionId = activeVersionId
 		}

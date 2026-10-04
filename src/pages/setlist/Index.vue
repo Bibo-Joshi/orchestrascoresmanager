@@ -1,6 +1,6 @@
 <template>
 	<Layout :title="setlist?.title">
-		<template #header-actions>
+		<template #headerActions>
 			<AddSetlistEntryButton
 				v-if="setlist && editable"
 				:setlist="setlist"
@@ -10,10 +10,10 @@
 				:setlist="setlist"
 				:entries="setlistEntries"
 				:editable="editable"
-				:fcv-scores-map="fcvScoresMap"
-				:fcv-score-book-indices-map="fcvScoreBookIndicesMap"
-				:folder-collection="folderCollection"
-				:get-columns="getPdfColumns" />
+				:fcvScoresMap="fcvScoresMap"
+				:fcvScoreBookIndicesMap="fcvScoreBookIndicesMap"
+				:folderCollection="folderCollection"
+				:getColumns="getPdfColumns" />
 			<NcButton
 				v-if="setlist && editable"
 				:size="buttonSize"
@@ -33,27 +33,27 @@
 					<InfoIcon :size="20" />
 				</template>
 			</NcButton>
-			<ViewModeMenu v-if="setlistEntries.length > 0" v-model:view-mode="viewMode" />
+			<ViewModeMenu v-if="setlistEntries.length > 0" v-model:viewMode="viewMode" />
 		</template>
 
 		<template #content>
 			<ContentStateWrapper
 				:loading="loading"
 				:error="loadError || !setlist"
-				:is-empty="setlistEntries.length === 0"
-				:error-text="t('Failed to load setlist')">
-				<template #empty-icon>
+				:isEmpty="setlistEntries.length === 0"
+				:errorText="t('Failed to load setlist')">
+				<template #emptyIcon>
 					<SetlistIcon :size="64" />
 				</template>
 				<SetlistEntriesTable
 					v-if="setlist && setlistEntries.length > 0"
 					ref="tableRef"
-					:view-mode="viewMode"
+					:viewMode="viewMode"
 					:setlist="setlist"
 					:entries="setlistEntries"
-					:fcv-scores-map="fcvScoresMap"
-					:fcv-score-book-indices-map="fcvScoreBookIndicesMap"
-					:folder-collection="folderCollection"
+					:fcvScoresMap="fcvScoresMap"
+					:fcvScoreBookIndicesMap="fcvScoreBookIndicesMap"
+					:folderCollection="folderCollection"
 					:editable="editable" />
 			</ContentStateWrapper>
 		</template>
@@ -66,36 +66,37 @@
 	<!-- Clone dialog -->
 	<CloneSetlistDialog
 		v-if="setlist && showCloneDialog"
-		:is-open="showCloneDialog"
-		:setlist-id="setlist.id"
-		@update:is-open="showCloneDialog = $event" />
+		:isOpen="showCloneDialog"
+		:setlistId="setlist.id"
+		@update:isOpen="showCloneDialog = $event" />
 </template>
 
 <script setup lang="ts">
-import { t } from '@/utils/l10n'
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import type { FolderCollection, Score, ScoreBookIndexed, ScoreIndexed, Setlist } from '@/api/generated/openapi/data-contracts'
+import type { PdfColumnConfig } from '@/utils/pdf-exporter'
+
 import { loadState } from '@nextcloud/initial-state'
-import Layout from '@/components/Layout.vue'
-import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import NcButton from '@nextcloud/vue/components/NcButton'
-import SetlistPageSidebar from './components/SetlistPageSidebar.vue'
-import SetlistEntriesTable from './components/SetlistEntriesTable.vue'
 import AddSetlistEntryButton from './components/AddSetlistEntryButton.vue'
 import ExportMenu from './components/ExportMenu.vue'
-import CloneSetlistDialog from '@/components/CloneSetlistDialog.vue'
-import { SetlistIcon, InfoIcon, CloneIcon } from '@/icons/vue-material'
-import { useSetlistsStore } from '@/stores/setlistsStore'
-import { useSetlistSidebarStore } from '@/stores/setlistSidebarStore'
-import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
-import { useScoresStore } from '@/stores/scoresStore'
-import { useScoreBooksStore } from '@/stores/scoreBooksStore'
-import { apiClients } from '@/api/client'
-import type { Setlist, Score, ScoreIndexed, FolderCollection, ScoreBookIndexed } from '@/api/generated/openapi/data-contracts'
-import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
-import type { PdfColumnConfig } from '@/utils/pdf-exporter'
-import { useBreakpoints } from '@/composables/useBreakpoints'
+import SetlistEntriesTable from './components/SetlistEntriesTable.vue'
+import SetlistPageSidebar from './components/SetlistPageSidebar.vue'
 import ViewModeMenu from './components/ViewModeMenu.vue'
+import CloneSetlistDialog from '@/components/CloneSetlistDialog.vue'
+import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
+import Layout from '@/components/Layout.vue'
+import { apiClients } from '@/api/client'
+import { useBreakpoints } from '@/composables/useBreakpoints'
+import { CloneIcon, InfoIcon, SetlistIcon } from '@/icons/vue-material'
+import { useScoreBooksStore } from '@/stores/scoreBooksStore'
+import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
+import { useScoresStore } from '@/stores/scoresStore'
+import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
+import { useSetlistSidebarStore } from '@/stores/setlistSidebarStore'
+import { useSetlistsStore } from '@/stores/setlistsStore'
+import { t } from '@/utils/l10n'
 
 const route = useRoute()
 const setlistsStore = useSetlistsStore()
@@ -156,7 +157,7 @@ function handleDetailsButtonClick(): void {
 	setlistSidebarStore.toggleSidebar()
 }
 
-const loadSetlistEntries = async (): Promise<void> => {
+async function loadSetlistEntries(): Promise<void> {
 	loading.value = true
 	loadError.value = false
 	try {
@@ -172,15 +173,11 @@ const loadSetlistEntries = async (): Promise<void> => {
 			if (setlist.value?.folderCollectionVersionId) {
 				try {
 					// First, get the folder collection version to find the folder collection ID
-					const versionResponse = await apiClients.default.folderCollectionVersionApiGetFolderCollectionVersion(
-						setlist.value.folderCollectionVersionId,
-					)
+					const versionResponse = await apiClients.default.folderCollectionVersionApiGetFolderCollectionVersion(setlist.value.folderCollectionVersionId)
 					const version = versionResponse.data.ocs.data
 
 					// Load the folder collection to get its type (alphabetical vs indexed)
-					const fcResponse = await apiClients.default.folderCollectionApiGetFolderCollection(
-						version.folderCollectionId,
-					)
+					const fcResponse = await apiClients.default.folderCollectionApiGetFolderCollection(version.folderCollectionId)
 					folderCollection.value = fcResponse.data.ocs.data
 
 					// Now load the scores for this folder collection version

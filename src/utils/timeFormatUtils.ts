@@ -1,4 +1,4 @@
-import { t } from './l10n'
+import { t } from './l10n.ts'
 
 /**
  * Format seconds as (HH:)MM:SS
@@ -22,13 +22,13 @@ export function formatDurationHHMMSS(seconds: number): string {
  *
  * @param durationStr - The duration string to parse
  * @return The total duration in seconds or null if empty
- * @throws Error if the format is invalid
+ * @throws { Error } if the format is invalid
  */
 export function parseDurationHHMMSS(durationStr: string | undefined | null): number | null {
 	if (!durationStr || durationStr.trim() === '') {
 		return null
 	}
-	const parts = durationStr.split(':').map(part => parseInt(part, 10))
+	const parts = durationStr.split(':').map((part) => parseInt(part, 10))
 	if (parts.some(isNaN)) {
 		throw new Error(t('Invalid duration format'))
 	}
@@ -73,13 +73,13 @@ export function formatDurationHHMM(seconds: number): string {
  *
  * @param durationStr - The duration string to parse
  * @return The total duration in seconds or null if empty
- * @throws Error if the format is invalid
+ * @throws { Error } if the format is invalid
  */
 export function parseDurationHHMM(durationStr: string | undefined | null): number | null {
 	if (!durationStr || durationStr.trim() === '') {
 		return null
 	}
-	const parts = durationStr.split(':').map(part => parseInt(part, 10))
+	const parts = durationStr.split(':').map((part) => parseInt(part, 10))
 	if (parts.some(isNaN)) {
 		throw new Error(t('Invalid duration format'))
 	}

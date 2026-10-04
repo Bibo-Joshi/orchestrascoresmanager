@@ -17,13 +17,13 @@ export function parseArrayValue(value: unknown): string[] | null {
 
 	// If already an array, filter out empty strings
 	if (Array.isArray(value)) {
-		const filtered = value.map(v => String(v).trim()).filter(Boolean)
+		const filtered = value.map((v) => String(v).trim()).filter(Boolean)
 		return filtered.length > 0 ? filtered : null
 	}
 
 	// If string, split by comma and filter
 	if (typeof value === 'string') {
-		const parts = value.split(',').map(s => s.trim()).filter(Boolean)
+		const parts = value.split(',').map((s) => s.trim()).filter(Boolean)
 		return parts.length > 0 ? parts : null
 	}
 

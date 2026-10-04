@@ -1,11 +1,12 @@
-import { ref, computed } from 'vue'
-import { apiClients } from '@/api/client'
 import type {
+	FolderCollection,
 	FolderCollectionScore,
 	FolderCollectionScoreBook,
-	FolderCollection,
 	FolderCollectionVersion,
 } from '@/api/generated/openapi/data-contracts'
+
+import { computed, ref } from 'vue'
+import { apiClients } from '@/api/client'
 
 export interface VersionEntry {
 	version: FolderCollectionVersion
@@ -68,9 +69,7 @@ export function useVersionHistory(type: 'score' | 'scorebook') {
 		}
 
 		// Convert to array and sort groups by folder collection title
-		return Array.from(groups.values()).sort((a, b) =>
-			a.folderCollection.title.localeCompare(b.folderCollection.title),
-		)
+		return Array.from(groups.values()).sort((a, b) => a.folderCollection.title.localeCompare(b.folderCollection.title))
 	})
 
 	/**
@@ -79,7 +78,9 @@ export function useVersionHistory(type: 'score' | 'scorebook') {
 	 * @param id - Score ID or Score Book ID
 	 */
 	async function load(id: number) {
-		if (!id) return
+		if (!id) {
+			return
+		}
 
 		loading.value = true
 		loadError.value = false

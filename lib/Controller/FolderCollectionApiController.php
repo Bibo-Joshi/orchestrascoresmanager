@@ -46,8 +46,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerFolderCollection>, array{}> the list of folder collections
 	 *
 	 * 200: Successful response with the list of folder collections
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/foldercollections')]
@@ -64,8 +64,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerFolderCollection, array{}> the folder collection
 	 *
 	 * 200: Successful response with the folder collection
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/foldercollections/{id}')]
@@ -85,8 +85,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerFolderCollection, array{}> the created folder collection
 	 *
 	 * 201: Successful creation of the folder collection
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/foldercollections')]
@@ -116,8 +116,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerFolderCollection, array{}> the updated folder collection
 	 *
 	 * 200: Successful update of the folder collection
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 *
 	 * @psalm-suppress PossiblyUnusedParam - extracted from request params
 	 */
@@ -156,8 +156,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}> empty response
 	 *
 	 * 200: Successful deletion of the folder collection
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'DELETE', url: '/foldercollections/{id}')]
@@ -175,8 +175,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerScoreIndexed>|list<OrchestraScoresManagerScore>, array{}> the list of scores (with index for indexed collections)
 	 *
 	 * 200: Successful response with the list of scores
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/foldercollections/{id}/scores')]
@@ -203,8 +203,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, array{}, array{}> empty response
 	 *
 	 * 201: Successfully added score to folder collection
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/foldercollections/{id}/scores')]
@@ -226,8 +226,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}> empty response
 	 *
 	 * 200: Successfully removed score from folder collection
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'DELETE', url: '/foldercollections/{id}/scores/{scoreId}')]
@@ -245,8 +245,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerScoreBookIndexed>|list<OrchestraScoresManagerScoreBook>, array{}> the list of score books (with index for indexed collections)
 	 *
 	 * 200: Successful response with the list of score books
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/foldercollections/{id}/scorebooks')]
@@ -273,8 +273,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, array{}, array{}> empty response
 	 *
 	 * 201: Successfully added score book to folder collection
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/foldercollections/{id}/scorebooks')]
@@ -292,8 +292,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}> empty response
 	 *
 	 * 200: Successfully removed score book from folder collection
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'DELETE', url: '/foldercollections/{id}/scorebooks/{scoreBookId}')]
@@ -310,8 +310,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerFolderCollectionVersion>, array{}> the list of versions
 	 *
 	 * 200: Successful response with the list of versions
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/foldercollections/{id}/versions')]
@@ -331,8 +331,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerFolderCollectionVersion, array{}> the created version
 	 *
 	 * 201: Successful creation of the version
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/foldercollections/{id}/versions')]
@@ -355,8 +355,8 @@ class FolderCollectionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerFolderCollectionVersion, array{}> the created version
 	 *
 	 * 201: Successful creation of the new version
-	 * @throws OCSBadRequestException Invalid request parameters
-	 * @throws OCSForbiddenException Insufficient permissions
+	 * @throws { OCSBadRequestException } Invalid request parameters
+	 * @throws { OCSForbiddenException } Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/foldercollections/{id}/versions/new')]

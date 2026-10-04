@@ -2,28 +2,31 @@
 	<div ref="tableContainer" class="full-page-table" :data-ag-theme-mode="themeMode">
 		<AgGridVue
 			:modules="resolvedModules"
-			:row-data="props.data"
-			:column-defs="props.columnDefs"
-			:default-col-def="defaultColDef"
-			:grid-options="gridOptions"
+			:rowData="props.data"
+			:columnDefs="props.columnDefs"
+			:defaultColDef="defaultColDef"
+			:gridOptions="gridOptions"
 			:style="{ height: '100%', width: '100%' }"
 			:theme="nextcloudTheme"
-			:locale-text="localeText"
-			invalid-edit-value-mode="block"
-			@grid-ready="onGridReady" />
+			:localeText="localeText"
+			invalidEditValueMode="block"
+			@gridReady="onGridReady" />
 	</div>
 </template>
 
 <script setup lang="ts">
+import type { ColDef, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-community'
+
 import { isDarkTheme } from '@nextcloud/vue/functions/isDarkTheme'
-import { ref, defineProps, watch, defineEmits, defineExpose, computed } from 'vue'
-import { AgGridVue } from 'ag-grid-vue3'
 import { AllCommunityModule, LocaleModule } from 'ag-grid-community'
-import type { ColDef, GridOptions, GridApi, GridReadyEvent } from 'ag-grid-community'
-import { nextcloudTheme } from '../utils/agGridTheme'
-import { getAgGridLocaleText } from '../utils/agGridLocale'
+import { AgGridVue } from 'ag-grid-vue3'
+import { computed, defineEmits, defineExpose, defineProps, ref, watch } from 'vue'
+import { getAgGridLocaleText } from '../utils/agGridLocale.ts'
+import { nextcloudTheme } from '../utils/agGridTheme.ts'
 import { useBreakpoints } from '@/composables/useBreakpoints'
 
+const props = defineProps<Props>()
+const emit = defineEmits(['cellValueChanged', 'cellDoubleClicked', 'rowDragEnd'] as const)
 const themeMode = ref<string>(isDarkTheme ? 'dark' : 'light')
 const { isMobile } = useBreakpoints()
 
@@ -43,9 +46,6 @@ interface Props {
 	rowDragManaged?: boolean
 	context?: Record<string, unknown>
 }
-
-const props = defineProps<Props>()
-const emit = defineEmits(['cellValueChanged', 'cellDoubleClicked', 'rowDragEnd'] as const)
 
 // Container ref for dynamic sizing
 const tableContainer = ref<HTMLElement>()
@@ -121,7 +121,9 @@ function onGridReady(params: GridReadyEvent) {
 
 // Export table as CSV. Only export columns that define a `field` (this excludes EditButton column).
 function exportAsCsv(fileName?: string): boolean {
-	if (!gridApi.value) throw new Error('Grid API not initialized')
+	if (!gridApi.value) {
+		throw new Error('Grid API not initialized')
+	}
 	const columnKeys = (props.columnDefs || [])
 		.filter((c) => !!(c as ColDef).field)
 		.map((c) => String((c as ColDef).field))

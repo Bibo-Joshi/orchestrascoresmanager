@@ -22,7 +22,7 @@ class TagMapper extends QBMapper {
 
 	/**
 	 * @return Tag[]
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findAll(): array {
 		/* @var $qb IQueryBuilder */
@@ -35,8 +35,8 @@ class TagMapper extends QBMapper {
 	 * Find a tag by its name (lowercased)
 	 * @param string $name
 	 * @return Tag|null
-	 * @throws Exception
-	 * @throws MultipleObjectsReturnedException
+	 * @throws { Exception }
+	 * @throws { MultipleObjectsReturnedException }
 	 */
 	public function findByName(string $name): ?Tag {
 		$normalized = mb_strtolower(trim($name));
@@ -54,9 +54,9 @@ class TagMapper extends QBMapper {
 	 * Find tag by id
 	 * @param int $id
 	 * @return Tag
-	 * @throws DoesNotExistException
-	 * @throws MultipleObjectsReturnedException
-	 * @throws Exception
+	 * @throws { DoesNotExistException }
+	 * @throws { MultipleObjectsReturnedException }
+	 * @throws { Exception }
 	 */
 	public function find(int $id): Tag {
 		$qb = $this->db->getQueryBuilder();
@@ -69,7 +69,7 @@ class TagMapper extends QBMapper {
 	 * Find multiple tags by their ids
 	 * @param array<int> $ids
 	 * @return Tag[]
-	 * @throws Exception
+	 * @throws { Exception }
 	 */
 	public function findMultiple(array $ids): array {
 		$ids = array_map('intval', array_values($ids));

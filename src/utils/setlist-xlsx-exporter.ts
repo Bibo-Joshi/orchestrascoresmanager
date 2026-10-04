@@ -1,10 +1,11 @@
+import type { Score, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
+
+import { linkTo } from '@nextcloud/router'
 /**
  * XLSX exporter for setlist GEMA report.
  * Generates an XLSX file with the setlist entries for GEMA reporting.
  */
 import { Workbook } from 'exceljs'
-import { linkTo } from '@nextcloud/router'
-import type { Setlist, SetlistEntry, Score } from '@/api/generated/openapi/data-contracts'
 import { isBreakEntry } from '@/utils/setlistScoreUtils'
 
 const TEMPLATE_URL = linkTo('orchestrascoresmanager', 'public/gema-template.xlsx')
@@ -43,7 +44,7 @@ function splitPersonName(rawName: string | null | undefined): PersonNameParts {
  * @param rawComposer - The raw composer string which may contain multiple names separated by commas
  * @return An object containing the primary and secondary composer name parts
  */
-function splitComposers(rawComposer: string | null | undefined): { primary: PersonNameParts; secondary: PersonNameParts } {
+function splitComposers(rawComposer: string | null | undefined): { primary: PersonNameParts, secondary: PersonNameParts } {
 	const composers = (rawComposer ?? '')
 		.split(',')
 		.map((value) => value.trim())

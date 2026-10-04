@@ -1,8 +1,9 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { loadState } from '@nextcloud/initial-state'
-import { apiClients } from '@/api/client'
 import type { Setlist } from '@/api/generated/openapi/data-contracts'
+
+import { loadState } from '@nextcloud/initial-state'
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { apiClients } from '@/api/client'
 
 /**
  * Pinia store for managing setlists state.
@@ -20,7 +21,9 @@ export const useSetlistsStore = defineStore('setlists', () => {
 	 * Initialize the store by loading data from initial state or API
 	 */
 	async function initialize(): Promise<void> {
-		if (isLoaded.value || isLoading.value) return
+		if (isLoaded.value || isLoading.value) {
+			return
+		}
 
 		isLoading.value = true
 
@@ -59,7 +62,7 @@ export const useSetlistsStore = defineStore('setlists', () => {
 	): Setlist[] {
 		const now = new Date()
 
-		return setlists.value.filter(setlist => {
+		return setlists.value.filter((setlist) => {
 			// Draft filter
 			if (isDraft !== undefined && setlist.isDraft !== isDraft) {
 				return false
@@ -73,15 +76,25 @@ export const useSetlistsStore = defineStore('setlists', () => {
 			// Date filter
 			if (dateFilter) {
 				if (dateFilter === 'unscheduled') {
-					if (setlist.startDateTime !== null) return false
+					if (setlist.startDateTime !== null) {
+						return false
+					}
 				} else if (dateFilter === 'future') {
-					if (setlist.startDateTime === null) return false
+					if (setlist.startDateTime === null) {
+						return false
+					}
 					const setlistDate = new Date(setlist.startDateTime)
-					if (setlistDate <= now) return false
+					if (setlistDate <= now) {
+						return false
+					}
 				} else if (dateFilter === 'past') {
-					if (setlist.startDateTime === null) return false
+					if (setlist.startDateTime === null) {
+						return false
+					}
 					const setlistDate = new Date(setlist.startDateTime)
-					if (setlistDate > now) return false
+					if (setlistDate > now) {
+						return false
+					}
 				}
 			}
 
@@ -115,7 +128,7 @@ export const useSetlistsStore = defineStore('setlists', () => {
 	 * @param id - The setlist ID
 	 */
 	function getSetlistById(id: number): Setlist | undefined {
-		return setlists.value.find(s => s.id === id)
+		return setlists.value.find((s) => s.id === id)
 	}
 
 	/**
@@ -127,7 +140,7 @@ export const useSetlistsStore = defineStore('setlists', () => {
 	 * @param isDraft - Whether it's a draft
 	 * @param isPublished - Whether it's published
 	 * @return The created setlist
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function createSetlist(
 		title: string,
@@ -154,7 +167,7 @@ export const useSetlistsStore = defineStore('setlists', () => {
 	 * @param id - The setlist ID to clone
 	 * @param title - The title for the cloned setlist
 	 * @return The cloned setlist
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function cloneSetlist(id: number, title: string): Promise<Setlist> {
 		const response = await apiClients.default.setlistApiPostCloneSetlist(id, { title })
@@ -167,11 +180,11 @@ export const useSetlistsStore = defineStore('setlists', () => {
 	 * Delete a setlist via API and remove from store
 	 *
 	 * @param id - The setlist ID to remove
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function deleteSetlist(id: number): Promise<void> {
 		await apiClients.default.setlistApiDeleteSetlist(id)
-		setlists.value = setlists.value.filter(s => s.id !== id)
+		setlists.value = setlists.value.filter((s) => s.id !== id)
 	}
 
 	/**
@@ -180,7 +193,7 @@ export const useSetlistsStore = defineStore('setlists', () => {
 	 * @param id - The setlist ID
 	 * @param updates - Partial setlist data to update
 	 * @return The updated setlist
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function updateSetlist(
 		id: number,
@@ -188,7 +201,7 @@ export const useSetlistsStore = defineStore('setlists', () => {
 	): Promise<Setlist> {
 		const response = await apiClients.default.setlistApiPatchSetlist(id, updates)
 		const updated = response.data.ocs.data as Setlist
-		const index = setlists.value.findIndex(s => s.id === id)
+		const index = setlists.value.findIndex((s) => s.id === id)
 		if (index !== -1) {
 			setlists.value[index] = updated
 		}

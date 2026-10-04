@@ -40,7 +40,7 @@ class UserSettingsController extends OCSController {
 	 *
 	 * 200: User setlist settings
 	 * 403: Not authenticated
-	 * @throws OCSForbiddenException If the user is not authenticated.
+	 * @throws { OCSForbiddenException } If the user is not authenticated.
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/settings/user/setlists')]
@@ -64,7 +64,7 @@ class UserSettingsController extends OCSController {
 	 *
 	 * 200: Updated user setlist settings
 	 * 403: Not authenticated
-	 * @throws OCSForbiddenException If the user is not authenticated.
+	 * @throws { OCSForbiddenException } If the user is not authenticated.
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'PUT', url: '/settings/user/setlists')]

@@ -1,6 +1,6 @@
+import { loadState } from '@nextcloud/initial-state'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { loadState } from '@nextcloud/initial-state'
 import { apiClients } from '@/api/client'
 
 export interface Tag {
@@ -24,7 +24,9 @@ export const useTagsStore = defineStore('tags', () => {
 	 * Initialize the store by loading data from initial state or API
 	 */
 	async function initialize(): Promise<void> {
-		if (isLoaded.value || isLoading.value) return
+		if (isLoaded.value || isLoading.value) {
+			return
+		}
 
 		isLoading.value = true
 
@@ -55,11 +57,11 @@ export const useTagsStore = defineStore('tags', () => {
 	 *
 	 * @param name - The tag name (will be normalized to lowercase)
 	 * @return The tag ID
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function getOrCreateTag(name: string): Promise<number> {
 		const normalizedName = name.toLowerCase()
-		const existing = tags.value.find(t => t.name === normalizedName)
+		const existing = tags.value.find((t) => t.name === normalizedName)
 		if (existing) {
 			return existing.id
 		}
@@ -76,7 +78,7 @@ export const useTagsStore = defineStore('tags', () => {
 	 *
 	 * @param names - Array of tag names
 	 * @return Array of tag IDs
-	 * @throws Error if any API call fails
+	 * @throws { Error } if any API call fails
 	 */
 	async function namesToIds(names: string[]): Promise<number[]> {
 		const ids: number[] = []

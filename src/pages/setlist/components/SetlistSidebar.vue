@@ -3,13 +3,13 @@
 		v-if="setlistSidebarStore.isOpen && setlist"
 		v-model="setlistSidebarStore.isOpen"
 		:name="formData.title"
-		:force-tabs="false"
-		:name-editable="nameEditable"
+		:forceTabs="false"
+		:nameEditable="nameEditable"
 		@update:name="(event) => {
 			formData.title = event
 		}"
-		@submit-name="nameEditable = false"
-		@dismiss-editing="nameEditable = false"
+		@submitName="nameEditable = false"
+		@dismissEditing="nameEditable = false"
 		@close="setlistSidebarStore.closeSidebar()">
 		<template #tertiary-actions>
 			<NcButton
@@ -28,7 +28,7 @@
 			<template #icon>
 				<InfoIcon :size="20" />
 			</template>
-			<NcFormGroup hide-label>
+			<NcFormGroup hideLabel>
 				<NcDateTimePickerNative
 					id="startDateTime"
 					v-model="formData.startDateTime"
@@ -47,11 +47,11 @@
 					v-model="selectedFolderCollectionVersion"
 					:disabled="!editable"
 					:options="folderCollectionVersionOptions"
-					:input-label="t('Folder Collection')"
+					:inputLabel="t('Folder Collection')"
 					:placeholder="t('Select folder collection')"
 					:clearable="true"
 					label="label"
-					track-by="value" />
+					trackBy="value" />
 
 				<NcTextField
 					v-model="formData.defaultModerationTimeStr"
@@ -86,7 +86,7 @@
 
 				<div v-if="editable" class="save-icon-container">
 					<NcSavingIndicatorIcon
-						:name="isSaving ? t('Saving...') : t('Saved')"
+						:name="isSaving ? t('Saving…') : t('Saved')"
 						:saving="isSaving"
 						:error="isSavingError" />
 				</div>
@@ -96,30 +96,31 @@
 </template>
 
 <script setup lang="ts">
-import { t } from '@/utils/l10n'
-import { ref, watch, onMounted } from 'vue'
+import type { Setlist } from '@/api/generated/openapi/data-contracts'
+
 import { showError } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
 import debounce from 'lodash.debounce'
-import NcSavingIndicatorIcon from '@nextcloud/vue/components/NcSavingIndicatorIcon'
+import { onMounted, ref, watch } from 'vue'
 import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
-import NcFormGroup from '@nextcloud/vue/components/NcFormGroup'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePickerNative from '@nextcloud/vue/components/NcDateTimePickerNative'
+import NcFormGroup from '@nextcloud/vue/components/NcFormGroup'
+import NcSavingIndicatorIcon from '@nextcloud/vue/components/NcSavingIndicatorIcon'
+import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
-import NcSelect from '@nextcloud/vue/components/NcSelect'
-import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
-import { InfoIcon, EditIcon } from '@/icons/vue-material'
+import { apiClients } from '@/api/client.ts'
+import { useBreakpoints } from '@/composables/useBreakpoints.ts'
+import { formatDateStr } from '@/composables/useDateFormatting.ts'
+import { EditIcon, InfoIcon } from '@/icons/vue-material'
+import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { useSetlistSidebarStore } from '@/stores/setlistSidebarStore'
 import { useSetlistsStore } from '@/stores/setlistsStore'
-import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
-import type { Setlist } from '@/api/generated/openapi/data-contracts'
-import { formatDurationHHMMSS, parseDurationHHMMSS, formatDurationHHMM, parseDurationHHMM, restrictToTimeFormat as restrictInputToTimeFormat } from '@/utils/timeFormatUtils'
-import { apiClients } from '@/api/client.ts'
-import { formatDateStr } from '@/composables/useDateFormatting.ts'
-import NcButton from '@nextcloud/vue/components/NcButton'
-import { useBreakpoints } from '@/composables/useBreakpoints.ts'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
+import { formatDurationHHMM, formatDurationHHMMSS, parseDurationHHMM, parseDurationHHMMSS, restrictToTimeFormat as restrictInputToTimeFormat } from '@/utils/timeFormatUtils'
 
 interface Props {
 	setlist: Setlist | undefined
@@ -158,8 +159,8 @@ const formData = ref<FormData>({
 	isPublished: false,
 })
 
-const selectedFolderCollectionVersion = ref<{ label: string; value: number | null } | null>(null)
-const folderCollectionVersionOptions = ref<Array<{ label: string; value: number | null }>>([])
+const selectedFolderCollectionVersion = ref<{ label: string, value: number | null } | null>(null)
+const folderCollectionVersionOptions = ref<Array<{ label: string, value: number | null }>>([])
 
 /**
  * Get active folder collection versions for the dropdown
@@ -168,7 +169,7 @@ const folderCollectionVersionOptions = ref<Array<{ label: string; value: number 
  * @return An array of options for the folder collection version select dropdown
  */
 async function getFolderCollectionVersionOptions(selectedID: number | null = null) {
-	const options: Array<{ label: string; value: number | null }> = []
+	const options: Array<{ label: string, value: number | null }> = []
 
 	for (const collection of folderCollectionsStore.folderCollectionsSorted) {
 		if (collection.activeVersionId) {
@@ -179,7 +180,7 @@ async function getFolderCollectionVersionOptions(selectedID: number | null = nul
 		}
 	}
 
-	if (selectedID && !options.some(opt => opt.value === selectedID)) {
+	if (selectedID && !options.some((opt) => opt.value === selectedID)) {
 		// If the currently selected version is not in the options, add it
 		const fcv = (await apiClients.default.folderCollectionVersionApiGetFolderCollectionVersion(selectedID)).data.ocs.data
 		const fc = folderCollectionsStore.getFolderCollectionById(fcv.folderCollectionId)
@@ -198,7 +199,9 @@ async function getFolderCollectionVersionOptions(selectedID: number | null = nul
  * Initialize form data from setlist
  */
 async function initializeFormData() {
-	if (!props.setlist) return
+	if (!props.setlist) {
+		return
+	}
 
 	skipNextSave.value = true
 
@@ -219,9 +222,7 @@ async function initializeFormData() {
 	// Set selected folder collection
 	folderCollectionVersionOptions.value = await getFolderCollectionVersionOptions(props.setlist?.folderCollectionVersionId)
 	if (props.setlist.folderCollectionVersionId) {
-		const option = folderCollectionVersionOptions.value.find(
-			opt => opt.value === props.setlist.folderCollectionVersionId,
-		)
+		const option = folderCollectionVersionOptions.value.find((opt) => opt.value === props.setlist.folderCollectionVersionId)
 		selectedFolderCollectionVersion.value = option || null
 	} else {
 		selectedFolderCollectionVersion.value = null
@@ -279,7 +280,9 @@ function restrictToTimeFormat(event: Event) {
  * Validate and save the setlist
  */
 async function handleSave() {
-	if (!props.setlist || !props.editable) return
+	if (!props.setlist || !props.editable) {
+		return
+	}
 
 	// Validate and parse times
 	let defaultModerationDuration: number | null = null
@@ -289,7 +292,7 @@ async function handleSave() {
 		if (formData.value.defaultModerationTimeStr.trim()) {
 			defaultModerationDuration = parseDurationHHMMSS(formData.value.defaultModerationTimeStr)
 		}
-	} catch (e) {
+	} catch {
 		showError(t('Invalid default moderation time format. Use (HH:)MM:SS'))
 		return
 	}
@@ -298,7 +301,7 @@ async function handleSave() {
 		if (formData.value.durationStr.trim()) {
 			duration = parseDurationHHMM(formData.value.durationStr)
 		}
-	} catch (e) {
+	} catch {
 		showError(t('Invalid duration format. Use (HH:)MM'))
 		return
 	}

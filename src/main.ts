@@ -1,11 +1,12 @@
-import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import { createApp } from 'vue'
 import App from './App.vue'
-import router from './router'
-import './types/nextcloud.d.ts'
-import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
+import router from './router.ts'
 import { useScoreBookSidebarStore } from '@/stores/scoreBookSidebarStore'
+import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import { useSetlistSidebarStore } from '@/stores/setlistSidebarStore'
+
+import './types/nextcloud.d.ts'
 
 const pinia = createPinia()
 const app = createApp(App)

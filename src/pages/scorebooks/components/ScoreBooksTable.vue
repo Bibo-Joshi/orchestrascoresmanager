@@ -2,25 +2,26 @@
 	<FullPageTable
 		ref="tableRef"
 		:data="scoreBooksStore.scoreBooks"
-		:column-defs="columnDefs"
+		:columnDefs="columnDefs"
 		:editable="editable"
-		@cell-value-changed="handleCellValueChanged" />
+		@cellValueChanged="handleCellValueChanged" />
 </template>
 
 <script setup lang="ts">
-import { markRaw, ref } from 'vue'
-import { t } from '@/utils/l10n'
-import { parseArrayValue } from '@/utils/arrayUtils'
+import type { CellValueChangedEvent, ColDef } from 'ag-grid-community'
+import type { ScoreBook } from '@/api/generated/openapi/data-contracts'
+
 import { showSuccess } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
+import { markRaw, ref } from 'vue'
 import FullPageTable from '@/components/FullPageTable.vue'
 import RowActionButton from '@/components/RowActionButton.vue'
+import { useBreakpoints } from '@/composables/useBreakpoints.ts'
 import { OpenExternalIcon } from '@/icons/vue-material'
-import type { ColDef, CellValueChangedEvent } from 'ag-grid-community'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useTagsStore } from '@/stores/tagsStore'
-import type { ScoreBook } from '@/api/generated/openapi/data-contracts'
-import { useBreakpoints } from '@/composables/useBreakpoints.ts'
+import { parseArrayValue } from '@/utils/arrayUtils'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	editable: boolean
@@ -41,7 +42,7 @@ const tableRef = ref<TableExportRef | null>(null)
 type ColumnEditHandler = (
 	id: number,
 	newValue: unknown,
-	oldValue: unknown
+	oldValue: unknown,
 ) => Promise<void>
 
 const columnEditHandlers: Record<string, ColumnEditHandler> = {
@@ -62,10 +63,14 @@ const columnEditHandlers: Record<string, ColumnEditHandler> = {
 // Wrapper function that handles try-catch and table updates
 async function handleCellValueChanged(event: CellValueChangedEvent) {
 	const field = (event.colDef && (event.colDef.field as string)) || ''
-	if (!field) return
+	if (!field) {
+		return
+	}
 
 	const id = event.data && event.data.id
-	if (!id) return
+	if (!id) {
+		return
+	}
 
 	await tryShowError(
 		async () => {
@@ -119,7 +124,7 @@ const columnDefs = ref<ColDef[]>([
 	{ field: 'defects', headerName: t('Defects') },
 	{ field: 'physicalCopiesStatus', headerName: t('Physical Copies') },
 	// custom valueParser to enable editing of array-type data
-	{ field: 'tags', headerName: t('Tags'), valueParser: params => parseArrayValue(params.newValue) },
+	{ field: 'tags', headerName: t('Tags'), valueParser: (params) => parseArrayValue(params.newValue) },
 ])
 
 // Expose tableRef for export functionality
