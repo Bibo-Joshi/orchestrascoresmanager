@@ -45,8 +45,8 @@ class SetlistApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerSetlist>, array{}> the list of setlists
 	 *
 	 * 200: Successful response with the list of setlists
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/setlists')]
@@ -63,8 +63,8 @@ class SetlistApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerSetlist, array{}> the setlist
 	 *
 	 * 200: Successful response with the setlist
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/setlists/{id}')]
@@ -88,8 +88,8 @@ class SetlistApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerSetlist, array{}> the created setlist
 	 *
 	 * 201: Successful creation of the setlist
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/setlists')]
@@ -139,8 +139,8 @@ class SetlistApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerSetlist, array{}> the updated setlist
 	 *
 	 * 200: Successful update of the setlist
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 *
 	 * @psalm-suppress PossiblyUnusedParam - extracted from request params
 	 */
@@ -192,8 +192,8 @@ class SetlistApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerSetlist, array{}> the cloned setlist
 	 *
 	 * 201: Successful cloning of the setlist
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/setlists/{id}/clone')]
@@ -210,8 +210,8 @@ class SetlistApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}> empty response
 	 *
 	 * 200: Successful deletion of the setlist
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'DELETE', url: '/setlists/{id}')]
@@ -228,8 +228,8 @@ class SetlistApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerSetlistEntry>, array{}> the list of entries
 	 *
 	 * 200: Successful response with the list of entries
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/setlists/{id}/entries')]
@@ -251,8 +251,8 @@ class SetlistApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerSetlistEntry, array{}> the created entry
 	 *
 	 * 201: Successfully created setlist entry
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/setlists/{id}/entries')]

@@ -101,8 +101,8 @@ class ScoreBookService {
 	 * @param ScoreBook $scoreBook
 	 * @param array|null $tagIds
 	 * @return array Score book data with scoreCount
-	 * @throws { Exception }
-	 * @throws { Throwable }
+	 * @throws Exception
+	 * @throws Throwable
 	 */
 	public function createScoreBook(ScoreBook $scoreBook, ?array $tagIds = null): array {
 		$this->authorizationService->authorizePolicy($this->scoreBookPolicy, PolicyInterface::ACTION_CREATE);
@@ -125,8 +125,8 @@ class ScoreBookService {
 	 * @param ScoreBook $scoreBook
 	 * @param array|null $tagIds
 	 * @return array Score book data with scoreCount
-	 * @throws { Exception }
-	 * @throws { Throwable }
+	 * @throws Exception
+	 * @throws Throwable
 	 */
 	public function updateScoreBook(ScoreBook $scoreBook, ?array $tagIds = null): array {
 		$this->authorizationService->authorizePolicy($this->scoreBookPolicy, PolicyInterface::ACTION_UPDATE, $scoreBook);
@@ -154,7 +154,7 @@ class ScoreBookService {
 	 * Delete a score book.
 	 *
 	 * @param int $id
-	 * @throws { Exception }
+	 * @throws Exception
 	 * @throws \Exception
 	 */
 	public function deleteScoreBook(int $id): void {
@@ -409,7 +409,7 @@ class ScoreBookService {
 	 * @param int $scoreBookId
 	 * @param array $tagIds
 	 * @throws \Exception
-	 * @throws { Throwable }
+	 * @throws Throwable
 	 */
 	private function validateAndSetTags(int $scoreBookId, array $tagIds): void {
 		$validIds = array_map('intval', $tagIds);

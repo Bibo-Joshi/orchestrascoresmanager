@@ -35,7 +35,7 @@ class SetlistEntryService {
 	 *
 	 * @param int $id
 	 * @return array Entry data
-	 * @throws { InvalidArgumentException }
+	 * @throws InvalidArgumentException
 	 */
 	public function getSetlistEntryById(int $id): array {
 		$entry = $this->findSetlistEntryEntity($id);
@@ -50,7 +50,7 @@ class SetlistEntryService {
 	 *
 	 * @param int $id
 	 * @return SetlistEntry
-	 * @throws { InvalidArgumentException }
+	 * @throws InvalidArgumentException
 	 */
 	public function findSetlistEntryEntity(int $id): SetlistEntry {
 		try {
@@ -66,8 +66,8 @@ class SetlistEntryService {
 	 * @param int $id
 	 * @param SetlistEntry $entry
 	 * @return array Updated entry data
-	 * @throws { Exception }
-	 * @throws { InvalidArgumentException }
+	 * @throws Exception
+	 * @throws InvalidArgumentException
 	 */
 	public function updateSetlistEntry(int $id, SetlistEntry $entry): array {
 		try {
@@ -102,8 +102,8 @@ class SetlistEntryService {
 	 *
 	 * @param int $id
 	 * @return void
-	 * @throws { Exception }
-	 * @throws { InvalidArgumentException }
+	 * @throws Exception
+	 * @throws InvalidArgumentException
 	 */
 	public function deleteSetlistEntry(int $id): void {
 		try {
@@ -124,8 +124,8 @@ class SetlistEntryService {
 	 *
 	 * @param array<array{id: int, index?: int, comment?: ?string, moderationDuration?: ?int, breakDuration?: ?int, scoreId?: ?int}> $entries
 	 * @return array[] Updated entries data
-	 * @throws { Exception }
-	 * @throws { InvalidArgumentException }
+	 * @throws Exception
+	 * @throws InvalidArgumentException
 	 */
 	public function batchUpdateSetlistEntries(array $entries): array {
 		if (empty($entries)) {

@@ -43,8 +43,8 @@ class ScoreBookApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerScoreBook>, array{}> the list of score books
 	 *
 	 * 200: Successful response with the list of score books
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/scorebooks')]
@@ -61,8 +61,8 @@ class ScoreBookApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerScoreBook, array{}> the score book
 	 *
 	 * 200: Successful response with the score book
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/scorebooks/{id}')]
@@ -89,8 +89,8 @@ class ScoreBookApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerScoreBook, array{}> the created score book
 	 *
 	 * 201: Successful creation of the score book
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/scorebooks')]
@@ -143,8 +143,8 @@ class ScoreBookApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerScoreBook, array{}> the updated score book
 	 *
 	 * 200: Successful update of the score book
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 *
 	 * @psalm-suppress PossiblyUnusedParam - extracted from request params
 	 */
@@ -193,8 +193,8 @@ class ScoreBookApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}> empty response
 	 *
 	 * 200: Successful deletion of the score book
-	 * @throws { OCSBadRequestException } Invalid request parameters (e.g., book has linked scores)
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters (e.g., book has linked scores)
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'DELETE', url: '/scorebooks/{id}')]
@@ -211,8 +211,8 @@ class ScoreBookApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerScore>, array{}> the list of scores
 	 *
 	 * 200: Successful response with the list of scores
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/scorebooks/{id}/scores')]
@@ -237,8 +237,8 @@ class ScoreBookApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, array{}, array{}> empty response
 	 *
 	 * 201: Successfully added score to score book
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/scorebooks/{id}/scores')]
@@ -263,8 +263,8 @@ class ScoreBookApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, array{}, array{}> empty response
 	 *
 	 * 201: Successfully added scores to score book
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/scorebooks/{id}/scores/batch')]
@@ -286,8 +286,8 @@ class ScoreBookApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}> empty response
 	 *
 	 * 200: Successfully removed score from score book
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'DELETE', url: '/scorebooks/{id}/scores/{scoreId}')]
@@ -304,8 +304,8 @@ class ScoreBookApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerFolderCollectionScoreBook>, array{}> the list of folder collections
 	 *
 	 * 200: Successful response with the list of folder collections
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/scorebooks/{id}/foldercollections')]

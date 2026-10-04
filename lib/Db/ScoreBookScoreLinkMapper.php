@@ -26,7 +26,7 @@ class ScoreBookScoreLinkMapper extends QBMapper {
 	 *
 	 * @param int $scoreBookId
 	 * @return array<array{score_id: int, index: int}> Array of score info with index
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function findScoresForScoreBook(int $scoreBookId): array {
 		$qb = $this->db->getQueryBuilder();
@@ -51,7 +51,7 @@ class ScoreBookScoreLinkMapper extends QBMapper {
 	 *
 	 * @param int $scoreId
 	 * @return array{score_book_id: int, index: int}|null Score book info or null if not in a book
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function findScoreBookForScore(int $scoreId): ?array {
 		$qb = $this->db->getQueryBuilder();
@@ -74,7 +74,7 @@ class ScoreBookScoreLinkMapper extends QBMapper {
 	 *
 	 * @param int[] $scoreIds
 	 * @return array<int, array{score_book_id: int, index: int}> Map of score id to score book info
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function findScoreBooksForScores(array $scoreIds): array {
 		$scoreIds = array_map('intval', array_values($scoreIds));
@@ -104,7 +104,7 @@ class ScoreBookScoreLinkMapper extends QBMapper {
 	 * @param int $scoreBookId
 	 * @param int $scoreId
 	 * @param int $index
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function addScoreToScoreBook(int $scoreBookId, int $scoreId, int $index): void {
 		$qb = $this->db->getQueryBuilder();
@@ -122,7 +122,7 @@ class ScoreBookScoreLinkMapper extends QBMapper {
 	 *
 	 * @param int $scoreBookId
 	 * @param array<array{score_id: int, index: int}> $scores Array of score_id and index pairs
-	 * @throws { Exception }
+	 * @throws Exception
 	 * @throws \Throwable
 	 */
 	public function addScoresToScoreBook(int $scoreBookId, array $scores): void {
@@ -154,7 +154,7 @@ class ScoreBookScoreLinkMapper extends QBMapper {
 	 *
 	 * @param int $scoreBookId
 	 * @param int $scoreId
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function removeScoreFromScoreBook(int $scoreBookId, int $scoreId): void {
 		$qb = $this->db->getQueryBuilder();
@@ -172,7 +172,7 @@ class ScoreBookScoreLinkMapper extends QBMapper {
 	 * Remove a score from its score book (regardless of which book).
 	 *
 	 * @param int $scoreId
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function removeScoreFromAllBooks(int $scoreId): void {
 		$qb = $this->db->getQueryBuilder();
@@ -187,7 +187,7 @@ class ScoreBookScoreLinkMapper extends QBMapper {
 	 * @param int $scoreBookId
 	 * @param int $scoreId
 	 * @param int $newIndex
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function updateScoreIndex(int $scoreBookId, int $scoreId, int $newIndex): void {
 		$qb = $this->db->getQueryBuilder();
@@ -208,7 +208,7 @@ class ScoreBookScoreLinkMapper extends QBMapper {
 	 * @param int $scoreBookId
 	 * @param int $index
 	 * @return bool
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function isIndexOccupied(int $scoreBookId, int $index): bool {
 		$qb = $this->db->getQueryBuilder();
@@ -228,7 +228,7 @@ class ScoreBookScoreLinkMapper extends QBMapper {
 	 *
 	 * @param int $scoreBookId
 	 * @return int
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function countScoresInScoreBook(int $scoreBookId): int {
 		$qb = $this->db->getQueryBuilder();

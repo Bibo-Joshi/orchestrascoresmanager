@@ -31,9 +31,9 @@ class ScoreBookMapper extends QBMapper {
 	 *
 	 * @param int $id
 	 * @return ScoreBook
-	 * @throws { DoesNotExistException }
-	 * @throws { MultipleObjectsReturnedException }
-	 * @throws { Exception }
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
 	 */
 	public function find(int $id): ScoreBook {
 		$qb = $this->db->getQueryBuilder();
@@ -49,7 +49,7 @@ class ScoreBookMapper extends QBMapper {
 	 * Get all score books.
 	 *
 	 * @return ScoreBook[]
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function findAll(): array {
 		$qb = $this->db->getQueryBuilder();
@@ -64,9 +64,9 @@ class ScoreBookMapper extends QBMapper {
 	 * Attach tags to a single score book.
 	 *
 	 * @param ScoreBook $scoreBook
-	 * @throws { DoesNotExistException }
-	 * @throws { MultipleObjectsReturnedException }
-	 * @throws { Exception }
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
 	 */
 	private function attachTags(ScoreBook $scoreBook): void {
 		$ids = $this->scoreBookTagLinkMapper->findTagIdsForScoreBook($scoreBook->getId());
@@ -83,7 +83,7 @@ class ScoreBookMapper extends QBMapper {
 	 *
 	 * @param int[] $ids
 	 * @return ScoreBook[]
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function findMultiple(array $ids): array {
 		$ids = array_map('intval', $ids);
@@ -105,7 +105,7 @@ class ScoreBookMapper extends QBMapper {
 	 * This method fetches all tag data in batches to avoid N+1 queries.
 	 *
 	 * @param ScoreBook[] $scoreBooks
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	private function attachTagsToMultiple(array $scoreBooks): void {
 		if (empty($scoreBooks)) {

@@ -24,9 +24,9 @@ class FolderCollectionMapper extends QBMapper {
 	 * Find a folder collection by its ID
 	 * @param int $id
 	 * @return FolderCollection
-	 * @throws { DoesNotExistException }
-	 * @throws { MultipleObjectsReturnedException }
-	 * @throws { Exception }
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
 	 */
 	public function find(int $id): FolderCollection {
 		$qb = $this->db->getQueryBuilder();
@@ -39,7 +39,7 @@ class FolderCollectionMapper extends QBMapper {
 	/**
 	 * Get all folder collections
 	 * @return FolderCollection[]
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function findAll(): array {
 		$qb = $this->db->getQueryBuilder();

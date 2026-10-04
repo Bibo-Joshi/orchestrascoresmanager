@@ -25,9 +25,9 @@ class CommentMapper extends QBMapper {
 	 *
 	 * @param int $id
 	 * @return Comment
-	 * @throws { MultipleObjectsReturnedException }
-	 * @throws { DoesNotExistException }
-	 * @throws { Exception }
+	 * @throws MultipleObjectsReturnedException
+	 * @throws DoesNotExistException
+	 * @throws Exception
 	 */
 	public function find(int $id): Comment {
 		$qb = $this->db->getQueryBuilder();
@@ -42,7 +42,7 @@ class CommentMapper extends QBMapper {
 	 *
 	 * @param int $scoreId
 	 * @return array<Comment>
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function findByScoreId(int $scoreId): array {
 		$qb = $this->db->getQueryBuilder();
@@ -58,7 +58,7 @@ class CommentMapper extends QBMapper {
 	 *
 	 * @param int $scoreId
 	 * @return void
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function deleteByScoreId(int $scoreId): void {
 		$qb = $this->db->getQueryBuilder();

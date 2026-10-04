@@ -45,8 +45,8 @@ class FolderCollectionVersionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerFolderCollectionVersion, array{}> the version
 	 *
 	 * 200: Successful response with the version
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/foldercollectionversions/{id}')]
@@ -67,8 +67,8 @@ class FolderCollectionVersionApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerFolderCollectionVersion, array{}> the updated version
 	 *
 	 * 200: Successful update of the version
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'PATCH', url: '/foldercollectionversions/{id}')]

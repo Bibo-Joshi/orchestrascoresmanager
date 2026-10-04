@@ -99,7 +99,7 @@ class ScoreService {
 	 *
 	 * @param int[] $ids
 	 * @return Score[]
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function getScoresByIds(array $ids): array {
 		$this->authorizationService->authorizePolicy($this->scorePolicy, PolicyInterface::ACTION_READ);
@@ -114,8 +114,8 @@ class ScoreService {
 	 * @param int[]|null $tagIds
 	 * @param array{scoreBookId?: int|null, index?: int|null}|null $scoreBookInfo Array with 'scoreBookId' and 'index' keys
 	 * @return Score
-	 * @throws { Exception }
-	 * @throws { Throwable }
+	 * @throws Exception
+	 * @throws Throwable
 	 */
 	public function createScore(Score $score, ?array $tagIds = null, ?array $scoreBookInfo = null): Score {
 		$this->authorizationService->authorizePolicy($this->scorePolicy, PolicyInterface::ACTION_CREATE);
@@ -149,8 +149,8 @@ class ScoreService {
 	 * @param int[]|null $tagIds
 	 * @param array{scoreBookId?: int|null, index?: int|null}|null $scoreBookInfo Array with optional 'scoreBookId' and 'index' keys
 	 * @return Score
-	 * @throws { Exception }
-	 * @throws { Throwable }
+	 * @throws Exception
+	 * @throws Throwable
 	 */
 	public function updateScore(Score $score, ?array $tagIds = null, ?array $scoreBookInfo = null): Score {
 		$this->authorizationService->authorizePolicy($this->scorePolicy, PolicyInterface::ACTION_UPDATE, $score);
@@ -191,7 +191,7 @@ class ScoreService {
 	 * @param int $scoreId
 	 * @param array{scoreBookId?: int|null, index?: int|null} $scoreBookInfo Array with 'scoreBookId' and/or 'index' keys
 	 * @throws \InvalidArgumentException
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	private function updateScoreBookInfoInternal(int $scoreId, array $scoreBookInfo): void {
 		$scoreBookId = $scoreBookInfo['scoreBookId'] ?? null;

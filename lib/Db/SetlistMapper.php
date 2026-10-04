@@ -24,7 +24,7 @@ class SetlistMapper extends QBMapper {
 	 * @param bool|null $isDraft Filter by draft status
 	 * @param bool|null $isPublished Filter by published status
 	 * @return Setlist[]
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function findAll(?bool $isDraft = null, ?bool $isPublished = null): array {
 		/* @var $qb IQueryBuilder */
@@ -42,7 +42,7 @@ class SetlistMapper extends QBMapper {
 	 * @param bool|null $isDraft Filter by draft status
 	 * @param bool|null $isPublished Filter by published status
 	 * @return Setlist[]
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function findFuture(?bool $isDraft = null, ?bool $isPublished = null): array {
 		$now = new \DateTimeImmutable();
@@ -55,7 +55,7 @@ class SetlistMapper extends QBMapper {
 	 * @param bool|null $isDraft Filter by draft status
 	 * @param bool|null $isPublished Filter by published status
 	 * @return Setlist[]
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function findPast(?bool $isDraft = null, ?bool $isPublished = null): array {
 		$now = new \DateTimeImmutable();
@@ -82,9 +82,9 @@ class SetlistMapper extends QBMapper {
 	 * Find setlist by id
 	 * @param int $id
 	 * @return Setlist
-	 * @throws { DoesNotExistException }
-	 * @throws { MultipleObjectsReturnedException }
-	 * @throws { Exception }
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
+	 * @throws Exception
 	 */
 	public function find(int $id): Setlist {
 		$qb = $this->db->getQueryBuilder();

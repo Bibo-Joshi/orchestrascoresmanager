@@ -41,8 +41,8 @@ class TagApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerTag>, array{}> the list of tags
 	 *
 	 * 200: Successful response with the list of tags
-	 * @throws { OCSBadRequestException } Invalid request parameters
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSBadRequestException Invalid request parameters
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/tags')]
@@ -61,7 +61,7 @@ class TagApiController extends OCSController {
 	 * 201: Successful creation of the tag
 	 * 403: Forbidden
 	 *
-	 * @throws { OCSForbiddenException } Insufficient permissions
+	 * @throws OCSForbiddenException Insufficient permissions
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/tags')]

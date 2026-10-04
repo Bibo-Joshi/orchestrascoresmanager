@@ -46,7 +46,7 @@ class CommentService {
 	 *
 	 * @param int $scoreId
 	 * @return array<Comment>
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function getCommentsForScore(int $scoreId): array {
 		$this->authorizationService->authorizePolicy($this->commentPolicy, PolicyInterface::ACTION_READ);
@@ -64,7 +64,7 @@ class CommentService {
 	 * Create a new comment if authorized.
 	 * Default-deny: if authorization fails, an exception is thrown.
 	 *
-	 * @throws { Exception }
+	 * @throws Exception
 	 */
 	public function createComment(Comment $comment): Comment {
 		$this->authorizationService->authorizePolicy($this->commentPolicy, PolicyInterface::ACTION_CREATE);
@@ -80,9 +80,9 @@ class CommentService {
 	 * Delete a comment if authorized.
 	 *
 	 * @param int $id
-	 * @throws { Exception }
-	 * @throws { DoesNotExistException }
-	 * @throws { MultipleObjectsReturnedException }
+	 * @throws Exception
+	 * @throws DoesNotExistException
+	 * @throws MultipleObjectsReturnedException
 	 */
 	public function deleteComment(int $id): void {
 		$this->authorizationService->authorizePolicy($this->commentPolicy, PolicyInterface::ACTION_DELETE);

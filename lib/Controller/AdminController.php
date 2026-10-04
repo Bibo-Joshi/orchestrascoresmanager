@@ -44,7 +44,7 @@ class AdminController extends OCSController {
 	 *
 	 * @param list<string> $editGroups List of group IDs allowed to edit
 	 * @return DataResponse<Http::STATUS_OK, array{editGroups: list<string>}, array{}> Updated settings
-	 * @throws { OCSBadRequestException } If input validation fails
+	 * @throws OCSBadRequestException If input validation fails
 	 *
 	 * 200: Successful update of settings
 	 * 400: Invalid input data
