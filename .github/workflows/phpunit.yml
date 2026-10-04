@@ -44,11 +44,13 @@ jobs:
       fail-fast: false
       matrix:
         php-versions: ['8.2', '8.3', '8.4', '8.5']
-        server-versions: ['stable33', 'stable34', 'master']
+        server-versions: ['stable34', 'stable35', 'master']
         database: ['sqlite', 'mysql', 'mariadb', 'pgsql']
         exclude:
           - php-versions: '8.2'
             server-versions: 'master'
+          - php-versions: '8.2'
+            server-versions: 'stable35'
 
     name: ${{ matrix.database }} | PHP ${{ matrix.php-versions }} | NC ${{ matrix.server-versions }}
 

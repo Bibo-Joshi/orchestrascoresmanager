@@ -20,16 +20,16 @@ Source code, issue tracker and releases: https://github.com/Bibo-Joshi/orchestra
 
 ## Requirements
 
-- Nextcloud 33 or later
+- Nextcloud 34 or later
 - PHP 8.2 or later
 
 ## Architecture
 
-| Layer    | Technology                                              |
-|----------|---------------------------------------------------------|
-| Backend  | PHP 8.1+, Nextcloud MVC (Controllers, Services, Mappers)|
-| Frontend | Vue 3, TypeScript, Pinia, Vite                          |
-| API      | REST, OpenAPI-documented                                |
+| Layer    | Technology                                                    |
+|----------|---------------------------------------------------------------|
+| Backend  | PHP 8.2+, Nextcloud MVC (Controllers, Services, Mappers)      |
+| Frontend | Vue 3, TypeScript, Pinia, Vite                                |
+| API      | REST, OpenAPI-documented                                      |
 | Database | Nextcloud DB abstraction (SQLite, MySQL, MariaDB, PostgreSQL) |
 
 The backend follows a clean separation of concerns: **Controllers** handle HTTP routing, **Services** contain business
