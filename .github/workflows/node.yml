@@ -62,6 +62,7 @@ jobs:
         env:
           CYPRESS_INSTALL_BINARY: 0
           PUPPETEER_SKIP_DOWNLOAD: true
+          NODE_ENV: production
         run: |
           npm ci
           npm run build --if-present 2>&1 | tee /tmp/build-output.txt
