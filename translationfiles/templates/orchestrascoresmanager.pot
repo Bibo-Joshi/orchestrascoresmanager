@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-08-02 07:06+0000\n"
+"POT-Creation-Date: 2026-10-04 05:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -219,7 +219,7 @@ msgstr ""
 msgid "Allowed Groups"
 msgstr ""
 
-msgid "Select groups..."
+msgid "Select groups…"
 msgstr ""
 
 msgid "Invalid default moderation time format. Use (HH:)MM:SS"
@@ -246,7 +246,7 @@ msgstr ""
 msgid "Select folder collection"
 msgstr ""
 
-msgid "Saving …"
+msgid "Saving …"
 msgstr ""
 
 msgid "Save"
@@ -294,7 +294,7 @@ msgstr ""
 msgid "Confirm"
 msgstr ""
 
-msgid "Loading..."
+msgid "Loading…"
 msgstr ""
 
 msgid "An error occurred"
@@ -707,7 +707,7 @@ msgstr ""
 msgid "No comments yet"
 msgstr ""
 
-msgid "Write a new comment …"
+msgid "Write a new comment …"
 msgstr ""
 
 msgid "GitHub flavored markdown is supported."
@@ -818,7 +818,7 @@ msgstr ""
 msgid "Is Published"
 msgstr ""
 
-msgid "Saving..."
+msgid "Saving…"
 msgstr ""
 
 msgid "Saved"
@@ -911,7 +911,7 @@ msgstr ""
 msgid "This index is already occupied"
 msgstr ""
 
-msgid "Loading occupied indices..."
+msgid "Loading occupied indices…"
 msgstr ""
 
 msgid "Index is unchanged"
