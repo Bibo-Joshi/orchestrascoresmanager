@@ -4,7 +4,7 @@
 NextCloud application for managing orchestra score databases. Built with PHP backend and Vue3 frontend.
 
 ## Versions & Compatibility
-- **NextCloud**: 33+
+- **NextCloud**: 34+
 - **PHP**: 8.4+ (minimum 8.1)
 - **Vue**: 3.5+
 - **Node**: 22.0.0+
@@ -73,7 +73,7 @@ The `.github/workflows/phpunit-sqlite.yml` workflow runs backend unit tests on p
 4. **Test paths change**: Update `paths` filter for triggering the workflow
 
 **Current configuration:**
-- Supported NC versions: stable33, stable34, master
+- Supported NC versions: stable34, stable35, master
 - PHP versions tested: 8.2, 8.3, 8.4, 8.5
 - Databases: SQLite, MySQL 8.4, MariaDB 11.4, PostgreSQL 16
 - All databases are defined as services and matrix selects which one to use
