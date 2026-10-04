@@ -31,10 +31,6 @@ export default defineConfig((env) => {
 				// don't copy contents of the /public folder as we just include the
 				// /public folder in the distribution and don't want to have duplicates
 				publicDir: false,
-				esbuild: {
-					// Drop console.*() calls in production builds
-					drop: isProduction ? ['console'] : [],
-				},
 			},
 			minify: isProduction,
 			createEmptyCSSEntryPoints: true,

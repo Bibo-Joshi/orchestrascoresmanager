@@ -1,7 +1,5 @@
 import { recommended } from '@nextcloud/eslint-config'
 
-const isProduction = process.env.NODE_ENV === 'production'
-
 export default [
 	...recommended,
 
@@ -19,7 +17,7 @@ export default [
 			'vue/no-multiple-template-root': 'off',
 			'vue/multi-word-component-names': 'off',
 			'import/extensions': 'off',
-			'no-console': isProduction ? 'error' : 'off',
+			'no-console': ['error', { allow: ['warn', 'error'] }],
 		},
 	},
 
