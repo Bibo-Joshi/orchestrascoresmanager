@@ -2,9 +2,9 @@
 	<ContentStateWrapper
 		:loading="loading"
 		:error="error || !scoreBook"
-		:is-empty="false"
-		:error-text="t('Failed to load score book')"
-		:icon-size="32">
+		:isEmpty="false"
+		:errorText="t('Failed to load score book')"
+		:iconSize="32">
 		<template #default>
 			<!-- Score Book Title -->
 			<div class="book-header">
@@ -32,7 +32,7 @@
 					:key="score.id"
 					:name="score.title"
 					:bold="score.id === scoreId"
-					:counter-number="score.scoreBook?.index ?? undefined"
+					:counterNumber="score.scoreBook?.index ?? undefined"
 					class="score-item"
 					@click="handleScoreClick(score)">
 					<template #subname>
@@ -45,16 +45,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { t } from '@/utils/l10n'
-import NcListItem from '@nextcloud/vue/components/NcListItem'
+import type { Score } from '@/api/generated/openapi/data-contracts'
+
+import { computed, onMounted, ref, watch } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcListItem from '@nextcloud/vue/components/NcListItem'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
 import { OpenExternalIcon } from '@/icons/vue-material'
-import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import { useScoreBookSidebarStore } from '@/stores/scoreBookSidebarStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
-import type { Score } from '@/api/generated/openapi/data-contracts'
+import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	scoreId: number

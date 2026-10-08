@@ -1,7 +1,8 @@
-import { toValue } from 'vue'
-import { useFormatTime } from '@nextcloud/vue/composables/useFormatDateTime'
-import { t } from '@/utils/l10n'
 import type { FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
+
+import { useFormatTime } from '@nextcloud/vue/composables/useFormatDateTime'
+import { toValue } from 'vue'
+import { t } from '@/utils/l10n'
 
 /**
  * Format a date string (Y-m-d format) for display using NextCloud's useFormatTime

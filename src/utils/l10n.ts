@@ -1,7 +1,5 @@
-/**
- * Translation utility that wraps @nextcloud/l10n with the app name pre-filled
- */
-import { t as nextcloudT, n as nextcloudN } from '@nextcloud/l10n'
+// Translation utility that wraps @nextcloud/l10n with the app name pre-filled
+import { n as nextcloudN, t as nextcloudT } from '@nextcloud/l10n'
 
 const APP_NAME = 'orchestrascoresmanager'
 

@@ -1,8 +1,9 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { loadState } from '@nextcloud/initial-state'
-import { apiClients } from '@/api/client'
 import type { Score } from '@/api/generated/openapi/data-contracts'
+
+import { loadState } from '@nextcloud/initial-state'
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { apiClients } from '@/api/client'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 
 /**
@@ -22,16 +23,16 @@ export const useScoresStore = defineStore('scores', () => {
 	 * Get scores sorted by title
 	 */
 	const scoresSorted = computed(() => {
-		return [...scores.value].sort((a, b) =>
-			a.title.localeCompare(b.title),
-		)
+		return [...scores.value].sort((a, b) => a.title.localeCompare(b.title))
 	})
 
 	/**
 	 * Initialize the store by loading data from initial state or API
 	 */
 	async function initialize(): Promise<void> {
-		if (isLoaded.value || isLoading.value) return
+		if (isLoaded.value || isLoading.value) {
+			return
+		}
 
 		isLoading.value = true
 
@@ -62,7 +63,7 @@ export const useScoresStore = defineStore('scores', () => {
 	 * @param id - The score ID
 	 */
 	function getScoreById(id: number): Score | undefined {
-		return scores.value.find(s => s.id === id)
+		return scores.value.find((s) => s.id === id)
 	}
 
 	/**
@@ -70,7 +71,7 @@ export const useScoresStore = defineStore('scores', () => {
 	 *
 	 * @param title - The title of the new score
 	 * @return The created score
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function createScore(title: string): Promise<Score> {
 		const response = await apiClients.default.scoreApiPostScore({ title })
@@ -85,11 +86,13 @@ export const useScoresStore = defineStore('scores', () => {
 	 * @param id - The score ID
 	 * @param field - The field to update
 	 * @param value - The new value
-	 * @throws Error if API call fails (local state is reverted)
+	 * @throws { Error } if API call fails (local state is reverted)
 	 */
 	async function updateScoreFieldApi(id: number, field: string, value: unknown): Promise<void> {
-		const index = scores.value.findIndex(s => s.id === id)
-		if (index === -1) return
+		const index = scores.value.findIndex((s) => s.id === id)
+		if (index === -1) {
+			return
+		}
 
 		const oldValue = scores.value[index][field as keyof Score]
 
@@ -111,8 +114,8 @@ export const useScoresStore = defineStore('scores', () => {
 	 * @param id - The score ID
 	 * @param scoreBook - The new scoreBook object or null to remove
 	 */
-	function updateScoreBookAssignment(id: number, scoreBook: { id: number; index: number } | null): void {
-		const index = scores.value.findIndex(s => s.id === id)
+	function updateScoreBookAssignment(id: number, scoreBook: { id: number, index: number } | null): void {
+		const index = scores.value.findIndex((s) => s.id === id)
 		if (index !== -1) {
 			scores.value[index] = { ...scores.value[index], scoreBook }
 		}
@@ -127,9 +130,9 @@ export const useScoresStore = defineStore('scores', () => {
 	 *
 	 * @param id - The score ID
 	 * @param scoreBook - The new scoreBook object or null to remove
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
-	async function updateScoreBookAssignmentApi(id: number, scoreBook: { id: number; index: number } | null): Promise<void> {
+	async function updateScoreBookAssignmentApi(id: number, scoreBook: { id: number, index: number } | null): Promise<void> {
 		await apiClients.default.scoreApiPatchScore(id, { scoreBook })
 		updateScoreBookAssignment(id, scoreBook)
 	}
@@ -139,7 +142,7 @@ export const useScoresStore = defineStore('scores', () => {
 	 *
 	 * @param id - The score ID
 	 * @param tagIds - Array of tag IDs to set
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function updateScoreTags(id: number, tagIds: number[]): Promise<void> {
 		await apiClients.default.scoreApiPatchScore(id, { tagIds })
@@ -149,11 +152,11 @@ export const useScoresStore = defineStore('scores', () => {
 	 * Delete a score via API and remove from store
 	 *
 	 * @param id - The score ID to remove
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function deleteScore(id: number): Promise<void> {
 		await apiClients.default.scoreApiDeleteScore(id)
-		scores.value = scores.value.filter(s => s.id !== id)
+		scores.value = scores.value.filter((s) => s.id !== id)
 	}
 
 	return {

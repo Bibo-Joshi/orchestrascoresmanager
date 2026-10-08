@@ -1,3 +1,5 @@
+import type { Score, ScoreBook, SetlistEntry } from '@/api/generated/openapi/data-contracts'
+
 /**
  * Shared utilities for resolving score-information display values from setlist entries.
  *
@@ -5,7 +7,6 @@
  * to avoid duplication of the score-field resolution logic.
  */
 import { t } from '@/utils/l10n'
-import type { SetlistEntry, Score, ScoreBook } from '@/api/generated/openapi/data-contracts'
 
 /**
  * Score-information fields that can be resolved from a setlist entry.
@@ -49,37 +50,41 @@ export function resolveScoreField(
 		return field === 'title' ? t('Break') : null
 	}
 
-	if (!score) return null
-
-	switch (field) {
-	case 'title':
-		return score.title
-	case 'difficulty':
-		return score.difficulty ?? null
-	case 'bookName':
-		if (score.scoreBook?.id) {
-			return getScoreBookById(score.scoreBook.id)?.title ?? null
-		}
-		return null
-	case 'bookIndex':
-		return score.scoreBook?.index ?? null
-	case 'gemaIds':
-		return score.gemaIds ?? null
-	case 'fcvIndex': {
-		if (fcvScoresMap && fcvScoreBookIndicesMap) {
-			const directIndex = fcvScoresMap.get(score.id)
-			if (directIndex !== undefined) return directIndex
-			if (score.scoreBook?.id) {
-				const bookIndex = fcvScoreBookIndicesMap.get(score.scoreBook.id)
-				const bookItemIndex = score.scoreBook.index
-				if (bookIndex !== undefined && bookItemIndex !== null && bookItemIndex !== undefined) {
-					return `${bookIndex}.${bookItemIndex}`
-				}
-			}
-		}
+	if (!score) {
 		return null
 	}
-	default:
-		return null
+
+	switch (field) {
+		case 'title':
+			return score.title
+		case 'difficulty':
+			return score.difficulty ?? null
+		case 'bookName':
+			if (score.scoreBook?.id) {
+				return getScoreBookById(score.scoreBook.id)?.title ?? null
+			}
+			return null
+		case 'bookIndex':
+			return score.scoreBook?.index ?? null
+		case 'gemaIds':
+			return score.gemaIds ?? null
+		case 'fcvIndex': {
+			if (fcvScoresMap && fcvScoreBookIndicesMap) {
+				const directIndex = fcvScoresMap.get(score.id)
+				if (directIndex !== undefined) {
+					return directIndex
+				}
+				if (score.scoreBook?.id) {
+					const bookIndex = fcvScoreBookIndicesMap.get(score.scoreBook.id)
+					const bookItemIndex = score.scoreBook.index
+					if (bookIndex !== undefined && bookItemIndex !== null && bookItemIndex !== undefined) {
+						return `${bookIndex}.${bookItemIndex}`
+					}
+				}
+			}
+			return null
+		}
+		default:
+			return null
 	}
 }

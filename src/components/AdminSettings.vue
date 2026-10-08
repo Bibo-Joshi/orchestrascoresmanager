@@ -7,24 +7,24 @@
 
 			<NcSettingsSelectGroup
 				:label="t('Allowed Groups')"
-				:model-value="allowedGroups"
-				:placeholder="t('Select groups...')"
+				:modelValue="allowedGroups"
+				:placeholder="t('Select groups…')"
 				:multiple="true"
 				:loading="loading"
-				@update:model-value="onGroupsChanged" />
+				@update:modelValue="onGroupsChanged" />
 		</div>
 	</NcSettingsSection>
 </template>
 
 <script setup lang="ts">
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import { loadState } from '@nextcloud/initial-state'
+import { confirmPassword, isPasswordConfirmationRequired, PwdConfirmationMode } from '@nextcloud/password-confirmation'
 import { ref } from 'vue'
-import { t } from '@/utils/l10n'
-import { isPasswordConfirmationRequired, confirmPassword, PwdConfirmationMode } from '@nextcloud/password-confirmation'
-import { showSuccess, showError } from '@nextcloud/dialogs'
 import NcSettingsSection from '@nextcloud/vue/components/NcSettingsSection'
 import NcSettingsSelectGroup from '@nextcloud/vue/components/NcSettingsSelectGroup'
-import { loadState } from '@nextcloud/initial-state'
 import { apiClients } from '@/api/client'
+import { t } from '@/utils/l10n'
 
 // Reactive data
 const allowedGroups = ref<string[]>(loadState('orchestrascoresmanager', 'allowed_groups'))

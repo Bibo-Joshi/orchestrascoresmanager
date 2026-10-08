@@ -7,15 +7,15 @@
 					<ExpandableListItem
 						:name="t('Drafts')"
 						:expanded="expandedSections.drafts"
-						:counter-number="setlistsStore.drafts.length"
+						:counterNumber="setlistsStore.drafts.length"
 						:bold="true"
 						@toggle="expandedSections.drafts = !expandedSections.drafts">
 						<template #nested>
 							<ContentStateWrapper
-								:is-empty="setlistsStore.drafts.length === 0"
-								:empty-text="t('No drafts')"
-								:empty-description="t('Create your first setlist draft')">
-								<template #empty-icon>
+								:isEmpty="setlistsStore.drafts.length === 0"
+								:emptyText="t('No drafts')"
+								:emptyDescription="t('Create your first setlist draft')">
+								<template #emptyIcon>
 									<SetlistIcon :size="64" />
 								</template>
 								<ul>
@@ -34,15 +34,15 @@
 				<ExpandableListItem
 					:name="t('Future')"
 					:expanded="expandedSections.future"
-					:counter-number="setlistsStore.futureSetlists.length"
+					:counterNumber="setlistsStore.futureSetlists.length"
 					:bold="true"
 					@toggle="expandedSections.future = !expandedSections.future">
 					<template #nested>
 						<ContentStateWrapper
-							:is-empty="setlistsStore.futureSetlists.length === 0"
-							:empty-text="t('No future setlists')"
-							:empty-description="t('Schedule your next performances')">
-							<template #empty-icon>
+							:isEmpty="setlistsStore.futureSetlists.length === 0"
+							:emptyText="t('No future setlists')"
+							:emptyDescription="t('Schedule your next performances')">
+							<template #emptyIcon>
 								<SetlistIcon :size="64" />
 							</template>
 							<ul>
@@ -60,15 +60,15 @@
 				<ExpandableListItem
 					:name="t('Unscheduled')"
 					:expanded="expandedSections.unscheduled"
-					:counter-number="setlistsStore.unscheduledSetlists.length"
+					:counterNumber="setlistsStore.unscheduledSetlists.length"
 					:bold="true"
 					@toggle="expandedSections.unscheduled = !expandedSections.unscheduled">
 					<template #nested>
 						<ContentStateWrapper
-							:is-empty="setlistsStore.unscheduledSetlists.length === 0"
-							:empty-text="t('No unscheduled setlists')"
-							:empty-description="t('Setlists without a start date will appear here')">
-							<template #empty-icon>
+							:isEmpty="setlistsStore.unscheduledSetlists.length === 0"
+							:emptyText="t('No unscheduled setlists')"
+							:emptyDescription="t('Setlists without a start date will appear here')">
+							<template #emptyIcon>
 								<SetlistIcon :size="64" />
 							</template>
 							<ul>
@@ -86,15 +86,15 @@
 				<ExpandableListItem
 					:name="t('Past')"
 					:expanded="expandedSections.past"
-					:counter-number="setlistsStore.pastSetlists.length"
+					:counterNumber="setlistsStore.pastSetlists.length"
 					:bold="true"
 					@toggle="expandedSections.past = !expandedSections.past">
 					<template #nested>
 						<ContentStateWrapper
-							:is-empty="setlistsStore.pastSetlists.length === 0"
-							:empty-text="t('No past setlists')"
-							:empty-description="t('Past performances will appear here')">
-							<template #empty-icon>
+							:isEmpty="setlistsStore.pastSetlists.length === 0"
+							:emptyText="t('No past setlists')"
+							:emptyDescription="t('Past performances will appear here')">
+							<template #emptyIcon>
 								<SetlistIcon :size="64" />
 							</template>
 							<ul>
@@ -110,20 +110,20 @@
 			</div>
 		</template>
 
-		<template #header-actions>
+		<template #headerActions>
 			<AddSetlistButton :editable="editable" />
 		</template>
 	</Layout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
 import { loadState } from '@nextcloud/initial-state'
-import Layout from '@/components/Layout.vue'
+import { onMounted, reactive, ref } from 'vue'
+import AddSetlistButton from './components/AddSetlistButton.vue'
+import SetlistListItem from './components/SetlistListItem.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
 import ExpandableListItem from '@/components/ExpandableListItem.vue'
-import SetlistListItem from './components/SetlistListItem.vue'
-import AddSetlistButton from './components/AddSetlistButton.vue'
+import Layout from '@/components/Layout.vue'
 import { SetlistIcon } from '@/icons/vue-material'
 import { useSetlistsStore } from '@/stores/setlistsStore'
 import { t } from '@/utils/l10n'

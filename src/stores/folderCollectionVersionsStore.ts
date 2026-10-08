@@ -1,7 +1,8 @@
+import type { FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
+
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { apiClients } from '@/api/client'
-import type { FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
 
 /**
  * Pinia store for managing folder collection versions state.
@@ -44,9 +45,11 @@ export const useFolderCollectionVersionsStore = defineStore('folderCollectionVer
 	 */
 	function getSelectedVersion(folderCollectionId: number): FolderCollectionVersion | undefined {
 		const versionId = getSelectedVersionId(folderCollectionId)
-		if (versionId === null) return undefined
+		if (versionId === null) {
+			return undefined
+		}
 		const versions = getVersions(folderCollectionId)
-		return versions.find(v => v.id === versionId)
+		return versions.find((v) => v.id === versionId)
 	}
 
 	/**
@@ -86,7 +89,7 @@ export const useFolderCollectionVersionsStore = defineStore('folderCollectionVer
 					selectedVersionByFolderCollection.value.set(folderCollectionId, activeVersionId)
 				} else if (versions.length > 0) {
 					// Select the active version (validTo = null) or the latest one
-					const activeVersion = versions.find(v => v.validTo === null)
+					const activeVersion = versions.find((v) => v.validTo === null)
 					selectedVersionByFolderCollection.value.set(
 						folderCollectionId,
 						activeVersion?.id ?? versions[0].id,
@@ -131,7 +134,7 @@ export const useFolderCollectionVersionsStore = defineStore('folderCollectionVer
 	 */
 	function updateVersion(folderCollectionId: number, version: FolderCollectionVersion): void {
 		const versions = versionsByFolderCollection.value.get(folderCollectionId) || []
-		const index = versions.findIndex(v => v.id === version.id)
+		const index = versions.findIndex((v) => v.id === version.id)
 		if (index !== -1) {
 			versions[index] = version
 			versionsByFolderCollection.value.set(folderCollectionId, [...versions])

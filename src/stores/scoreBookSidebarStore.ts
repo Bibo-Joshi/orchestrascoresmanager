@@ -1,6 +1,7 @@
+import type { ScoreBook } from '@/api/generated/openapi/data-contracts'
+
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { ScoreBook } from '@/api/generated/openapi/data-contracts'
 
 export const useScoreBookSidebarStore = defineStore('scoreBookSidebar', () => {
 	const selectedScoreBook = ref<ScoreBook | null>(null)

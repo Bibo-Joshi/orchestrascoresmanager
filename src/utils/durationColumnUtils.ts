@@ -1,6 +1,7 @@
-import { formatDurationHHMMSS, parseDurationHHMMSS } from './timeFormatUtils'
 import type { ColDef } from 'ag-grid-community'
-import { t } from './l10n'
+
+import { t } from './l10n.ts'
+import { formatDurationHHMMSS, parseDurationHHMMSS } from './timeFormatUtils.ts'
 
 /**
  * Create a column definition for a duration field with (HH:)MM:SS format
@@ -57,7 +58,7 @@ export function createDurationColumn(field: string, headerName: string, editable
 					}
 					try {
 						parseDurationHHMMSS(value)
-					} catch (e) {
+					} catch {
 						return [t('Invalid duration format. Use (HH:)MM:SS')]
 					}
 					return null

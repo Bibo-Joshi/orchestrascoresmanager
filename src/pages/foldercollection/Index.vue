@@ -4,12 +4,12 @@
 			<ContentStateWrapper
 				:loading="loading"
 				:error="loadError || !folderCollection"
-				:is-empty="scores.length === 0"
-				:error-text="t('Failed to load folder collection')"
-				:error-description="t('Please check if the folder collection exists and try again.')"
-				:empty-text="t('No entries in this collection')"
-				:empty-description="t('Add scores or score books to this folder collection to see them here.')">
-				<template #empty-icon>
+				:isEmpty="scores.length === 0"
+				:errorText="t('Failed to load folder collection')"
+				:errorDescription="t('Please check if the folder collection exists and try again.')"
+				:emptyText="t('No entries in this collection')"
+				:emptyDescription="t('Add scores or score books to this folder collection to see them here.')">
+				<template #emptyIcon>
 					<ScoreIcon :size="64" />
 				</template>
 				<template #default>
@@ -28,15 +28,15 @@
 						v-if="folderCollection"
 						ref="scoresTableRef"
 						:editable="editable && isSelectedVersionActive"
-						:is-indexed-collection="isIndexed"
-						:folder-collection-scores="scores"
-						:score-book-index-map="scoreBookIndexMap"
-						:on-delete-score="handleDeleteScore" />
+						:isIndexedCollection="isIndexed"
+						:folderCollectionScores="scores"
+						:scoreBookIndexMap="scoreBookIndexMap"
+						:onDeleteScore="handleDeleteScore" />
 				</template>
 			</ContentStateWrapper>
 		</template>
 
-		<template #header-actions>
+		<template #headerActions>
 			<!-- Version Selector -->
 			<NcSelect
 				v-if="versions.length > 0"
@@ -50,28 +50,28 @@
 			<!-- Start New Version Button -->
 			<StartNewVersionButton
 				v-if="editable && folderCollection"
-				:folder-collection-id="folderCollection.id"
+				:folderCollectionId="folderCollection.id"
 				:disabled="!isSelectedVersionActive"
-				@version-created="handleVersionCreated" />
+				@versionCreated="handleVersionCreated" />
 
 			<AddToCollectionButton
 				v-if="folderCollection"
 				:editable="editable && isSelectedVersionActive"
-				:folder-collection-id="folderCollection.id"
-				:is-indexed="isIndexed"
-				:existing-score-ids="existingScoreIds"
-				:existing-score-book-ids="existingScoreBookIds"
-				:occupied-indices="occupiedIndices"
-				@score-added="handleScoreAdded"
-				@scorebook-added="handleScoreBookAdded" />
+				:folderCollectionId="folderCollection.id"
+				:isIndexed="isIndexed"
+				:existingScoreIds="existingScoreIds"
+				:existingScoreBookIds="existingScoreBookIds"
+				:occupiedIndices="occupiedIndices"
+				@scoreAdded="handleScoreAdded"
+				@scorebookAdded="handleScoreBookAdded" />
 
 			<!-- Export CSV Button -->
-			<ExportCsvButton :table-ref="scoresTableRef?.tableRef ?? null" />
+			<ExportCsvButton :tableRef="scoresTableRef?.tableRef ?? null" />
 
 			<!-- Export ToC & Index Button -->
 			<ExportTocButton
 				v-if="folderCollection && selectedVersion && scores.length > 0"
-				:folder-collection="folderCollection"
+				:folderCollection="folderCollection"
 				:version="selectedVersion"
 				:entries="allEntries" />
 		</template>
@@ -84,30 +84,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import type { FolderCollectionVersion, Score, ScoreBook, ScoreBookIndexed, ScoreIndexed } from '@/api/generated/openapi/data-contracts'
+
 import { loadState } from '@nextcloud/initial-state'
-import { tryShowError } from '@/utils/errorHandling'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
-import Layout from '@/components/Layout.vue'
-import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
-import { ScoreIcon } from '@/icons/vue-material'
-import ScoresTable from '@/components/ScoresTable.vue'
-import ExportCsvButton from '@/components/ExportCsvButton.vue'
-import ScoreSidebar from '@/components/ScoreSidebar.vue'
 import AddToCollectionButton from './components/AddToCollectionButton.vue'
-import StartNewVersionButton from './components/StartNewVersionButton.vue'
 import ExportTocButton from './components/ExportTocButton.vue'
+import StartNewVersionButton from './components/StartNewVersionButton.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import { t } from '@/utils/l10n'
-import { formatDateStr } from '@/composables/useDateFormatting'
+import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
+import ExportCsvButton from '@/components/ExportCsvButton.vue'
+import Layout from '@/components/Layout.vue'
+import ScoreSidebar from '@/components/ScoreSidebar.vue'
+import ScoresTable from '@/components/ScoresTable.vue'
 import { apiClients } from '@/api/client'
+import { formatDateStr } from '@/composables/useDateFormatting'
+import { ScoreIcon } from '@/icons/vue-material'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { useFolderCollectionVersionsStore } from '@/stores/folderCollectionVersionsStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
-import type { Score, ScoreIndexed, ScoreBook, ScoreBookIndexed, FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 interface CollectionEntry {
 	key: string
@@ -155,7 +156,9 @@ const folderCollection = computed(() => {
  * Get versions for current folder collection
  */
 const versions = computed(() => {
-	if (!folderCollection.value) return []
+	if (!folderCollection.value) {
+		return []
+	}
 	return versionsStore.getVersions(folderCollection.value.id)
 })
 
@@ -171,7 +174,9 @@ const selectedVersionId = computed(() => {
 			return parsed
 		}
 	}
-	if (!folderCollection.value) return null
+	if (!folderCollection.value) {
+		return null
+	}
 	return versionsStore.getSelectedVersionId(folderCollection.value.id)
 })
 
@@ -179,8 +184,10 @@ const selectedVersionId = computed(() => {
  * Get selected version entity
  */
 const selectedVersion = computed(() => {
-	if (!folderCollection.value || selectedVersionId.value === null) return undefined
-	return versions.value.find(v => v.id === selectedVersionId.value)
+	if (!folderCollection.value || selectedVersionId.value === null) {
+		return undefined
+	}
+	return versions.value.find((v) => v.id === selectedVersionId.value)
 })
 
 /**
@@ -194,7 +201,7 @@ const isSelectedVersionActive = computed(() => {
  * Version selector options
  */
 const versionOptions = computed<VersionOption[]>(() => {
-	return versions.value.map(v => ({
+	return versions.value.map((v) => ({
 		label: formatVersionLabel(v),
 		value: v.id,
 		isActive: v.validTo === null,
@@ -205,7 +212,7 @@ const versionOptions = computed<VersionOption[]>(() => {
  * Selected version option for NcSelect
  */
 const selectedVersionOption = computed({
-	get: () => versionOptions.value.find(o => o.value === selectedVersionId.value) || null,
+	get: () => versionOptions.value.find((o) => o.value === selectedVersionId.value) || null,
 	set: (option: VersionOption | null) => {
 		if (option && folderCollection.value) {
 			handleVersionChange(option)
@@ -227,12 +234,21 @@ function formatVersionLabel(version: FolderCollectionVersion): string {
 }
 
 /**
- * Sort sorces in place
- * For indexed collections, sort by index. Lexikographical sorting on (<index of score in collection>, <index of score in book>|null)
- * For alphabetical collections, sort by lexikographical sorting (<scrobook title if viaScoreBook>|<score title>, <index of score in book>|null)
+ * Check if the collection is indexed
+ */
+const isIndexed = computed(() => {
+	return folderCollection.value?.collectionType === 'indexed'
+})
+
+/**
+ * Sort scores in place
+ * For indexed collections, sort by index. Lexicographical sorting on (<index of score in collection>, <index of score in book>|null)
+ * For alphabetical collections, sort by lexicographical sorting (<scorebook title if viaScoreBook>|<score title>, <index of score in book>|null)
  */
 function sortScores(): void {
-	if (!scores.value) return
+	if (!scores.value) {
+		return
+	}
 
 	const collectionIndex = (s: Score | ScoreIndexed): number | null => {
 		return (s as ScoreIndexed).index ?? null
@@ -249,7 +265,9 @@ function sortScores(): void {
 		scores.value.sort((a, b) => {
 			const aCol = collectionIndex(a) ?? Number.MAX_SAFE_INTEGER
 			const bCol = collectionIndex(b) ?? Number.MAX_SAFE_INTEGER
-			if (aCol !== bCol) return aCol - bCol
+			if (aCol !== bCol) {
+				return aCol - bCol
+			}
 
 			const aInner = indexInBook(a) ?? Number.MAX_SAFE_INTEGER
 			const bInner = indexInBook(b) ?? Number.MAX_SAFE_INTEGER
@@ -260,7 +278,9 @@ function sortScores(): void {
 			const titleA = a.viaScoreBook && a.scoreBook ? scoreBooksStore.getScoreBookById(a.scoreBook.id).title : a.title
 			const titleB = b.viaScoreBook && b.scoreBook ? scoreBooksStore.getScoreBookById(b.scoreBook.id).title : b.title
 			const cmp = titleA.localeCompare(titleB)
-			if (cmp !== 0) return cmp
+			if (cmp !== 0) {
+				return cmp
+			}
 
 			const aInner = indexInBook(a) ?? Number.MAX_SAFE_INTEGER
 			const bInner = indexInBook(b) ?? Number.MAX_SAFE_INTEGER
@@ -268,13 +288,6 @@ function sortScores(): void {
 		})
 	}
 }
-
-/**
- * Check if the collection is indexed
- */
-const isIndexed = computed(() => {
-	return folderCollection.value?.collectionType === 'indexed'
-})
 
 /**
  * Combined and sorted entries (scores + score books)
@@ -340,7 +353,9 @@ const scoreBookIndexMap = computed<Map<number, number>>(() => {
  * @param option - The selected version option
  */
 function handleVersionChange(option: VersionOption) {
-	if (!folderCollection.value) return
+	if (!folderCollection.value) {
+		return
+	}
 	versionsStore.setSelectedVersion(folderCollection.value.id, option.value)
 	// Update URL query parameter
 	router.replace({
@@ -452,14 +467,14 @@ watch(() => route.query.versionId, () => {
  * Set of existing score IDs in the collection (direct only)
  */
 const existingScoreIds = computed<Set<number>>(() => {
-	return new Set(scores.value.map(s => s.id))
+	return new Set(scores.value.map((s) => s.id))
 })
 
 /**
  * Set of existing score book IDs in the collection
  */
 const existingScoreBookIds = computed<Set<number>>(() => {
-	return new Set(scoreBooks.value.map(sb => sb.id))
+	return new Set(scoreBooks.value.map((sb) => sb.id))
 })
 
 /**
@@ -471,10 +486,14 @@ const occupiedIndices = computed<Set<number>>(() => {
 	}
 	const indices = new Set<number>()
 	for (const score of scores.value as ScoreIndexed[]) {
-		if (score.index !== undefined) indices.add(score.index)
+		if (score.index !== undefined) {
+			indices.add(score.index)
+		}
 	}
 	for (const book of scoreBooks.value as ScoreBookIndexed[]) {
-		if (book.index !== undefined) indices.add(book.index)
+		if (book.index !== undefined) {
+			indices.add(book.index)
+		}
 	}
 	return indices
 })
@@ -508,11 +527,13 @@ async function handleScoreBookAdded(newScoreBook: ScoreBook | ScoreBookIndexed) 
  * @param viaScoreBook - Whether the score is part of a score book
  */
 async function handleDeleteScore(scoreId: number, scoreBookId: number | null, viaScoreBook: boolean) {
-	if (!folderCollection.value) return
+	if (!folderCollection.value) {
+		return
+	}
 
 	// If the score is from a scorebook, we need to remove the entire scorebook
 	if (viaScoreBook) {
-		const scoreBook = scoreBooks.value.find(sb => sb.id === scoreBookId)
+		const scoreBook = scoreBooks.value.find((sb) => sb.id === scoreBookId)
 		if (scoreBook) {
 			const bookScores = scoreBookScoresMap.value.get(scoreBookId) || []
 			const result = await spawnDialog(
@@ -533,7 +554,7 @@ async function handleDeleteScore(scoreId: number, scoreBookId: number | null, vi
 		}
 	} else {
 		// Direct score - just remove it
-		const score = scores.value.find(s => s.id === scoreId)
+		const score = scores.value.find((s) => s.id === scoreId)
 		if (score) {
 			const result = await spawnDialog(
 				ConfirmationDialog,
@@ -556,7 +577,9 @@ async function handleDeleteScore(scoreId: number, scoreBookId: number | null, vi
  * @param score - The score to delete
  */
 async function deleteScore(score: Score | ScoreIndexed) {
-	if (!folderCollection.value) return
+	if (!folderCollection.value) {
+		return
+	}
 
 	const collectionId = folderCollection.value.id
 
@@ -578,7 +601,9 @@ async function deleteScore(score: Score | ScoreIndexed) {
  * @param scoreBook - The score book to delete
  */
 async function deleteScoreBook(scoreBook: ScoreBook | ScoreBookIndexed) {
-	if (!folderCollection.value) return
+	if (!folderCollection.value) {
+		return
+	}
 
 	const collectionId = folderCollection.value.id
 	const scoreCount = scoreBookScoresMap.value.get(scoreBook.id)?.length || 0

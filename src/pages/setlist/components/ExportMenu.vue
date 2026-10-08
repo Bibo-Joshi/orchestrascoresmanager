@@ -1,15 +1,15 @@
 <template>
 	<NcActions
-		:menu-name="buttonText(t('Export'))"
+		:menuName="buttonText(t('Export'))"
 		:size="buttonSize"
 		:primary="true"
 		variant="primary"
-		:force-name="true">
+		:forceName="true">
 		<template #icon>
 			<DownloadIcon :size="20" />
 		</template>
 		<NcActionButton
-			:close-after-click="true"
+			:closeAfterClick="true"
 			@click="openDialog">
 			<template #icon>
 				<PDFIcon :size="20" />
@@ -18,7 +18,7 @@
 		</NcActionButton>
 		<NcActionButton
 			v-if="editable"
-			:close-after-click="false"
+			:closeAfterClick="false"
 			:name="t('GEMA Report')"
 			:disabled="gemaExporting"
 			@click="onGemaExport">
@@ -37,7 +37,7 @@
 		<draggable
 			:list="dialogColumns"
 			class="column-list"
-			item-key="id"
+			itemKey="id"
 			tag="ul">
 			<NcListItem
 				v-for="column in dialogColumns"
@@ -72,24 +72,25 @@
 </template>
 
 <script setup lang="ts">
+import type { FolderCollection, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
+import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
+
 import { ref } from 'vue'
-import { t } from '@/utils/l10n'
-import NcActions from '@nextcloud/vue/components/NcActions'
+import { VueDraggableNext as draggable } from 'vue-draggable-next'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
-import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
-import { VueDraggableNext as draggable } from 'vue-draggable-next'
-import { DownloadIcon, CancelIcon, DragVerticalIcon, ExcelIcon, LoadingIcon, PDFIcon } from '@/icons/vue-material'
-import { tryShowError } from '@/utils/errorHandling'
-import { exportSetlistToPdf } from '@/utils/pdf-exporter'
-import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
-import { exportSetlistToGemaXlsx } from '@/utils/setlist-xlsx-exporter'
-import { useScoresStore } from '@/stores/scoresStore'
-import { useScoreBooksStore } from '@/stores/scoreBooksStore'
-import type { Setlist, SetlistEntry, FolderCollection } from '@/api/generated/openapi/data-contracts'
 import { useBreakpoints } from '@/composables/useBreakpoints'
+import { CancelIcon, DownloadIcon, DragVerticalIcon, ExcelIcon, LoadingIcon, PDFIcon } from '@/icons/vue-material'
+import { useScoreBooksStore } from '@/stores/scoreBooksStore'
+import { useScoresStore } from '@/stores/scoresStore'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
+import { exportSetlistToPdf } from '@/utils/pdf-exporter'
+import { exportSetlistToGemaXlsx } from '@/utils/setlist-xlsx-exporter'
 
 interface Props {
 	setlist: Setlist
@@ -134,7 +135,7 @@ function openDialog(): void {
 	const currentColumns = props.getColumns()
 
 	if (initialOpen.value) {
-		dialogColumns.value = currentColumns.map(col => ({
+		dialogColumns.value = currentColumns.map((col) => ({
 			...col,
 			enabled: DEFAULT_ENABLED_IDS.has(col.id),
 		}))
@@ -150,7 +151,7 @@ function openDialog(): void {
 async function onPdfExport(): Promise<void> {
 	dialogOpen.value = false
 	const selectedColumns = dialogColumns.value
-		.filter(col => col.enabled)
+		.filter((col) => col.enabled)
 		.map(({ id, label }) => ({ id, label }))
 
 	await tryShowError(

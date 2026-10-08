@@ -15,18 +15,18 @@
 				:name="errorText"
 				:description="errorDescription">
 				<template #icon>
-					<slot name="error-icon">
+					<slot name="errorIcon">
 						<ErrorIcon :size="iconSize" />
 					</slot>
 				</template>
 			</NcEmptyContent>
 		</div>
 
-		<!-- Empty State with optional above-content shown based on showAboveContentOnEmpty -->
+		<!-- Empty State with optional aboveContent shown based on showAboveContentOnEmpty -->
 		<div v-else-if="isEmpty" class="state-container">
 			<!-- Content above empty state (e.g., input forms) - only shown if showAboveContentOnEmpty is true -->
-			<template v-if="showAboveContentOnEmpty && $slots['above-content']">
-				<slot name="above-content" />
+			<template v-if="showAboveContentOnEmpty && $slots['aboveContent']">
+				<slot name="aboveContent" />
 				<hr class="content-separator" aria-hidden="true">
 			</template>
 			<div class="centered-state">
@@ -34,7 +34,7 @@
 					:name="emptyText"
 					:description="emptyDescription">
 					<template #icon>
-						<slot name="empty-icon">
+						<slot name="emptyIcon">
 							<InfoIcon :size="iconSize" />
 						</slot>
 					</template>
@@ -45,8 +45,8 @@
 		<!-- Content (shown when not loading, no error, and not empty) -->
 		<template v-else>
 			<!-- Content above main content (e.g., input forms) -->
-			<template v-if="$slots['above-content']">
-				<slot name="above-content" />
+			<template v-if="$slots['aboveContent']">
+				<slot name="aboveContent" />
 				<hr class="content-separator" aria-hidden="true">
 			</template>
 			<slot />
@@ -98,7 +98,7 @@ interface Props {
 	 */
 	iconSize?: number
 	/**
-	 * Whether to show the above-content slot when content is empty
+	 * Whether to show the aboveContent slot when content is empty
 	 */
 	showAboveContentOnEmpty?: boolean
 }
@@ -107,7 +107,7 @@ withDefaults(defineProps<Props>(), {
 	loading: false,
 	error: false,
 	isEmpty: false,
-	loadingText: () => t('Loading...'),
+	loadingText: () => t('Loading…'),
 	errorText: () => t('An error occurred'),
 	errorDescription: '',
 	emptyText: () => t('No content'),

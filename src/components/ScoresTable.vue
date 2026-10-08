@@ -3,55 +3,58 @@
 		<FullPageTable
 			ref="tableRef"
 			:data="scores"
-			:column-defs="columnDefs"
+			:columnDefs="columnDefs"
 			:editable="editable"
 			:modules="gridModules"
 			:context="gridContext"
-			@cell-value-changed="handleCellValueChanged"
-			@cell-double-clicked="handleCellDoubleClicked" />
+			@cellValueChanged="handleCellValueChanged"
+			@cellDoubleClicked="handleCellDoubleClicked" />
 
 		<AssignScoreBookDialog
 			v-model="showAssignDialog"
-			:score-id="editingScoreId"
-			:current-score-book-id="editingScoreBookId"
-			:current-index="editingScoreBookIndex"
+			:scoreId="editingScoreId"
+			:currentScoreBookId="editingScoreBookId"
+			:currentIndex="editingScoreBookIndex"
 			@updated="handleScoreBookUpdated" />
 	</div>
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw, ref } from 'vue'
-import { t } from '@/utils/l10n'
-import { parseArrayValue } from '@/utils/arrayUtils'
-import { parseDurationHHMMSS } from '@/utils/timeFormatUtils'
-import { createDurationColumn } from '@/utils/durationColumnUtils'
-import { showError, showSuccess } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
-import FullPageTable from '@/components/FullPageTable.vue'
-import RowActionButton from '@/components/RowActionButton.vue'
-import AssignScoreBookDialog from '@/components/AssignScoreBookDialog.vue'
 import type {
 	CellDoubleClickedEvent,
 	CellValueChangedEvent,
 	ColDef,
-} from 'ag-grid-community'
-import {
-	TooltipModule,
 } from 'ag-grid-community'
 import type {
 	Score,
 	ScoreBook,
 	ScoreIndexed,
 } from '@/api/generated/openapi/data-contracts'
+
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import { spawnDialog } from '@nextcloud/vue/functions/dialog'
+import {
+	TooltipModule,
+} from 'ag-grid-community'
+import { computed, markRaw, ref } from 'vue'
+import AssignScoreBookDialog from '@/components/AssignScoreBookDialog.vue'
+import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import FullPageTable from '@/components/FullPageTable.vue'
+import RowActionButton from '@/components/RowActionButton.vue'
 import ScoreOrScoreBookTitleRenderer
 	from '@/components/ScoreOrScoreBookTitleRenderer.vue'
-import { useScoresStore } from '@/stores/scoresStore'
-import { useScoreBooksStore } from '@/stores/scoreBooksStore'
-import { useTagsStore } from '@/stores/tagsStore'
-import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
-import { spawnDialog } from '@nextcloud/vue/functions/dialog'
-import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import { useBreakpoints } from '@/composables/useBreakpoints.ts'
+import { useScoreBooksStore } from '@/stores/scoreBooksStore'
+import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
+import { useScoresStore } from '@/stores/scoresStore'
+import { useTagsStore } from '@/stores/tagsStore'
+import { parseArrayValue } from '@/utils/arrayUtils'
+import { createDurationColumn } from '@/utils/durationColumnUtils'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
+import { parseDurationHHMMSS } from '@/utils/timeFormatUtils'
+
+const props = defineProps<Props>()
 
 const gridModules = [TooltipModule]
 
@@ -82,8 +85,6 @@ interface Props {
 	 */
 	onDeleteScore?: (scoreId: number, scoreBookId: number | null, viaScoreBook: boolean) => Promise<void>
 }
-
-const props = defineProps<Props>()
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
@@ -149,7 +150,9 @@ function getScoreBookIndex(score: Score): number | null {
  * @param scoreBookId - The ID of the score book to retrieve
  */
 function getScoreBook(scoreBookId: number | null): ScoreBook | undefined {
-	if (scoreBookId === null) return undefined
+	if (scoreBookId === null) {
+		return undefined
+	}
 	return scoreBooksStore.getScoreBookById(scoreBookId)
 }
 
@@ -181,7 +184,9 @@ function getInheritableValue(score: Score, field: keyof Score): unknown {
  */
 function createInheritableValueGetter(field: keyof Score) {
 	return (params: { data: Score }) => {
-		if (!params.data) return null
+		if (!params.data) {
+			return null
+		}
 		return getInheritableValue(params.data, field)
 	}
 }
@@ -192,7 +197,9 @@ function createInheritableValueGetter(field: keyof Score) {
  * @param params.data - The score row data
  */
 function scoreBookIndexValueGetter(params: { data: Score }) {
-	if (!params.data) return null
+	if (!params.data) {
+		return null
+	}
 	return getScoreBookIndex(params.data)
 }
 
@@ -204,9 +211,13 @@ function scoreBookIndexValueGetter(params: { data: Score }) {
  * @param params.data - The score row data
  */
 function scoreBookTitleValueGetter(params: { data: Score }) {
-	if (!params.data) return null
+	if (!params.data) {
+		return null
+	}
 	const scoreBookId = getScoreBookId(params.data)
-	if (scoreBookId === null) return null
+	if (scoreBookId === null) {
+		return null
+	}
 	const book = getScoreBook(scoreBookId)
 	return book?.title || String(scoreBookId)
 }
@@ -216,7 +227,7 @@ type ColumnEditHandler = (
 	id: number,
 	newValue: unknown,
 	oldValue: unknown,
-	score: Score
+	score: Score,
 ) => Promise<void>
 
 /**
@@ -275,7 +286,7 @@ const columnEditHandlers: Record<string, ColumnEditHandler> = {
 		let parsedDuration: number | null
 		try {
 			parsedDuration = parseDurationHHMMSS(newValue as string)
-		} catch (e) {
+		} catch {
 			showError(t('Invalid duration format. Use (HH:)MM:SS'))
 			return
 		}
@@ -335,7 +346,9 @@ async function handleScoreBookUpdated(scoreBookId: number | null, index: number 
  * @param scoreId - The ID of the score to remove
  */
 async function handleRemoveFromScoreBook(scoreId: number) {
-	if (!props.scoreBookId) return
+	if (!props.scoreBookId) {
+		return
+	}
 
 	const result = await spawnDialog(
 		ConfirmationDialog,
@@ -372,10 +385,14 @@ async function handleRemoveFromScoreBook(scoreId: number) {
 // Wrapper function that handles try-catch and table updates
 async function handleCellValueChanged(event: CellValueChangedEvent) {
 	const field = (event.colDef && (event.colDef.field as string)) || ''
-	if (!field) return
+	if (!field) {
+		return
+	}
 
 	const id = event.data && event.data.id
-	if (!id) return
+	if (!id) {
+		return
+	}
 
 	const score = event.data as Score
 
@@ -449,7 +466,9 @@ const columnDefs = computed<ColDef[]>(() => {
 			width: 100,
 			sort: 'asc',
 			valueGetter: (params) => {
-				if (!params.data) return null
+				if (!params.data) {
+					return null
+				}
 				const score = params.data as ScoreIndexed
 				if (score.viaScoreBook) {
 					// Inherited score - format as "bookIndex.scoreIndex"
@@ -466,7 +485,9 @@ const columnDefs = computed<ColDef[]>(() => {
 			comparator: (valueA: unknown, valueB: unknown) => {
 				// Custom comparator to handle "bookIndex.scoreIndex" format
 				const parseIndex = (value: unknown): [number, number] => {
-					if (value === null || value === undefined) return [Infinity, Infinity]
+					if (value === null || value === undefined) {
+						return [Infinity, Infinity]
+					}
 					const str = String(value)
 					if (str.includes('.')) {
 						const parts = str.split('.')
@@ -479,7 +500,9 @@ const columnDefs = computed<ColDef[]>(() => {
 				const [bBook, bScore] = parseIndex(valueB)
 
 				// Compare book index first, then score index
-				if (aBook !== bBook) return aBook - bBook
+				if (aBook !== bBook) {
+					return aBook - bBook
+				}
 				return aScore - bScore
 			},
 		})
@@ -493,19 +516,19 @@ const columnDefs = computed<ColDef[]>(() => {
 		sort: props.isIndexedCollection ? undefined : 'asc',
 		...(props.folderCollectionScores && hasScoreBooks.value
 			? {
-				cellRenderer: markRaw(ScoreOrScoreBookTitleRenderer),
-				tooltipValueGetter: (params) => {
-					const score = params.data as Score | ScoreIndexed
-					// Only show tooltip for inherited scores (not direct members)
-					if (score.viaScoreBook) {
-						const scoreBook = getScoreBook(getScoreBookId(score))
-						if (scoreBook) {
-							return t('Included in folder collection via score book »{name}«', { name: scoreBook.title })
+					cellRenderer: markRaw(ScoreOrScoreBookTitleRenderer),
+					tooltipValueGetter: (params) => {
+						const score = params.data as Score | ScoreIndexed
+						// Only show tooltip for inherited scores (not direct members)
+						if (score.viaScoreBook) {
+							const scoreBook = getScoreBook(getScoreBookId(score))
+							if (scoreBook) {
+								return t('Included in folder collection via score book »{name}«', { name: scoreBook.title })
+							}
 						}
-					}
-					return null
-				},
-			}
+						return null
+					},
+				}
 			: {}),
 	}
 	cols.push(titleColumn)
@@ -556,8 +579,8 @@ const columnDefs = computed<ColDef[]>(() => {
 			valueGetter: createInheritableValueGetter('difficulty'),
 		},
 		createDurationColumn('duration', t('Duration')),
-		{ field: 'medleyContents', headerName: t('Medley Contents'), valueParser: params => parseArrayValue(params.newValue) },
-		{ field: 'gemaIds', headerName: t('GEMA IDs'), valueParser: params => parseArrayValue(params.newValue) },
+		{ field: 'medleyContents', headerName: t('Medley Contents'), valueParser: (params) => parseArrayValue(params.newValue) },
+		{ field: 'gemaIds', headerName: t('GEMA IDs'), valueParser: (params) => parseArrayValue(params.newValue) },
 		{
 			field: 'defects',
 			headerName: t('Defects'),
@@ -570,7 +593,7 @@ const columnDefs = computed<ColDef[]>(() => {
 			valueGetter: createInheritableValueGetter('physicalCopiesStatus'),
 		},
 		// custom valueParser to enable editing of array-type data
-		{ field: 'tags', headerName: t('Tags'), valueParser: params => parseArrayValue(params.newValue) },
+		{ field: 'tags', headerName: t('Tags'), valueParser: (params) => parseArrayValue(params.newValue) },
 	)
 
 	return cols

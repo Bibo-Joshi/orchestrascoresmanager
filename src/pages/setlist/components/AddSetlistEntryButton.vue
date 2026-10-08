@@ -13,26 +13,26 @@
 		:name="t('Add Setlist Entry')"
 		@update:open="handleDialogClose">
 		<template #default>
-			<NcFormGroup hide-label>
+			<NcFormGroup hideLabel>
 				<FocusTrap />
 
 				<NcSelect
 					v-model="selectedEntryType"
 					:options="entryTypeOptions"
-					:input-label="t('Entry Type')"
+					:inputLabel="t('Entry Type')"
 					:placeholder="t('Select entry type')"
 					label="label"
-					track-by="value"
-					@update:model-value="handleEntryTypeChange" />
+					trackBy="value"
+					@update:modelValue="handleEntryTypeChange" />
 
 				<NcSelect
 					v-if="selectedEntryType?.value === 'score'"
 					v-model="selectedScore"
 					:options="availableScoreOptions"
-					:input-label="t('Score')"
+					:inputLabel="t('Score')"
 					:placeholder="t('Select score')"
 					label="label"
-					track-by="value" />
+					trackBy="value" />
 
 				<NcTextField
 					v-if="selectedEntryType?.value === 'break'"
@@ -64,26 +64,26 @@
 </template>
 
 <script setup lang="ts">
-import { t } from '@/utils/l10n'
-import { ref, computed, watch } from 'vue'
+import type { Score, ScoreIndexed, Setlist } from '@/api/generated/openapi/data-contracts'
+
 import { showError } from '@nextcloud/dialogs'
+import { computed, ref, watch } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcFormGroup from '@nextcloud/vue/components/NcFormGroup'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
-import { AddIcon, ConfirmIcon, CancelIcon } from '@/icons/vue-material'
 import FocusTrap from '@/components/FocusTrap.vue'
-import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
-import { useScoresStore } from '@/stores/scoresStore'
-import { parseDurationHHMMSS, formatDurationHHMMSS, restrictToTimeFormat as restrictInputToTimeFormat } from '@/utils/timeFormatUtils'
-import type { Setlist, Score, ScoreIndexed } from '@/api/generated/openapi/data-contracts'
 import { apiClients } from '@/api/client'
 import { useBreakpoints } from '@/composables/useBreakpoints'
+import { AddIcon, CancelIcon, ConfirmIcon } from '@/icons/vue-material'
+import { useScoresStore } from '@/stores/scoresStore'
+import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
+import { t } from '@/utils/l10n'
+import { formatDurationHHMMSS, parseDurationHHMMSS, restrictToTimeFormat as restrictInputToTimeFormat } from '@/utils/timeFormatUtils'
 
 interface Props {
 	setlist: Setlist
-	editable: boolean
 }
 
 const props = defineProps<Props>()
@@ -102,10 +102,10 @@ const entryTypeOptions = [
 	{ label: t('Break'), value: 'break' as const },
 ]
 
-const selectedEntryType = ref<{ label: string; value: 'score' | 'break' } | null>(entryTypeOptions[0])
-const selectedScore = ref<{ label: string; value: number } | null>(null)
+const selectedEntryType = ref<{ label: string, value: 'score' | 'break' } | null>(entryTypeOptions[0])
+const selectedScore = ref<{ label: string, value: number } | null>(null)
 const breakDurationStr = ref('')
-const fcvScoreOptions = ref<Array<{ label: string; value: number }>>([])
+const fcvScoreOptions = ref<Array<{ label: string, value: number }>>([])
 
 /**
  * Get available scores based on whether setlist has a folder collection version
@@ -117,7 +117,7 @@ const availableScoreOptions = computed(() => {
 	}
 
 	// Otherwise, show all scores
-	const options: Array<{ label: string; value: number }> = []
+	const options: Array<{ label: string, value: number }> = []
 	for (const score of scoresStore.scoresSorted) {
 		options.push({
 			label: score.title,
@@ -131,14 +131,18 @@ const availableScoreOptions = computed(() => {
  * Validate form inputs
  */
 const isFormValid = computed(() => {
-	if (!selectedEntryType.value) return false
+	if (!selectedEntryType.value) {
+		return false
+	}
 
 	if (selectedEntryType.value.value === 'score') {
 		return selectedScore.value !== null
 	}
 
 	if (selectedEntryType.value.value === 'break') {
-		if (!breakDurationStr.value.trim()) return false
+		if (!breakDurationStr.value.trim()) {
+			return false
+		}
 		try {
 			parseDurationHHMMSS(breakDurationStr.value)
 			return true
@@ -155,7 +159,7 @@ const isFormValid = computed(() => {
  *
  * @param option - The selected entry type option
  */
-function handleEntryTypeChange(option: { label: string; value: 'score' | 'break' } | null) {
+function handleEntryTypeChange(option: { label: string, value: 'score' | 'break' } | null) {
 	selectedEntryType.value = option
 	// Reset the other fields when changing type
 	selectedScore.value = null
@@ -198,13 +202,13 @@ function handleDialogClose(open: boolean) {
  * Load FCV scores when the dialog opens
  */
 async function loadFcvScores() {
-	if (!props.setlist.folderCollectionVersionId) return
+	if (!props.setlist.folderCollectionVersionId) {
+		return
+	}
 
 	try {
 		// Get the folder collection version to find the folder collection ID
-		const versionResponse = await apiClients.default.folderCollectionVersionApiGetFolderCollectionVersion(
-			props.setlist.folderCollectionVersionId,
-		)
+		const versionResponse = await apiClients.default.folderCollectionVersionApiGetFolderCollectionVersion(props.setlist.folderCollectionVersionId)
 		const version = versionResponse.data.ocs.data
 
 		// Load the scores for this folder collection version
@@ -215,7 +219,7 @@ async function loadFcvScores() {
 		const fcvScores = scoresResponse.data.ocs.data as (Score | ScoreIndexed)[]
 
 		// Build options from FCV scores
-		const options: Array<{ label: string; value: number }> = []
+		const options: Array<{ label: string, value: number }> = []
 		for (const score of fcvScores) {
 			options.push({
 				label: score.title,
@@ -250,13 +254,15 @@ watch(showDialog, (isOpen) => {
  * Submit the form to create a new entry
  */
 async function handleSubmit() {
-	if (!isFormValid.value) return
+	if (!isFormValid.value) {
+		return
+	}
 
 	try {
 		// Get the current entries to determine the next index
 		const currentEntries = setlistEntriesStore.getEntriesBySetlistId(props.setlist.id)
 		const nextIndex = currentEntries.length > 0
-			? Math.max(...currentEntries.map(e => e.index)) + 10
+			? Math.max(...currentEntries.map((e) => e.index)) + 10
 			: 0
 
 		if (selectedEntryType.value?.value === 'score' && selectedScore.value) {

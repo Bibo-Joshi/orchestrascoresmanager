@@ -1,19 +1,19 @@
 <template>
 	<AddOrEditDialog
-		v-model:is-open="showDialog"
+		v-model:isOpen="showDialog"
 		:name="t('Assign to Score Book')"
-		:is-input-valid="isFormValid"
-		:submit-label="t('Save')"
+		:isInputValid="isFormValid"
+		:submitLabel="t('Save')"
 		@submit="handleSubmit"
 		@reset="resetForm">
 		<FocusTrap />
 		<NcSelect
 			v-model="selectedScoreBook"
 			:options="scoreBookOptions"
-			:input-label="t('Score Book')"
+			:inputLabel="t('Score Book')"
 			:placeholder="t('Select a score book')"
 			:clearable="true"
-			:filter-by="filterScoreBooks" />
+			:filterBy="filterScoreBooks" />
 
 		<NcTextField
 			v-if="selectedScoreBook !== null"
@@ -22,7 +22,7 @@
 			:placeholder="t('Enter index position')"
 			:error="!!indexValidation.error.value"
 			:success="indexValidation.isValid.value"
-			:helper-text="indexValidation.helperText.value"
+			:helperText="indexValidation.helperText.value"
 			type="number"
 			required />
 
@@ -33,24 +33,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
-import { t } from '@/utils/l10n'
+import type { ScoreBook } from '@/api/generated/openapi/data-contracts'
+import type { EntityOption } from '@/composables/useEntitySelect'
+
+import { showSuccess } from '@nextcloud/dialogs'
+import { computed, ref, watch } from 'vue'
+import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
-import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import { showSuccess } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
 import AddOrEditDialog from '@/components/AddOrEditDialog.vue'
-import { useIndexValidation } from '@/composables/useIndexValidation'
+import FocusTrap from '@/components/FocusTrap.vue'
 import {
 	createScoreBookOptions,
 	filterScoreBooks,
-	type EntityOption,
 } from '@/composables/useEntitySelect'
-import { useScoresStore } from '@/stores/scoresStore'
+import { useIndexValidation } from '@/composables/useIndexValidation'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
-import type { ScoreBook } from '@/api/generated/openapi/data-contracts'
-import FocusTrap from '@/components/FocusTrap.vue'
+import { useScoresStore } from '@/stores/scoresStore'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	modelValue: boolean
@@ -63,7 +64,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
 	'update:modelValue': [value: boolean]
-	'updated': [scoreBookId: number | null, index: number | null]
+	updated: [scoreBookId: number | null, index: number | null]
 }>()
 
 const scoresStore = useScoresStore()
@@ -153,10 +154,14 @@ const hasChanges = computed<boolean>(() => {
  */
 const isFormValid = computed<boolean>(() => {
 	// Must have changes to submit
-	if (!hasChanges.value) return false
+	if (!hasChanges.value) {
+		return false
+	}
 
 	// Valid if removing from book (clearing selection)
-	if (selectedScoreBook.value === null) return true
+	if (selectedScoreBook.value === null) {
+		return true
+	}
 
 	// Valid if assigning to book with valid index (and index is not unchanged)
 	return indexValidation.isValid.value
@@ -168,7 +173,7 @@ const isFormValid = computed<boolean>(() => {
 function resetForm() {
 	// Set initial values based on current assignment
 	if (props.currentScoreBookId !== null) {
-		const currentBook = scoreBookOptions.value.find(o => o.value === props.currentScoreBookId)
+		const currentBook = scoreBookOptions.value.find((o) => o.value === props.currentScoreBookId)
 		selectedScoreBook.value = currentBook ?? null
 		inputIndex.value = props.currentIndex ?? NaN
 	} else {
@@ -188,7 +193,9 @@ watch(showDialog, (isOpen) => {
  * Submit handler
  */
 async function handleSubmit() {
-	if (!isFormValid.value) return
+	if (!isFormValid.value) {
+		return
+	}
 
 	await tryShowError(
 		async () => {

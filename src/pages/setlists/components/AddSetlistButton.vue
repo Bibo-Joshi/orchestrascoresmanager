@@ -14,13 +14,13 @@
 		:name="t('Create setlist')"
 		@update:open="handleDialogClose">
 		<template #default>
-			<NcFormGroup hide-label>
+			<NcFormGroup hideLabel>
 				<NcTextField
 					v-model="form.title"
 					:label="t('Title')"
 					required
 					:error="titleError"
-					@update:model-value="validateTitle" />
+					@update:modelValue="validateTitle" />
 
 				<NcTextArea
 					v-model="form.description"
@@ -66,20 +66,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
-import { t } from '@/utils/l10n'
-import NcButton from '@nextcloud/vue/components/NcButton'
-import NcDialog from '@nextcloud/vue/components/NcDialog'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
-import NcTextArea from '@nextcloud/vue/components/NcTextArea'
-import NcDateTimePickerNative from '@nextcloud/vue/components/NcDateTimePickerNative'
-import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
-import NcFormGroup from '@nextcloud/vue/components/NcFormGroup'
-import { AddIcon, ConfirmIcon, CancelIcon } from '@/icons/vue-material'
 import { showError, showSuccess } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
-import { useSetlistsStore } from '@/stores/setlistsStore'
+import { computed, reactive, ref } from 'vue'
+import NcButton from '@nextcloud/vue/components/NcButton'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcDateTimePickerNative from '@nextcloud/vue/components/NcDateTimePickerNative'
+import NcDialog from '@nextcloud/vue/components/NcDialog'
+import NcFormGroup from '@nextcloud/vue/components/NcFormGroup'
+import NcTextArea from '@nextcloud/vue/components/NcTextArea'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 import { useBreakpoints } from '@/composables/useBreakpoints'
+import { AddIcon, CancelIcon, ConfirmIcon } from '@/icons/vue-material'
+import { useSetlistsStore } from '@/stores/setlistsStore'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	editable: boolean

@@ -3,39 +3,42 @@
 		<FullPageTable
 			ref="tableRef"
 			:data="tableData"
-			:column-defs="columnDefs"
+			:columnDefs="columnDefs"
 			:editable="false"
 			:modules="gridModules"
 			:context="gridContext"
-			:row-drag-managed="props.editable"
-			@cell-value-changed="handleCellValueChanged"
-			@row-drag-end="handleRowDragEnd" />
+			:rowDragManaged="props.editable"
+			@cellValueChanged="handleCellValueChanged"
+			@rowDragEnd="handleRowDragEnd" />
 	</div>
 </template>
 
 <script setup lang="ts">
+import type { CellValueChangedEvent, ColDef, GridApi, RowDragEndEvent } from 'ag-grid-community'
+import type { FolderCollection, Score, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
+import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
+import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
+
+import { showError } from '@nextcloud/dialogs'
+import {
+	ClientSideRowModelModule,
+	RowDragModule,
+} from 'ag-grid-community'
 import { computed, markRaw, ref } from 'vue'
-import { t } from '@/utils/l10n'
-import { parseDurationHHMMSS } from '@/utils/timeFormatUtils'
-import { createDurationColumn } from '@/utils/durationColumnUtils'
-import { tryShowError } from '@/utils/errorHandling'
+import RowActionButton from './RowActionButton.vue'
 import FullPageTable from '@/components/FullPageTable.vue'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
-import {
-	RowDragModule,
-	ClientSideRowModelModule,
-} from 'ag-grid-community'
-import type { ColDef, CellValueChangedEvent, RowDragEndEvent, GridApi } from 'ag-grid-community'
-import type { Score, Setlist, SetlistEntry, FolderCollection } from '@/api/generated/openapi/data-contracts'
 import { parseArrayValue } from '@/utils/arrayUtils'
-import RowActionButton from './RowActionButton.vue'
-import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
+import { createDurationColumn } from '@/utils/durationColumnUtils'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 import { isBreakEntry, resolveScoreField } from '@/utils/setlistScoreUtils'
-import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
-import { showError } from '@nextcloud/dialogs'
-import { useBreakpoints } from '@/composables/useBreakpoints'
+import { parseDurationHHMMSS } from '@/utils/timeFormatUtils'
+
+const props = defineProps<Props>()
 
 const gridModules = [
 	ClientSideRowModelModule,
@@ -61,8 +64,6 @@ interface Props {
 	folderCollection?: FolderCollection | null
 }
 
-const props = defineProps<Props>()
-
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
 const setlistEntriesStore = useSetlistEntriesStore()
@@ -70,7 +71,7 @@ const setlistEntriesStore = useSetlistEntriesStore()
 const { columnPin, isMobile } = useBreakpoints()
 
 // Ref to access FullPageTable exposed methods
-type TableExportRef = { exportAsCsv?: (fileName?: string) => boolean; getGridApi?: () => GridApi | null }
+type TableExportRef = { exportAsCsv?: (fileName?: string) => boolean, getGridApi?: () => GridApi | null }
 const tableRef = ref<TableExportRef | null>(null)
 
 /**
@@ -89,7 +90,9 @@ interface TableEntry extends SetlistEntry {
  * @param entry - The setlist entry or null/undefined
  */
 function getScoreForEntry(entry: SetlistEntry | null | undefined): Score | null {
-	if (!entry?.scoreId) return null
+	if (!entry?.scoreId) {
+		return null
+	}
 	return scoresStore.getScoreById(entry.scoreId) ?? null
 }
 
@@ -183,7 +186,9 @@ const gridContext = computed(() => ({
  */
 function scoreInfoValueGetter(field: ScoreInfoField) {
 	return (params: { data: TableEntry }) => {
-		if (!params.data) return null
+		if (!params.data) {
+			return null
+		}
 		const entry = params.data as TableEntry
 		const score = getScoreForEntry(entry)
 		return resolveScoreField(
@@ -219,7 +224,7 @@ async function handleRowDragEnd(event: RowDragEndEvent): Promise<void> {
 
 	// Build updates for entries that need reordering
 	// Only update entries whose positions have changed
-	const updates: Array<{ id: number; index: number }> = []
+	const updates: Array<{ id: number, index: number }> = []
 
 	allNodes.forEach((entry, newIndex) => {
 		// New index should be the position in the list (0-based, but we'll use entry indices)
@@ -260,7 +265,7 @@ const columnEditHandlers: Record<string, ColumnEditHandler> = {
 		let parsedDuration: number | null
 		try {
 			parsedDuration = parseDurationHHMMSS(newValue as string)
-		} catch (e) {
+		} catch {
 			showError(t('Invalid duration format. Use (HH:)MM:SS'))
 			return
 		}
@@ -270,7 +275,7 @@ const columnEditHandlers: Record<string, ColumnEditHandler> = {
 		let parsedDuration: number | null
 		try {
 			parsedDuration = parseDurationHHMMSS(newValue as string)
-		} catch (e) {
+		} catch {
 			showError(t('Invalid duration format. Use (HH:)MM:SS'))
 			return
 		}
@@ -288,11 +293,15 @@ const columnEditHandlers: Record<string, ColumnEditHandler> = {
  */
 async function handleCellValueChanged(event: CellValueChangedEvent): Promise<void> {
 	const field = (event.colDef && (event.colDef.field as string)) || ''
-	if (!field) return
+	if (!field) {
+		return
+	}
 
 	const entry = event.data as TableEntry
 	const id = entry.id
-	if (!id) return
+	if (!id) {
+		return
+	}
 
 	await tryShowError(
 		async () => {
@@ -441,7 +450,7 @@ const columnDefs = computed<ColDef[]>(() => {
 		headerName: t('GEMA IDs'),
 		colId: 'gemaIds' satisfies PdfColumnId,
 		valueGetter: scoreInfoValueGetter('gemaIds'),
-		valueParser: params => parseArrayValue(params.newValue),
+		valueParser: (params) => parseArrayValue(params.newValue),
 		hide: fullModeColumnIsHidden.value,
 	})
 
@@ -457,16 +466,16 @@ function getPdfColumns(): PdfColumnConfig[] {
 	const api = tableRef.value?.getGridApi?.()
 	if (api) {
 		return (api.getColumns() || [])
-			.filter(col => !!col.getColDef().colId)
-			.map(col => ({
+			.filter((col) => !!col.getColDef().colId)
+			.map((col) => ({
 				id: col.getColDef().colId as PdfColumnId,
 				label: col.getColDef().headerName ?? '',
 			}))
 	}
 	// Fallback: use the computed column defs in definition order
 	return columnDefs.value
-		.filter(col => !!col.colId)
-		.map(col => ({
+		.filter((col) => !!col.colId)
+		.map((col) => ({
 			id: col.colId as PdfColumnId,
 			label: col.headerName ?? '',
 		}))

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-08-02 07:06+0000\n"
+"POT-Creation-Date: 2026-10-04 05:10+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -221,8 +221,8 @@ msgstr "Wählen Sie die Gruppen aus, die die Orchester-Noten-Tabelle bearbeiten 
 msgid "Allowed Groups"
 msgstr "Erlaubte Gruppen"
 
-msgid "Select groups..."
-msgstr "Gruppen auswählen..."
+msgid "Select groups…"
+msgstr ""
 
 msgid "Invalid default moderation time format. Use (HH:)MM:SS"
 msgstr "Ungültiges Format für Standard-Moderationszeit. Verwenden Sie (HH:)MM:SS"
@@ -248,8 +248,8 @@ msgstr "Standard-Ordnersammlung"
 msgid "Select folder collection"
 msgstr "Ordnersammlung auswählen"
 
-msgid "Saving …"
-msgstr "Speichern …"
+msgid "Saving …"
+msgstr ""
 
 msgid "Save"
 msgstr "Speichern"
@@ -296,8 +296,8 @@ msgstr "Titel"
 msgid "Confirm"
 msgstr "Bestätigen"
 
-msgid "Loading..."
-msgstr "Wird geladen..."
+msgid "Loading…"
+msgstr ""
 
 msgid "An error occurred"
 msgstr "Ein Fehler ist aufgetreten"
@@ -695,8 +695,8 @@ msgstr "Kommentare konnten nicht geladen werden. Bitte laden Sie die Seite neu."
 msgid "No comments yet"
 msgstr "Noch keine Kommentare"
 
-msgid "Write a new comment …"
-msgstr "Neuen Kommentar schreiben …"
+msgid "Write a new comment …"
+msgstr ""
 
 msgid "GitHub flavored markdown is supported."
 msgstr "GitHub Markdown wird unterstützt."
@@ -806,8 +806,8 @@ msgstr "Ist Entwurf"
 msgid "Is Published"
 msgstr "Ist veröffentlicht"
 
-msgid "Saving..."
-msgstr "Speichern..."
+msgid "Saving…"
+msgstr ""
 
 msgid "Saved"
 msgstr "Gespeichert"
@@ -899,8 +899,8 @@ msgstr "Index muss eine nicht-negative ganze Zahl sein"
 msgid "This index is already occupied"
 msgstr "Dieser Index ist bereits belegt"
 
-msgid "Loading occupied indices..."
-msgstr "Belegte Indizes werden geladen..."
+msgid "Loading occupied indices…"
+msgstr ""
 
 msgid "Index is unchanged"
 msgstr "Index unverändert"
@@ -940,6 +940,24 @@ msgstr "Gesamtdauer"
 
 msgid "Invalid duration format"
 msgstr "Ungültiges Spieldauerformat"
+
+#~ msgid "Select groups..."
+#~ msgstr "Gruppen auswählen..."
+
+#~ msgid "Saving …"
+#~ msgstr "Speichern …"
+
+#~ msgid "Loading..."
+#~ msgstr "Wird geladen..."
+
+#~ msgid "Write a new comment …"
+#~ msgstr "Neuen Kommentar schreiben …"
+
+#~ msgid "Saving..."
+#~ msgstr "Speichern..."
+
+#~ msgid "Loading occupied indices..."
+#~ msgstr "Belegte Indizes werden geladen..."
 
 #~ msgid "Failed to update setlist title: "
 #~ msgstr "Setlist-Titel konnte nicht aktualisiert werden: "

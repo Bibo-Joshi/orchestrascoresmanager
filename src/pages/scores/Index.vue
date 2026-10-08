@@ -3,10 +3,10 @@
 		<template #content>
 			<ContentStateWrapper
 				:loading="scoresStore.isLoading"
-				:is-empty="scoresStore.scores.length === 0"
-				:empty-text="t('No scores yet')"
-				:empty-description="t('Create your first score to get started')">
-				<template #empty-icon>
+				:isEmpty="scoresStore.scores.length === 0"
+				:emptyText="t('No scores yet')"
+				:emptyDescription="t('Create your first score to get started')">
+				<template #emptyIcon>
 					<ScoreIcon :size="64" />
 				</template>
 				<ScoresTable
@@ -15,9 +15,9 @@
 			</ContentStateWrapper>
 		</template>
 
-		<template #header-actions>
+		<template #headerActions>
 			<AddScoreButton :editable="editable" />
-			<ExportCsvButton :table-ref="scoresTableRef?.tableRef ?? null" />
+			<ExportCsvButton :tableRef="scoresTableRef?.tableRef ?? null" />
 		</template>
 
 		<template #sidebar>
@@ -27,17 +27,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
 import { loadState } from '@nextcloud/initial-state'
-import Layout from '@/components/Layout.vue'
-import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
-import ScoresTable from '@/components/ScoresTable.vue'
+import { onMounted, ref } from 'vue'
 import AddScoreButton from './components/AddScoreButton.vue'
+import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
 import ExportCsvButton from '@/components/ExportCsvButton.vue'
+import Layout from '@/components/Layout.vue'
 import ScoreSidebar from '@/components/ScoreSidebar.vue'
+import ScoresTable from '@/components/ScoresTable.vue'
 import { ScoreIcon } from '@/icons/vue-material'
-import { useScoresStore } from '@/stores/scoresStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
+import { useScoresStore } from '@/stores/scoresStore'
 import { useTagsStore } from '@/stores/tagsStore'
 import { t } from '@/utils/l10n'
 

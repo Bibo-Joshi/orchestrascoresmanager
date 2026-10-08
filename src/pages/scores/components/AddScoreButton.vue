@@ -11,9 +11,9 @@
 	</NcButton>
 
 	<AddOrEditDialog
-		v-model:is-open="showCreateDialog"
+		v-model:isOpen="showCreateDialog"
 		:name="t('Create score')"
-		:is-input-valid="isFormValid"
+		:isInputValid="isFormValid"
 		@submit="handleSubmit"
 		@reset="resetForm">
 		<NcTextField v-model="inputNewScoreTitle" :label="t('Title')" required />
@@ -21,16 +21,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { t } from '@/utils/l10n'
+import { showError, showSuccess } from '@nextcloud/dialogs'
+import { computed, ref } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
-import { AddIcon } from '@/icons/vue-material'
-import { showError, showSuccess } from '@nextcloud/dialogs'
-import { tryShowError } from '@/utils/errorHandling'
 import AddOrEditDialog from '@/components/AddOrEditDialog.vue'
-import { useScoresStore } from '@/stores/scoresStore'
 import { useBreakpoints } from '@/composables/useBreakpoints'
+import { AddIcon } from '@/icons/vue-material'
+import { useScoresStore } from '@/stores/scoresStore'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 interface Props {
 	editable: boolean

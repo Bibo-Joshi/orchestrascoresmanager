@@ -19,7 +19,7 @@
 				:key="folderCollectionsNavigationItem.name"
 				:name="folderCollectionsNavigationItem.displayName"
 				:to="{ path: folderCollectionsNavigationItem.path }"
-				allow-collapse
+				allowCollapse
 				:open="isFolderCollectionsOpen">
 				<template #icon>
 					<component :is="folderCollectionsNavigationItem.icon" v-if="folderCollectionsNavigationItem.icon" :size="20" />
@@ -58,19 +58,20 @@
 </template>
 
 <script setup lang="ts">
+import type { NavigationItem } from '@/types/navigation'
+
+import { loadState } from '@nextcloud/initial-state'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
 import NcAppNavigationItem from '@nextcloud/vue/components/NcAppNavigationItem'
-import NcCounterBubble from '@nextcloud/vue/components/NcCounterBubble'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcCounterBubble from '@nextcloud/vue/components/NcCounterBubble'
 import AppSettings from '@/components/AppSettings.vue'
+import { SettingsIcon } from '@/icons/vue-material'
 import { navigation } from '@/navigation'
-import { NavigationItem } from '@/types/navigation'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { t } from '@/utils/l10n'
-import { SettingsIcon } from '@/icons/vue-material'
-import { loadState } from '@nextcloud/initial-state'
 
 const route = useRoute()
 const folderCollectionsStore = useFolderCollectionsStore()
@@ -88,14 +89,14 @@ onMounted(() => {
  * Static navigation items (non-folder collection items)
  */
 const staticNavigationItems = computed((): NavigationItem[] => {
-	return navigation.filter(item => item.name !== 'foldercollections')
+	return navigation.filter((item) => item.name !== 'foldercollections')
 })
 
 /**
  * Folder collections navigation item (for the parent collapsible item)
  */
 const folderCollectionsNavigationItem = computed((): NavigationItem | undefined => {
-	return navigation.find(item => item.name === 'foldercollections')
+	return navigation.find((item) => item.name === 'foldercollections')
 })
 
 /**

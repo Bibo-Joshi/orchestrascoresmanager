@@ -1,3 +1,5 @@
+import type { Theme } from 'ag-grid-community'
+
 /**
  * AG Grid theme configuration for Nextcloud integration.
  *
@@ -11,7 +13,6 @@
  * ```
  */
 import { themeQuartz } from 'ag-grid-community'
-import type { Theme } from 'ag-grid-community'
 
 /**
  * Shared theme parameters using Nextcloud CSS variables.

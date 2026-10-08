@@ -8,10 +8,11 @@
 </template>
 
 <script setup lang="ts">
-import ScoreSidebar from '@/components/ScoreSidebar.vue'
-import SetlistSidebar from './SetlistSidebar.vue'
-import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import type { Setlist } from '@/api/generated/openapi/data-contracts'
+
+import SetlistSidebar from './SetlistSidebar.vue'
+import ScoreSidebar from '@/components/ScoreSidebar.vue'
+import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 
 interface Props {
 	setlist: Setlist | undefined

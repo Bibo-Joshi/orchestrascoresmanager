@@ -3,7 +3,7 @@
 		<NcActions>
 			<NcActionButton
 				v-if="!!props.params.score"
-				:close-after-click="true"
+				:closeAfterClick="true"
 				:name="t('Details')"
 				@click="handleInfoButton">
 				<template #icon>
@@ -12,7 +12,7 @@
 			</NcActionButton>
 			<NcActionButton
 				v-if="props.params.showDeleteButton == true"
-				:close-after-click="true"
+				:closeAfterClick="true"
 				:name="t('Delete')"
 				@click="handleDeleteButton">
 				<template #icon>
@@ -24,16 +24,17 @@
 </template>
 
 <script setup lang="ts">
-import NcActions from '@nextcloud/vue/components/NcActions'
+import type { Score, SetlistEntry } from '@/api/generated/openapi/data-contracts'
+
+import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import { InfoIcon, DeleteIcon } from '@/icons/vue-material'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import { DeleteIcon, InfoIcon } from '@/icons/vue-material'
 import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
-import type { Score, SetlistEntry } from '@/api/generated/openapi/data-contracts'
-import { spawnDialog } from '@nextcloud/vue/functions/dialog'
-import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import { t } from '@/utils/l10n'
 import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 type Params = {
 	score?: Score

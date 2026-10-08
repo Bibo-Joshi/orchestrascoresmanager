@@ -4,12 +4,12 @@
 			<ContentStateWrapper
 				:loading="loading"
 				:error="loadError || !scoreBook"
-				:is-empty="scores.length === 0"
-				:error-text="t('Failed to load score book')"
-				:error-description="t('Please check if the score book exists and try again.')"
-				:empty-text="t('No scores in this book')"
-				:empty-description="t('Add scores to this score book to see them here.')">
-				<template #empty-icon>
+				:isEmpty="scores.length === 0"
+				:errorText="t('Failed to load score book')"
+				:errorDescription="t('Please check if the score book exists and try again.')"
+				:emptyText="t('No scores in this book')"
+				:emptyDescription="t('Add scores to this score book to see them here.')">
+				<template #emptyIcon>
 					<ScoreIcon :size="64" />
 				</template>
 				<!-- Scores Table -->
@@ -17,19 +17,19 @@
 					v-if="scoreBook"
 					ref="scoresTableRef"
 					:editable="editable"
-					:score-book-id="scoreBook.id" />
+					:scoreBookId="scoreBook.id" />
 			</ContentStateWrapper>
 		</template>
 
-		<template #header-actions>
+		<template #headerActions>
 			<AddScoreToBookButton
 				v-if="scoreBook"
 				:editable="editable"
-				:score-book-id="scoreBook.id"
-				:existing-score-ids="existingScoreIds"
-				:occupied-indices="occupiedIndices"
-				@score-added="handleScoreAdded" />
-			<ExportCsvButton :table-ref="scoresTableRef?.tableRef ?? null" />
+				:scoreBookId="scoreBook.id"
+				:existingScoreIds="existingScoreIds"
+				:occupiedIndices="occupiedIndices"
+				@scoreAdded="handleScoreAdded" />
+			<ExportCsvButton :tableRef="scoresTableRef?.tableRef ?? null" />
 		</template>
 
 		<template #sidebar>
@@ -39,21 +39,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { loadState } from '@nextcloud/initial-state'
-import Layout from '@/components/Layout.vue'
-import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
-import ScoresTable from '@/components/ScoresTable.vue'
-import ExportCsvButton from '@/components/ExportCsvButton.vue'
-import ScoreSidebar from '@/components/ScoreSidebar.vue'
-import { ScoreIcon } from '@/icons/vue-material'
-import AddScoreToBookButton from './components/AddScoreToBookButton.vue'
-import { t } from '@/utils/l10n'
-import { useScoresStore } from '@/stores/scoresStore'
-import { useScoreBooksStore } from '@/stores/scoreBooksStore'
-import { useTagsStore } from '@/stores/tagsStore'
 import type { Score, ScoreBook } from '@/api/generated/openapi/data-contracts'
+
+import { loadState } from '@nextcloud/initial-state'
+import { computed, onMounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import AddScoreToBookButton from './components/AddScoreToBookButton.vue'
+import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
+import ExportCsvButton from '@/components/ExportCsvButton.vue'
+import Layout from '@/components/Layout.vue'
+import ScoreSidebar from '@/components/ScoreSidebar.vue'
+import ScoresTable from '@/components/ScoresTable.vue'
+import { ScoreIcon } from '@/icons/vue-material'
+import { useScoreBooksStore } from '@/stores/scoreBooksStore'
+import { useScoresStore } from '@/stores/scoresStore'
+import { useTagsStore } from '@/stores/tagsStore'
+import { t } from '@/utils/l10n'
 
 const route = useRoute()
 const scoresStore = useScoresStore()
@@ -87,7 +88,9 @@ const scoreBook = computed<ScoreBook | undefined>(() => {
  * Get scores for the current scorebook from the cache
  */
 const scores = computed<Score[]>(() => {
-	if (!scoreBook.value) return []
+	if (!scoreBook.value) {
+		return []
+	}
 	return scoreBooksStore.getScoreBookScores(scoreBook.value.id)
 })
 
@@ -132,14 +135,14 @@ watch(() => route.params.id, () => {
  * Set of existing score IDs in the book (for disabling in dropdown)
  */
 const existingScoreIds = computed<Set<number>>(() => {
-	return new Set(scores.value.map(s => s.id))
+	return new Set(scores.value.map((s) => s.id))
 })
 
 /**
  * Set of occupied indices in the book
  */
 const occupiedIndices = computed<Set<number>>(() => {
-	return new Set(scores.value.map(s => s.scoreBook?.index).filter((i): i is number => i !== null && i !== undefined))
+	return new Set(scores.value.map((s) => s.scoreBook?.index).filter((i): i is number => i !== null && i !== undefined))
 })
 
 /**

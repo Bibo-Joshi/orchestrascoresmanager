@@ -3,7 +3,7 @@
 		<NcActions>
 			<NcActionButton
 				v-if="props.params.showInfoButton !== false"
-				:close-after-click="true"
+				:closeAfterClick="true"
 				:name="t('Details')"
 				@click="handleInfoButton">
 				<template #icon>
@@ -14,7 +14,7 @@
 			<NcActionButton
 				v-for="(action, index) in props.params.customActions"
 				:key="index"
-				:close-after-click="action.closeAfterClick ?? true"
+				:closeAfterClick="action.closeAfterClick ?? true"
 				:name="action.name"
 				:href="getActionHref(action)"
 				:target="action.target"
@@ -25,7 +25,7 @@
 			</NcActionButton>
 			<NcActionButton
 				v-if="props.params.showDeleteButton == true"
-				:close-after-click="true"
+				:closeAfterClick="true"
 				:name="props.params.deleteText || t('Delete')"
 				@click="handleDeleteButton">
 				<template #icon>
@@ -37,20 +37,21 @@
 </template>
 
 <script setup lang="ts">
-import NcActions from '@nextcloud/vue/components/NcActions'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import { InfoIcon, DeleteIcon } from '@/icons/vue-material'
-import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
-import { useScoreBookSidebarStore } from '@/stores/scoreBookSidebarStore'
-import { useScoresStore } from '@/stores/scoresStore'
-import { useScoreBooksStore } from '@/stores/scoreBooksStore'
-import type { Score, ScoreBook } from '@/api/generated/openapi/data-contracts'
-import { spawnDialog } from '@nextcloud/vue/functions/dialog'
-import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import { t } from '@/utils/l10n'
-import { tryShowError } from '@/utils/errorHandling'
 import type { Component } from 'vue'
+import type { Score, ScoreBook } from '@/api/generated/openapi/data-contracts'
+
+import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import { useRouter } from 'vue-router'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActions from '@nextcloud/vue/components/NcActions'
+import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
+import { DeleteIcon, InfoIcon } from '@/icons/vue-material'
+import { useScoreBookSidebarStore } from '@/stores/scoreBookSidebarStore'
+import { useScoreBooksStore } from '@/stores/scoreBooksStore'
+import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
+import { useScoresStore } from '@/stores/scoresStore'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 type ItemType = 'score' | 'scorebook'
 
@@ -71,7 +72,7 @@ type CustomAction = {
 	 * Can be an object or a function that returns a router location
 	 * Preferred over href for internal navigation
 	 */
-	to?: { name: string; params?: Record<string, string | number> } | ((data: Score | ScoreBook) => { name: string; params?: Record<string, string | number> })
+	to?: { name: string, params?: Record<string, string | number> } | ((data: Score | ScoreBook) => { name: string, params?: Record<string, string | number> })
 	/**
 	 * Optional href for link actions
 	 * Can be a string or a function that takes the row data and returns a string
@@ -137,8 +138,12 @@ const scoreBookSidebarStore = useScoreBookSidebarStore()
  */
 function getActionHref(action: CustomAction): string | undefined {
 	// Don't return href if 'to' is specified (router navigation takes precedence)
-	if (action.to) return undefined
-	if (!action.href) return undefined
+	if (action.to) {
+		return undefined
+	}
+	if (!action.href) {
+		return undefined
+	}
 	if (typeof action.href === 'function') {
 		return action.href(props.params.data)
 	}

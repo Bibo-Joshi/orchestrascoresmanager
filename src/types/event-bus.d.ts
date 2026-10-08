@@ -1,6 +1,6 @@
 declare module '@nextcloud/event-bus' {
 	interface NextcloudEvents {
-		'orchestrascoresmanager:sidebar:content-set': { key: string; content: string }
+		'orchestrascoresmanager:sidebar:content-set': { key: string, content: string }
 		'orchestrascoresmanager:sidebar:toggle': void
 	}
 	export function emit(event: keyof NextcloudEvents, payload: NextcloudEvents[keyof NextcloudEvents]): void

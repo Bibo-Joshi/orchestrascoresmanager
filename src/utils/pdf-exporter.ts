@@ -1,3 +1,7 @@
+import type { Table as AutoTable, Styles } from 'jspdf-autotable'
+import type { FolderCollection, Score, ScoreBook, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
+import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
+
 /**
  * PDF exporter for setlist export.
  * Generates an A4 portrait PDF with setlist metadata and entries table.
@@ -5,28 +9,26 @@
  * This module is designed to be easily adaptable for formatting changes.
  */
 import { jsPDF } from 'jspdf'
-import { autoTable, type Table as AutoTable, type Styles } from 'jspdf-autotable'
+import { autoTable } from 'jspdf-autotable'
 import { t } from '@/utils/l10n'
-import { formatDurationHHMM, formatDurationHHMMSS } from '@/utils/timeFormatUtils'
-import type { Setlist, SetlistEntry, Score, ScoreBook, FolderCollection } from '@/api/generated/openapi/data-contracts'
 import { isBreakEntry, resolveScoreField } from '@/utils/setlistScoreUtils'
-import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
+import { formatDurationHHMM, formatDurationHHMMSS } from '@/utils/timeFormatUtils'
 
 /**
  * Identifies a column in the entries table by a stable string key.
  */
-export type PdfColumnId =
-	| 'startTime'
-	| 'endTime'
-	| 'moderation'
-	| 'duration'
-	| 'fcvIndex'
-	| 'title'
-	| 'difficulty'
-	| 'bookName'
-	| 'bookIndex'
-	| 'comment'
-	| 'gemaIds'
+export type PdfColumnId
+	= | 'startTime'
+		| 'endTime'
+		| 'moderation'
+		| 'duration'
+		| 'fcvIndex'
+		| 'title'
+		| 'difficulty'
+		| 'bookName'
+		| 'bookIndex'
+		| 'comment'
+		| 'gemaIds'
 
 /**
  * Describes a single column in the PDF entries table.
@@ -105,7 +107,9 @@ export const defaultPdfFormatConfig: PdfFormatConfig = {
  * @return Formatted duration string with unit suffix, or empty string
  */
 function formatDurationWithUnit(seconds: number | null | undefined): string {
-	if (seconds === null || seconds === undefined) return ''
+	if (seconds === null || seconds === undefined) {
+		return ''
+	}
 	return `${formatDurationHHMM(seconds)} ${t('h')}`
 }
 
@@ -116,7 +120,7 @@ function formatDurationWithUnit(seconds: number | null | undefined): string {
  * @param dateTimeStr - ISO 8601 datetime string
  * @return Object with formatted date, time string, and startOfDaySecs (elapsed seconds since midnight)
  */
-function formatDateTime(dateTimeStr: string): { date: string; time: string; startOfDaySecs: number } {
+function formatDateTime(dateTimeStr: string): { date: string, time: string, startOfDaySecs: number } {
 	const date = new Date(dateTimeStr)
 	// Elapsed seconds since midnight, used to compute end time and format start time
 	const startOfDaySecs = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds()
@@ -285,24 +289,28 @@ function getEntryCellValue(
 			fcvScoresMap,
 			fcvScoreBookIndicesMap,
 		)
-		if (raw === null || raw === undefined) return ''
-		if (Array.isArray(raw)) return raw.join(', ')
+		if (raw === null || raw === undefined) {
+			return ''
+		}
+		if (Array.isArray(raw)) {
+			return raw.join(', ')
+		}
 		return String(raw)
 	}
 
 	switch (columnId) {
-	case 'startTime':
-		return formatDurationHHMM(startTime)
-	case 'endTime':
-		return formatDurationHHMM(startTime + effectiveMod + effectiveDuration)
-	case 'moderation':
-		return effectiveMod > 0 ? formatDurationHHMMSS(effectiveMod) : '-'
-	case 'duration':
-		return effectiveDuration > 0 ? formatDurationHHMMSS(effectiveDuration) : '-'
-	case 'comment':
-		return entry.comment ?? ''
-	default:
-		return ''
+		case 'startTime':
+			return formatDurationHHMM(startTime)
+		case 'endTime':
+			return formatDurationHHMM(startTime + effectiveMod + effectiveDuration)
+		case 'moderation':
+			return effectiveMod > 0 ? formatDurationHHMMSS(effectiveMod) : '-'
+		case 'duration':
+			return effectiveDuration > 0 ? formatDurationHHMMSS(effectiveDuration) : '-'
+		case 'comment':
+			return entry.comment ?? ''
+		default:
+			return ''
 	}
 }
 
@@ -318,7 +326,6 @@ export function exportSetlistToPdf(
 ): void {
 	const { setlist, entries, getScoreById, getScoreBookById, fcvScoresMap, fcvScoreBookIndicesMap, folderCollection } = data
 
-	// eslint-disable-next-line new-cap
 	const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
 	const pageWidth = doc.internal.pageSize.getWidth()
 	const margin = config.margin
@@ -400,7 +407,7 @@ export function exportSetlistToPdf(
 	const activeColumns = data.columnConfigs
 		?? buildDefaultColumnConfigs(hasFolderCollectionVersion, isIndexedCollection)
 
-	const entryHeaders = activeColumns.map(col => col.label)
+	const entryHeaders = activeColumns.map((col) => col.label)
 
 	// Compute cumulative start times
 	let cumulativeTime = 0
@@ -418,11 +425,7 @@ export function exportSetlistToPdf(
 		const startTime = cumulativeTime
 		cumulativeTime += effectiveMod + effectiveDuration
 
-		entryRows.push(
-			activeColumns.map(col =>
-				getEntryCellValue(col.id, entry, startTime, effectiveDuration, effectiveMod, score, getScoreBookById, fcvScoresMap, fcvScoreBookIndicesMap),
-			),
-		)
+		entryRows.push(activeColumns.map((col) => getEntryCellValue(col.id, entry, startTime, effectiveDuration, effectiveMod, score, getScoreBookById, fcvScoresMap, fcvScoreBookIndicesMap)))
 	}
 
 	autoTable(doc, {

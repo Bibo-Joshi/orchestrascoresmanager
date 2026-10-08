@@ -36,7 +36,7 @@ export function createScoreOptions(
 	excludeScoreBooksIds?: Set<number>,
 ): EntityOption<Score>[] {
 	return scores
-		.filter(score => {
+		.filter((score) => {
 			// If excludeScoreBooksIds is provided, exclude scores belonging to those score books
 			if (excludeScoreBooksIds && score.scoreBook !== null) {
 				return !excludeScoreBooksIds.has(score.scoreBook.id)
@@ -44,7 +44,7 @@ export function createScoreOptions(
 			// Otherwise use the old logic
 			return !excludeInBook || score.scoreBook === null
 		})
-		.map(score => ({
+		.map((score) => ({
 			label: formatEntityLabel(score.title, score.titleShort),
 			value: score.id,
 			entity: score,
@@ -56,10 +56,8 @@ export function createScoreOptions(
  * @param scoreBooks - Array of score books
  * @return Array of score book options for NcSelect
  */
-export function createScoreBookOptions(
-	scoreBooks: ScoreBook[],
-): EntityOption<ScoreBook>[] {
-	return scoreBooks.map(scoreBook => ({
+export function createScoreBookOptions(scoreBooks: ScoreBook[]): EntityOption<ScoreBook>[] {
+	return scoreBooks.map((scoreBook) => ({
 		label: formatEntityLabel(scoreBook.title, scoreBook.titleShort),
 		value: scoreBook.id,
 		entity: scoreBook,
@@ -118,8 +116,6 @@ export function createScoreSelectable(excludeIds: Set<number>): (option: EntityO
  * @param excludeIds - Set of score book IDs to exclude
  * @return Function to check if a score book is selectable
  */
-export function createScoreBookSelectable(
-	excludeIds: Set<number>,
-): (option: EntityOption<ScoreBook>) => boolean {
+export function createScoreBookSelectable(excludeIds: Set<number>): (option: EntityOption<ScoreBook>) => boolean {
 	return (option: EntityOption<ScoreBook>) => !excludeIds.has(option.value)
 }

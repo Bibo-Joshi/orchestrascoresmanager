@@ -1,7 +1,8 @@
+import type { NavigationItem, NavigationRoute } from './types/navigation.ts'
+
 import { markRaw } from 'vue'
-import { NavigationItem, NavigationRoute } from './types/navigation'
-import { ScoreIcon, ScoreBookIcon, FolderCollectionIcon, SetlistIcon } from '@/icons/vue-material'
-import { t } from './utils/l10n'
+import { t } from './utils/l10n.ts'
+import { FolderCollectionIcon, ScoreBookIcon, ScoreIcon, SetlistIcon } from '@/icons/vue-material'
 
 const APP_NAME = t('Orchestra Scores Manager')
 
@@ -45,7 +46,7 @@ const navigation: NavigationItem[] = [
  * Uses the component references from navigation config
  */
 const routes: NavigationRoute[] = [
-	...navigation.map(item => ({
+	...navigation.map((item) => ({
 		path: item.path,
 		name: item.name,
 		component: item.component,
@@ -86,15 +87,15 @@ const routes: NavigationRoute[] = [
  * Generate browser tab title based on page title
  * @param pageTitle - The page title or null
  */
-const generateFullTitle = (pageTitle: string | null | undefined): string => {
+function generateFullTitle(pageTitle: string | null | undefined): string {
 	return pageTitle
 		? `${pageTitle} - ${APP_NAME} - Nextcloud`
 		: `${APP_NAME} - Nextcloud`
 }
 
 export {
+	APP_NAME,
+	generateFullTitle,
 	navigation,
 	routes,
-	generateFullTitle,
-	APP_NAME,
 }

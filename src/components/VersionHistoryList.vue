@@ -7,7 +7,7 @@
 			:name="group.folderCollection.title"
 			:expanded="isExpanded(group.folderCollection.id)"
 			:bold="true"
-			:counter-number="group.activeIndex ?? undefined"
+			:counterNumber="group.activeIndex ?? undefined"
 			:active="group.hasActiveVersion"
 			@toggle="$emit('toggle', group.folderCollection.id)">
 			<template #icon>
@@ -27,7 +27,7 @@
 						v-for="entry in collapseVersions(group.versions)"
 						:key="entry.lastVersion.id"
 						:name="formatCollapsedVersionDateRange(entry)"
-						:counter-number="entry.index ?? undefined"
+						:counterNumber="entry.index ?? undefined"
 						:bold="false"
 						:active="entry.lastVersion.validTo === null"
 						:to="{ name: 'foldercollection', params: { id: group.folderCollection.id }, query: { versionId: entry.lastVersion.id } }">
@@ -43,13 +43,14 @@
 </template>
 
 <script setup lang="ts">
+import type { FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
+import type { FolderCollectionGroup, VersionEntry } from '@/composables/useVersionHistory'
+
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import ExpandableListItem from '@/components/ExpandableListItem.vue'
-import { FolderCollectionIcon, CheckCircleIcon, HistoryIcon } from '@/icons/vue-material'
-import { t } from '@/utils/l10n'
 import { formatCollapsedVersionDateRange } from '@/composables/useDateFormatting'
-import type { FolderCollectionGroup, VersionEntry } from '@/composables/useVersionHistory'
-import type { FolderCollectionVersion } from '@/api/generated/openapi/data-contracts'
+import { CheckCircleIcon, FolderCollectionIcon, HistoryIcon } from '@/icons/vue-material'
+import { t } from '@/utils/l10n'
 
 defineProps<{
 	groups: FolderCollectionGroup[]
@@ -73,9 +74,7 @@ function collapseVersions(versions: VersionEntry[]): CollapsedVersionEntry[] {
 	const toTime = (date: string | null): number | null => (date === null ? null : new Date(date).getTime())
 
 	// Work on a copy to avoid mutating reactive source data.
-	const sorted = [...versions].sort(
-		(a, b) => new Date(a.version.validFrom).getTime() - new Date(b.version.validFrom).getTime(),
-	)
+	const sorted = [...versions].sort((a, b) => new Date(a.version.validFrom).getTime() - new Date(b.version.validFrom).getTime())
 
 	let currentGroup: CollapsedVersionEntry | null = null
 

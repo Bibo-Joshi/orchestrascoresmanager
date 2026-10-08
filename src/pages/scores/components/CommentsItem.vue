@@ -4,8 +4,8 @@
 			<NcAvatar
 				:user="comment.author.userId"
 				:size="32"
-				:disable-menu="true"
-				:show-user-status="false" />
+				:disableMenu="true"
+				:hideStatus="true" />
 		</div>
 		<div class="comment-body">
 			<div class="comment-header">
@@ -29,8 +29,8 @@
 			<NcRichText
 				:text="comment.content"
 				:autolink="true"
-				:use-markdown="true"
-				:use-extended-markdown="true"
+				:useMarkdown="true"
+				:useExtendedMarkdown="true"
 				:interactive="false"
 				class="comment-content" />
 		</div>
@@ -38,19 +38,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { t } from '@/utils/l10n.ts'
-import { tryShowError } from '@/utils/errorHandling'
+import type { Comment } from '@/api/generated/openapi/data-contracts'
+
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
+import { ref } from 'vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActions from '@nextcloud/vue/components/NcActions'
 import NcAvatar from '@nextcloud/vue/components/NcAvatar'
 import NcDateTime from '@nextcloud/vue/components/NcDateTime'
 import NcRichText from '@nextcloud/vue/components/NcRichText'
-import NcActions from '@nextcloud/vue/components/NcActions'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import { DeleteIcon } from '@/icons/vue-material'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import type { Comment } from '@/api/generated/openapi/data-contracts'
 import { apiClients } from '@/api/client'
+import { DeleteIcon } from '@/icons/vue-material'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n.ts'
 
 interface Props {
 	comment: Comment

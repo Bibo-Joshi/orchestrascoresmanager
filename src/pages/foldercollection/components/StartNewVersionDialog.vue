@@ -31,12 +31,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { t } from '@/utils/l10n.ts'
-import NcDialog from '@nextcloud/vue/components/NcDialog'
+import { computed, onMounted, ref } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDateTimePickerNative from '@nextcloud/vue/components/NcDateTimePickerNative'
-import { ConfirmIcon, CancelIcon } from '@/icons/vue-material'
+import NcDialog from '@nextcloud/vue/components/NcDialog'
+import { CancelIcon, ConfirmIcon } from '@/icons/vue-material'
+import { t } from '@/utils/l10n.ts'
 
 interface Props {
 	/**
@@ -47,10 +47,11 @@ interface Props {
 }
 
 interface Emits {
-	(e: 'close', result: { confirmed: boolean; validFrom?: string }): void
+	(e: 'close', result: { confirmed: boolean, validFrom?: string }): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
+	// eslint-disable-next-line vue/no-boolean-default
 	open: true,
 })
 
@@ -73,7 +74,9 @@ const minDate = computed(() => {
  * Check if the selected date is valid
  */
 const isValidDate = computed(() => {
-	if (!selectedDate.value) return false
+	if (!selectedDate.value) {
+		return false
+	}
 	return selectedDate.value >= minDate.value
 })
 

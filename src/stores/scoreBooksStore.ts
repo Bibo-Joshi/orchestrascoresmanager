@@ -1,8 +1,9 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { loadState } from '@nextcloud/initial-state'
-import { apiClients } from '@/api/client'
 import type { Score, ScoreBook } from '@/api/generated/openapi/data-contracts'
+
+import { loadState } from '@nextcloud/initial-state'
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { apiClients } from '@/api/client'
 
 /**
  * Pinia store for managing score books state.
@@ -23,7 +24,9 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	 * Initialize the store by loading data from initial state or API
 	 */
 	async function initialize(): Promise<void> {
-		if (isLoaded.value || isLoading.value) return
+		if (isLoaded.value || isLoading.value) {
+			return
+		}
 
 		isLoading.value = true
 
@@ -52,9 +55,7 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	 * Get score books sorted by title
 	 */
 	const scoreBooksSorted = computed(() => {
-		return [...scoreBooks.value].sort((a, b) =>
-			a.title.localeCompare(b.title),
-		)
+		return [...scoreBooks.value].sort((a, b) => a.title.localeCompare(b.title))
 	})
 
 	/**
@@ -63,7 +64,7 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	 * @param id - The score book ID
 	 */
 	function getScoreBookById(id: number): ScoreBook | undefined {
-		return scoreBooks.value.find(sb => sb.id === id)
+		return scoreBooks.value.find((sb) => sb.id === id)
 	}
 
 	/**
@@ -71,7 +72,7 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	 *
 	 * @param title - The title of the new score book
 	 * @return The created score book
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function createScoreBook(title: string): Promise<ScoreBook> {
 		const response = await apiClients.default.scoreBookApiPostScoreBook({ title })
@@ -90,7 +91,7 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	function updateScoreBookScoreIndex(scoreBookId: number, scoreId: number, index: number): void {
 		const scores = scoreBookScores.value.get(scoreBookId)
 		if (scores) {
-			const score = scores.find(s => s.id === scoreId)
+			const score = scores.find((s) => s.id === scoreId)
 			if (score) {
 				score.scoreBook = { id: scoreBookId, index }
 			}
@@ -103,11 +104,13 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	 * @param id - The score book ID
 	 * @param field - The field to update
 	 * @param value - The new value
-	 * @throws Error if API call fails (local state is reverted)
+	 * @throws { Error } if API call fails (local state is reverted)
 	 */
 	async function updateScoreBookFieldApi(id: number, field: string, value: unknown): Promise<void> {
-		const index = scoreBooks.value.findIndex(sb => sb.id === id)
-		if (index === -1) return
+		const index = scoreBooks.value.findIndex((sb) => sb.id === id)
+		if (index === -1) {
+			return
+		}
 
 		const oldValue = scoreBooks.value[index][field as keyof ScoreBook]
 
@@ -127,11 +130,11 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	 * Delete a score book via API and remove from store
 	 *
 	 * @param id - The score book ID to remove
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function deleteScoreBook(id: number): Promise<void> {
 		await apiClients.default.scoreBookApiDeleteScoreBook(id)
-		scoreBooks.value = scoreBooks.value.filter(sb => sb.id !== id)
+		scoreBooks.value = scoreBooks.value.filter((sb) => sb.id !== id)
 	}
 
 	/**
@@ -139,7 +142,7 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	 *
 	 * @param id - The score book ID
 	 * @param tagIds - Array of tag IDs to set
-	 * @throws Error if API call fails
+	 * @throws { Error } if API call fails
 	 */
 	async function updateScoreBookTags(id: number, tagIds: number[]): Promise<void> {
 		await apiClients.default.scoreBookApiPatchScoreBook(id, { tagIds })
@@ -151,7 +154,7 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	 * @param id - The score book ID
 	 */
 	function incrementScoreCount(id: number): void {
-		const sb = scoreBooks.value.find(sb => sb.id === id)
+		const sb = scoreBooks.value.find((sb) => sb.id === id)
 		if (sb) {
 			sb.scoreCount = sb.scoreCount + 1
 		}
@@ -163,7 +166,7 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	 * @param id - The score book ID
 	 */
 	function decrementScoreCount(id: number): void {
-		const sb = scoreBooks.value.find(sb => sb.id === id)
+		const sb = scoreBooks.value.find((sb) => sb.id === id)
 		if (sb && sb.scoreCount > 0) {
 			sb.scoreCount = sb.scoreCount - 1
 		}
@@ -232,7 +235,7 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 		if (cached) {
 			scoreBookScores.value.set(
 				scoreBookId,
-				cached.filter(s => s.id !== scoreId),
+				cached.filter((s) => s.id !== scoreId),
 			)
 		}
 

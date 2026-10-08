@@ -3,10 +3,10 @@
 		<template #content>
 			<ContentStateWrapper
 				:loading="folderCollectionsStore.isLoading"
-				:is-empty="folderCollections.length === 0"
-				:empty-text="t('No folder collections yet')"
-				:empty-description="t('Create your first folder collection to organize your scores')">
-				<template #empty-icon>
+				:isEmpty="folderCollections.length === 0"
+				:emptyText="t('No folder collections yet')"
+				:emptyDescription="t('Create your first folder collection to organize your scores')">
+				<template #emptyIcon>
 					<FolderCollectionIcon :size="64" />
 				</template>
 				<ul class="folder-collections-list">
@@ -14,7 +14,7 @@
 						v-for="fc in folderCollections"
 						:key="fc.id"
 						:name="fc.title"
-						:counter-number="fc.scoreCount || 0"
+						:counterNumber="fc.scoreCount || 0"
 						:details="fc.collectionType === 'indexed' ? t('Indexed') : t('Alphabetical')"
 						:to="{ name: 'foldercollection', params: { id: fc.id } }"
 						:bold="false">
@@ -36,27 +36,28 @@
 			</ContentStateWrapper>
 		</template>
 
-		<template #header-actions>
+		<template #headerActions>
 			<AddFolderCollectionButton :editable="editable" />
 		</template>
 	</Layout>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import type { FolderCollection } from '@/api/generated/openapi/data-contracts'
+
 import { loadState } from '@nextcloud/initial-state'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
-import Layout from '@/components/Layout.vue'
-import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
-import NcListItem from '@nextcloud/vue/components/NcListItem'
+import { computed, onMounted } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import { FolderCollectionIcon, DeleteIcon } from '@/icons/vue-material'
+import NcListItem from '@nextcloud/vue/components/NcListItem'
 import AddFolderCollectionButton from './components/AddFolderCollectionButton.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
-import { t } from '@/utils/l10n'
-import { tryShowError } from '@/utils/errorHandling'
+import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
+import Layout from '@/components/Layout.vue'
+import { DeleteIcon, FolderCollectionIcon } from '@/icons/vue-material'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
-import type { FolderCollection } from '@/api/generated/openapi/data-contracts'
+import { tryShowError } from '@/utils/errorHandling'
+import { t } from '@/utils/l10n'
 
 const folderCollectionsStore = useFolderCollectionsStore()
 

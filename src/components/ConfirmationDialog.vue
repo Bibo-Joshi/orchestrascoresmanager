@@ -36,12 +36,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { t } from '@/utils/l10n.ts'
-import NcDialog from '@nextcloud/vue/components/NcDialog'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcProgressBar from '@nextcloud/vue/components/NcProgressBar'
-import { ConfirmIcon, CancelIcon } from '@/icons/vue-material'
+import { CancelIcon, ConfirmIcon } from '@/icons/vue-material'
+import { t } from '@/utils/l10n.ts'
 
 /**
  * Countdown duration types
@@ -69,6 +69,7 @@ interface Emits {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+	// eslint-disable-next-line vue/no-boolean-default
 	open: true,
 	countdown: 'long',
 })
@@ -96,7 +97,9 @@ function getCountdownDuration(): number {
 
 const progressValue = computed(() => {
 	const duration = getCountdownDuration()
-	if (duration === 0) return 100
+	if (duration === 0) {
+		return 100
+	}
 	return ((duration - remainingMilliseconds.value) / duration) * 100
 })
 const remainingSeconds = computed(() => {
