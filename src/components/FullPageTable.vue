@@ -1,5 +1,5 @@
 <template>
-	<div ref="tableContainer" class="full-page-table" :data-ag-theme-mode="themeMode">
+	<div ref="tableContainer" class="full-page-table ag-theme-mode" :data-ag-theme-mode="themeMode">
 		<AgGridVue
 			:modules="resolvedModules"
 			:rowData="props.data"
