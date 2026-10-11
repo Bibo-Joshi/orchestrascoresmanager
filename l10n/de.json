@@ -273,7 +273,7 @@
     "Deleting setlist failed: " : "Löschen der Setliste fehlgeschlagen: ",
     "Delete setlist" : "Setliste löschen",
     "Are you sure you want to delete this setlist?" : "Sind Sie sicher, dass Sie diese Setliste löschen möchten?",
-    "Present" : "Gegenwart",
+    "Starting" : "Ab",
     "Index must be a non-negative integer" : "Index muss eine nicht-negative ganze Zahl sein",
     "This index is already occupied" : "Dieser Index ist bereits belegt",
     "Index is unchanged" : "Index unverändert",

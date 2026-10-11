@@ -902,7 +902,7 @@ msgstr ""
 msgid "Are you sure you want to delete this setlist?"
 msgstr ""
 
-msgid "Present"
+msgid "Starting"
 msgstr ""
 
 msgid "Index must be a non-negative integer"
