@@ -893,6 +893,9 @@ msgstr "Sind Sie sicher, dass Sie diese Setliste löschen möchten?"
 msgid "Starting"
 msgstr "Ab"
 
+msgid "Present"
+msgstr "Jetzt"
+
 msgid "Index must be a non-negative integer"
 msgstr "Index muss eine nicht-negative ganze Zahl sein"
 
