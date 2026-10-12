@@ -36,7 +36,7 @@ export function formatDateTimeStr(dateTimeStr: string): string {
  */
 export function formatVersionDateRange(version: FolderCollectionVersion): string {
 	if (version.validTo === null) {
-		return `${formatDateStr(version.validFrom)} - ${t('Present')}`
+		return `${t('Starting')} ${formatDateStr(version.validFrom)}`
 	}
 	return `${formatDateStr(version.validFrom)} - ${formatDateStr(version.validTo)}`
 }

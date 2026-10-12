@@ -86,6 +86,7 @@ export async function tryShowError<T>(
 	try {
 		return await callback()
 	} catch (error) {
+		console.error(errorPrefix, error)
 		const message = extractErrorMessage(error)
 		showError(errorPrefix + message)
 
