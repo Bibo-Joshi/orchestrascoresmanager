@@ -159,6 +159,13 @@ const tableData = computed<TableEntry[]>(() => {
 })
 
 /**
+ * indicator if any of the pieces in the setlist has a comment
+ */
+const hasAnyComment = computed<boolean>(() => {
+	return props.entries.some((entry) => entry.comment && entry.comment.trim() !== '')
+})
+
+/**
  * Check if setlist has a folder collection version that is indexed
  */
 const hasFolderCollectionVersion = computed(() => {
@@ -417,6 +424,7 @@ const columnDefs = computed<ColDef[]>(() => {
 		valueGetter: scoreInfoValueGetter('difficulty'),
 		filter: 'agNumberColumnFilter',
 		editable: false,
+		hide: fullModeColumnIsHidden.value,
 	})
 
 	// Add score book columns if setlist has no folder collection version
@@ -443,6 +451,7 @@ const columnDefs = computed<ColDef[]>(() => {
 		colId: 'comment' satisfies PdfColumnId,
 		headerName: t('Comment'),
 		editable: props.editable,
+		hide: fullModeColumnIsHidden.value && !props.editable && !hasAnyComment.value,
 	})
 
 	// gema ids
