@@ -86,7 +86,9 @@ export const useSetlistEntriesStore = defineStore('setlistEntries', () => {
 		if (setlistEntries) {
 			const index = setlistEntries.findIndex((e) => e.id === entryId)
 			if (index !== -1) {
-				setlistEntries[index] = updated
+				const updatedEntries = [...setlistEntries]
+				updatedEntries[index] = updated
+				entries.value.set(updated.setlistId, updatedEntries)
 			}
 		}
 
@@ -129,14 +131,15 @@ export const useSetlistEntriesStore = defineStore('setlistEntries', () => {
 		// Update in store
 		if (updated.length > 0) {
 			const setlistId = updated[0].setlistId
-			const setlistEntries = entries.value.get(setlistId) || []
+			const currentEntries = entries.value.get(setlistId) || []
+			const updatedEntries = [...currentEntries]
 			updated.forEach((updatedEntry) => {
-				const index = setlistEntries.findIndex((e) => e.id === updatedEntry.id)
+				const index = updatedEntries.findIndex((e) => e.id === updatedEntry.id)
 				if (index !== -1) {
-					setlistEntries[index] = updatedEntry
+					updatedEntries[index] = updatedEntry
 				}
 			})
-			entries.value.set(setlistId, setlistEntries)
+			entries.value.set(setlistId, updatedEntries)
 		}
 
 		return updated

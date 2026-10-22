@@ -38,7 +38,8 @@
 			:list="dialogColumns"
 			class="column-list"
 			itemKey="id"
-			tag="ul">
+			tag="ul"
+			@change="markColumnsCustomized">
 			<NcListItem
 				v-for="column in dialogColumns"
 				:key="column.id"
@@ -50,7 +51,8 @@
 					<NcCheckboxRadioSwitch
 						v-model="column.enabled"
 						type="checkbox"
-						:aria-label="column.label" />
+						:aria-label="column.label"
+						@update:modelValue="markColumnsCustomized" />
 				</template>
 			</NcListItem>
 		</draggable>
@@ -115,7 +117,7 @@ interface DialogColumn extends PdfColumnConfig {
 
 const dialogOpen = ref(false)
 const dialogColumns = ref<DialogColumn[]>([])
-const initialOpen = ref(true)
+const hasUserCustomizedColumns = ref(false)
 const gemaExporting = ref(false)
 
 /**
@@ -145,16 +147,23 @@ const DEFAULT_ENABLED_IDS: computed<ReadonlySet<PdfColumnId>> = computed(() => {
  */
 function openDialog(): void {
 	const currentColumns = props.getColumns()
+		.filter((col) => col.label.trim() !== '')
 
-	if (initialOpen.value) {
+	if (!hasUserCustomizedColumns.value) {
 		dialogColumns.value = currentColumns.map((col) => ({
 			...col,
 			enabled: DEFAULT_ENABLED_IDS.value.has(col.id),
 		}))
 	}
 
-	initialOpen.value = false
 	dialogOpen.value = true
+}
+
+/**
+ * Mark export columns as user-customized so defaults stop auto-refreshing.
+ */
+function markColumnsCustomized(): void {
+	hasUserCustomizedColumns.value = true
 }
 
 /**
