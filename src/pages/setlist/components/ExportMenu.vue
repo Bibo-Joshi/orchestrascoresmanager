@@ -38,7 +38,8 @@
 			:list="dialogColumns"
 			class="column-list"
 			itemKey="id"
-			tag="ul">
+			tag="ul"
+			@change="markColumnsCustomized">
 			<NcListItem
 				v-for="column in dialogColumns"
 				:key="column.id"
@@ -50,7 +51,8 @@
 					<NcCheckboxRadioSwitch
 						v-model="column.enabled"
 						type="checkbox"
-						:aria-label="column.label" />
+						:aria-label="column.label"
+						@update:modelValue="markColumnsCustomized" />
 				</template>
 			</NcListItem>
 		</draggable>
@@ -75,7 +77,7 @@
 import type { FolderCollection, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
 import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
 
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -109,23 +111,35 @@ const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
 const { buttonSize, buttonText } = useBreakpoints()
 
-/** Column IDs that are enabled by default in the export dialog */
-const DEFAULT_ENABLED_IDS: ReadonlySet<PdfColumnId> = new Set([
-	'startTime',
-	'duration',
-	'fcvIndex',
-	'title',
-	'comment',
-])
-
 interface DialogColumn extends PdfColumnConfig {
 	enabled: boolean
 }
 
 const dialogOpen = ref(false)
 const dialogColumns = ref<DialogColumn[]>([])
-const initialOpen = ref(true)
+const hasUserCustomizedColumns = ref(false)
 const gemaExporting = ref(false)
+
+/**
+ * indicator if any of the pieces in the setlist has a comment
+ */
+const hasAnyComment = computed<boolean>(() => {
+	return props.entries.some((entry) => entry.comment && entry.comment.trim() !== '')
+})
+
+/** Column IDs that are enabled by default in the export dialog */
+const DEFAULT_ENABLED_IDS: computed<ReadonlySet<PdfColumnId>> = computed(() => {
+	const enabledIds = new Set([
+		'startTime',
+		'duration',
+		'fcvIndex',
+		'title',
+	])
+	if (hasAnyComment.value) {
+		enabledIds.add('comment')
+	}
+	return enabledIds
+})
 
 /**
  * Open the PDF export configuration dialog, populating it with the current
@@ -133,16 +147,23 @@ const gemaExporting = ref(false)
  */
 function openDialog(): void {
 	const currentColumns = props.getColumns()
+		.filter((col) => col.label.trim() !== '')
 
-	if (initialOpen.value) {
+	if (!hasUserCustomizedColumns.value) {
 		dialogColumns.value = currentColumns.map((col) => ({
 			...col,
-			enabled: DEFAULT_ENABLED_IDS.has(col.id),
+			enabled: DEFAULT_ENABLED_IDS.value.has(col.id),
 		}))
 	}
 
-	initialOpen.value = false
 	dialogOpen.value = true
+}
+
+/**
+ * Mark export columns as user-customized so defaults stop auto-refreshing.
+ */
+function markColumnsCustomized(): void {
+	hasUserCustomizedColumns.value = true
 }
 
 /**
