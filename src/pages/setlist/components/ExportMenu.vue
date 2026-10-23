@@ -39,6 +39,7 @@
 			class="column-list"
 			itemKey="id"
 			tag="ul"
+			handle=".drag-handle"
 			@change="markColumnsCustomized">
 			<NcListItem
 				v-for="column in dialogColumns"
