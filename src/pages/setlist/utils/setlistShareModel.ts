@@ -16,7 +16,7 @@ export interface ShareColumn {
 /** Normalized data used to render the share image and to build the share text */
 export interface SetlistShareModel {
 	title: string
-	subtitle: string
+	subtitleLines: string[]
 	isDraft: boolean
 	columns: ShareColumn[]
 	rows: string[][]
@@ -44,6 +44,16 @@ export interface SetlistShareData {
  */
 function formatDate(date: Date): string {
 	return date.toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' })
+}
+
+/**
+ * Format a date with hour and minute for display in the share subtitle and share text.
+ *
+ * @param date - The date to format
+ * @return Localized date and time string
+ */
+function formatDateTime(date: Date): string {
+	return date.toLocaleString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 }
 
 /**
@@ -95,23 +105,22 @@ export function buildSetlistShareModel(data: SetlistShareData): SetlistShareMode
 		return toText(resolveScoreField(col.id as ScoreInfoField, entry, scores[i], getScoreBookById, fcvScoresMap, fcvScoreBookIndicesMap))
 	}))
 
-	const sharedOn = `${t('Shared on')} ${formatDate(data.sharedAt ?? new Date())}`
+	const sharedOn = `${t('Shared on')} ${formatDateTime(data.sharedAt ?? new Date())}`
 	const date = setlist.startDateTime ? formatDate(new Date(setlist.startDateTime)) : null
-	const draft = setlist.isDraft ? t('Draft') : null
+	const separator = ' • '
 
-	const subtitleParts = [
-		date,
-		folderCollection ? folderCollection.title : null,
-		draft,
+	const subtitleLines = [
+		[date, folderCollection ? folderCollection.title : null].filter((part): part is string => part !== null).join(separator),
 		sharedOn,
-	].filter((part): part is string => part !== null)
+	].filter((line) => line !== '')
 
-	const textParts = [date, draft, sharedOn].filter((part): part is string => part !== null)
-	const shareText = [setlist.title, textParts.join(' · '), data.url].join('\n')
+	const headline = `${t('Setlist')}: ${setlist.title}${date ? ` (${date})` : ''}`
+	const statusLine = [setlist.isDraft ? t('Draft') : null, sharedOn].filter((part): part is string => part !== null).join(separator)
+	const shareText = [headline, statusLine, '', `${t('View online')}: ${data.url}`].join('\n')
 
 	return {
 		title: setlist.title,
-		subtitle: subtitleParts.join(' · '),
+		subtitleLines,
 		isDraft: setlist.isDraft,
 		columns,
 		rows,

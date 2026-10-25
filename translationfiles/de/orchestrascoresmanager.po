@@ -971,6 +971,9 @@ msgstr "Setlist-Bild"
 msgid "Close"
 msgstr "Schließen"
 
+msgid "View online"
+msgstr "Online ansehen"
+
 #~ msgid "Select groups..."
 #~ msgstr "Gruppen auswählen..."
 

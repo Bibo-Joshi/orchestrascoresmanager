@@ -173,8 +173,8 @@ onBeforeUnmount(reset)
 
 	&__image {
 		max-width: 100%;
-		max-height: 60vh;
-		border: 1px solid var(--color-border);
+		height: auto;
+		border-radius: var(--border-radius-container);
 	}
 }
 </style>

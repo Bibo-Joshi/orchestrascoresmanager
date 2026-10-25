@@ -4,8 +4,8 @@
 			<span v-for="i in WATERMARK_COUNT" :key="i">{{ draftLabel }}</span>
 		</div>
 		<h1>{{ model.title }}</h1>
-		<p class="subtitle">
-			{{ model.subtitle }}
+		<p v-for="line in model.subtitleLines" :key="line" class="subtitle">
+			{{ line }}
 		</p>
 		<table>
 			<thead>
@@ -46,7 +46,8 @@ const draftLabel = t('Draft').toUpperCase()
 	position: relative;
 	overflow: hidden;
 	box-sizing: border-box;
-	width: 800px;
+	width: max-content;
+	min-width: 800px;
 	padding: 40px;
 	background: #fff;
 	color: #000;
@@ -59,13 +60,14 @@ const draftLabel = t('Draft').toUpperCase()
 	}
 
 	.subtitle {
-		margin: 0 0 24px;
+		margin: 0 0 4px;
 		color: #555;
 		font-size: 20px;
 	}
 
 	table {
 		width: 100%;
+		margin-top: 24px;
 		border-collapse: collapse;
 		font-size: 22px;
 	}
@@ -100,7 +102,7 @@ const draftLabel = t('Draft').toUpperCase()
 			color: transparent;
 			font-size: 90px;
 			font-weight: bold;
-			-webkit-text-stroke: 2px rgba(200, 0, 0, 0.35);
+			-webkit-text-stroke: 2px rgba(0, 0, 0, 0.12);
 		}
 	}
 }

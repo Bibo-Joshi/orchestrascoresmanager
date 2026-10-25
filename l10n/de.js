@@ -300,6 +300,7 @@ OC.L10N.register(
     "Share setlist" : "Setlist teilen",
     "Review the image and press \"Share\" to send it to a messenger." : "Prüfe das Bild und drücke „Teilen“, um es an einen Messenger zu senden.",
     "Setlist image" : "Setlist-Bild",
-    "Close" : "Schließen"
+    "Close" : "Schließen",
+    "View online" : "Online ansehen"
 },
 "nplurals=2; plural=(n != 1);");
