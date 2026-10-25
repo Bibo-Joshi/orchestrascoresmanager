@@ -14,6 +14,13 @@
 				:fcvScoreBookIndicesMap="fcvScoreBookIndicesMap"
 				:folderCollection="folderCollection"
 				:getColumns="getPdfColumns" />
+			<SetlistShareButton
+				v-if="setlist"
+				:setlist="setlist"
+				:entries="setlistEntries"
+				:fcvScoresMap="fcvScoresMap"
+				:fcvScoreBookIndicesMap="fcvScoreBookIndicesMap"
+				:folderCollection="folderCollection" />
 			<NcButton
 				v-if="setlist && editable"
 				:size="buttonSize"
@@ -83,6 +90,7 @@ import AddSetlistEntryButton from './components/AddSetlistEntryButton.vue'
 import ExportMenu from './components/ExportMenu.vue'
 import SetlistEntriesTable from './components/SetlistEntriesTable.vue'
 import SetlistPageSidebar from './components/SetlistPageSidebar.vue'
+import SetlistShareButton from './components/SetlistShareButton.vue'
 import ViewModeMenu from './components/ViewModeMenu.vue'
 import CloneSetlistDialog from '@/components/CloneSetlistDialog.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'

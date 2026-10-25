@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-10-12 07:36+0000\n"
+"POT-Creation-Date: 2026-10-25 15:16+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -779,6 +779,27 @@ msgstr "Moderation"
 msgid "Comment"
 msgstr "Kommentar"
 
+msgid "Sharing failed: "
+msgstr "Teilen fehlgeschlagen: "
+
+msgid "Share"
+msgstr "Teilen"
+
+msgid "Share setlist"
+msgstr "Setlist teilen"
+
+msgid "Review the image and press \"Share\" to send it to a messenger."
+msgstr "Prüfe das Bild und drücke „Teilen“, um es an einen Messenger zu senden."
+
+msgid "Setlist image"
+msgstr "Setlist-Bild"
+
+msgid "Close"
+msgstr "Schließen"
+
+msgid "Draft"
+msgstr "Entwurf"
+
 msgid "Invalid duration format. Use (HH:)MM"
 msgstr "Ungültiges Dauerformat. Verwenden Sie (HH:)MM"
 
@@ -872,9 +893,6 @@ msgstr "Optionale Beschreibung"
 msgid "Start date and time"
 msgstr "Startdatum und -zeit"
 
-msgid "Draft"
-msgstr "Entwurf"
-
 msgid "Published"
 msgstr "Veröffentlicht"
 
@@ -916,6 +934,18 @@ msgstr "Geben Sie den Positionsindex in der Sammlung ein"
 
 msgid "Setlist"
 msgstr "Setlist"
+
+msgid "Image could not be generated"
+msgstr "Bild konnte nicht erzeugt werden"
+
+msgid "Image downloaded and share text copied to clipboard"
+msgstr "Bild heruntergeladen und Text in die Zwischenablage kopiert"
+
+msgid "Shared on"
+msgstr "Geteilt am"
+
+msgid "View online"
+msgstr "Online ansehen"
 
 msgid "Value must not be empty"
 msgstr "Wert darf nicht leer sein"
