@@ -31,6 +31,7 @@
 					:options="availableScoreOptions"
 					:inputLabel="t('Score')"
 					:placeholder="t('Select score')"
+					:filterBy="filterScores"
 					label="label"
 					trackBy="value" />
 
@@ -65,6 +66,7 @@
 
 <script setup lang="ts">
 import type { Score, ScoreIndexed, Setlist } from '@/api/generated/openapi/data-contracts'
+import type { EntityOption } from '@/composables/useEntitySelect'
 
 import { showError } from '@nextcloud/dialogs'
 import { computed, ref, watch } from 'vue'
@@ -76,6 +78,7 @@ import NcTextField from '@nextcloud/vue/components/NcTextField'
 import FocusTrap from '@/components/FocusTrap.vue'
 import { apiClients } from '@/api/client'
 import { useBreakpoints } from '@/composables/useBreakpoints'
+import { createScoreOptions, filterScores } from '@/composables/useEntitySelect'
 import { AddIcon, CancelIcon, ConfirmIcon } from '@/icons/vue-material'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
@@ -103,9 +106,9 @@ const entryTypeOptions = [
 ]
 
 const selectedEntryType = ref<{ label: string, value: 'score' | 'break' } | null>(entryTypeOptions[0])
-const selectedScore = ref<{ label: string, value: number } | null>(null)
+const selectedScore = ref<EntityOption<Score> | null>(null)
 const breakDurationStr = ref('')
-const fcvScoreOptions = ref<Array<{ label: string, value: number }>>([])
+const fcvScoreOptions = ref<EntityOption<Score>[]>([])
 
 /**
  * Get available scores based on whether setlist has a folder collection version
@@ -117,14 +120,7 @@ const availableScoreOptions = computed(() => {
 	}
 
 	// Otherwise, show all scores
-	const options: Array<{ label: string, value: number }> = []
-	for (const score of scoresStore.scoresSorted) {
-		options.push({
-			label: score.title,
-			value: score.id,
-		})
-	}
-	return options
+	return createScoreOptions(scoresStore.scoresSorted)
 })
 
 /**
@@ -219,16 +215,10 @@ async function loadFcvScores() {
 		const fcvScores = scoresResponse.data.ocs.data as (Score | ScoreIndexed)[]
 
 		// Build options from FCV scores
-		const options: Array<{ label: string, value: number }> = []
-		for (const score of fcvScores) {
-			options.push({
-				label: score.title,
-				value: score.id,
-			})
-		}
+		const options = createScoreOptions(fcvScores)
 
 		// Sort by title
-		options.sort((a, b) => a.label.localeCompare(b.label))
+		options.sort((a, b) => a.entity.title.localeCompare(b.entity.title))
 
 		// Update the available scores
 		fcvScoreOptions.value = options
