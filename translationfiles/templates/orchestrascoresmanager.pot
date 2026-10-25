@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-10-12 07:36+0000\n"
+"POT-Creation-Date: 2026-10-25 15:16+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -791,6 +791,27 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
+msgid "Sharing failed: "
+msgstr ""
+
+msgid "Share"
+msgstr ""
+
+msgid "Share setlist"
+msgstr ""
+
+msgid "Review the image and press \"Share\" to send it to a messenger."
+msgstr ""
+
+msgid "Setlist image"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Draft"
+msgstr ""
+
 msgid "Invalid duration format. Use (HH:)MM"
 msgstr ""
 
@@ -884,9 +905,6 @@ msgstr ""
 msgid "Start date and time"
 msgstr ""
 
-msgid "Draft"
-msgstr ""
-
 msgid "Published"
 msgstr ""
 
@@ -927,6 +945,18 @@ msgid "Enter the position index in the collection"
 msgstr ""
 
 msgid "Setlist"
+msgstr ""
+
+msgid "Image could not be generated"
+msgstr ""
+
+msgid "Image downloaded and share text copied to clipboard"
+msgstr ""
+
+msgid "Shared on"
+msgstr ""
+
+msgid "View online"
 msgstr ""
 
 msgid "Value must not be empty"
