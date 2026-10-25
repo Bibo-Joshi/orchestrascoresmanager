@@ -209,7 +209,7 @@
                 "required": [
                     "id",
                     "title",
-                    "titleShort",
+                    "titlesShort",
                     "composer",
                     "arranger",
                     "publisher",
@@ -232,7 +232,7 @@
                     "title": {
                         "type": "string"
                     },
-                    "titleShort": {
+                    "titlesShort": {
                         "type": "array",
                         "nullable": true,
                         "items": {
@@ -494,7 +494,7 @@
                 "required": [
                     "id",
                     "title",
-                    "titleShort",
+                    "titlesShort",
                     "composer",
                     "arranger",
                     "publisher",
@@ -518,7 +518,7 @@
                     "title": {
                         "type": "string"
                     },
-                    "titleShort": {
+                    "titlesShort": {
                         "type": "array",
                         "nullable": true,
                         "items": {
@@ -4267,7 +4267,7 @@
                                         "type": "string",
                                         "description": "The title of the score"
                                     },
-                                    "titleShort": {
+                                    "titlesShort": {
                                         "type": "array",
                                         "nullable": true,
                                         "default": null,
@@ -4499,7 +4499,7 @@
                                         "default": null,
                                         "description": "The title of the score"
                                     },
-                                    "titleShort": {
+                                    "titlesShort": {
                                         "type": "array",
                                         "nullable": true,
                                         "default": null,

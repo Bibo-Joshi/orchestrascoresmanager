@@ -22,6 +22,10 @@ final class ScoreTest extends TestCase {
 			'medleyContents with JSON string' => ['medleyContents', json_encode(['Song A', 'Song B']), ['Song A', 'Song B']],
 			'medleyContents with null' => ['medleyContents', null, null],
 			'medleyContents with empty string' => ['medleyContents', '', null],
+			'titlesShort with array' => ['titlesShort', ['Showman', 'Greatest Showman'], ['Showman', 'Greatest Showman']],
+			'titlesShort with JSON string' => ['titlesShort', json_encode(['A', 'B']), ['A', 'B']],
+			'titlesShort with null' => ['titlesShort', null, null],
+			'titlesShort with empty string' => ['titlesShort', '', null],
 			'gemaIds with array' => ['gemaIds', ['GEMA-001', 'GEMA-002', 'GEMA-003'], ['GEMA-001', 'GEMA-002', 'GEMA-003']],
 			'gemaIds with JSON string' => ['gemaIds', json_encode(['ID-1', 'ID-2']), ['ID-1', 'ID-2']],
 			'gemaIds with null' => ['gemaIds', null, null],
@@ -46,6 +50,7 @@ final class ScoreTest extends TestCase {
 
 	public static function invalidJsonProvider(): array {
 		return [
+			'titlesShort with invalid JSON' => ['titlesShort', '{"invalid json', 'Failed to decode titlesShort JSON'],
 			'medleyContents with invalid JSON' => ['medleyContents', '{"invalid json', 'Failed to decode medleyContents JSON'],
 			'gemaIds with invalid JSON' => ['gemaIds', 'not valid json }', 'Failed to decode gemaIds JSON'],
 		];
@@ -64,6 +69,7 @@ final class ScoreTest extends TestCase {
 
 	public static function nonArrayJsonProvider(): array {
 		return [
+			'titlesShort with string JSON' => ['titlesShort', '"just a string"'],
 			'medleyContents with string JSON' => ['medleyContents', '"just a string"'],
 			'gemaIds with number JSON' => ['gemaIds', '123'],
 		];
@@ -152,7 +158,7 @@ final class ScoreTest extends TestCase {
 		$score = new Score();
 		$score->setId(1);
 		$score->setTitle('Complete Score');
-		$score->setTitleShort(['CS', 'Complete']);
+		$score->setTitlesShort(['CS', 'Complete']);
 		$score->setComposer('Composer Name');
 		$score->setArranger('Arranger Name');
 		$score->setPublisher('Publisher Name');
@@ -171,7 +177,7 @@ final class ScoreTest extends TestCase {
 
 		$this->assertSame(1, $json['id']);
 		$this->assertSame('Complete Score', $json['title']);
-		$this->assertSame(['CS', 'Complete'], $json['titleShort']);
+		$this->assertSame(['CS', 'Complete'], $json['titlesShort']);
 		$this->assertSame('Composer Name', $json['composer']);
 		$this->assertSame('Arranger Name', $json['arranger']);
 		$this->assertSame('Publisher Name', $json['publisher']);
@@ -196,7 +202,7 @@ final class ScoreTest extends TestCase {
 
 		$this->assertSame(1, $json['id']);
 		$this->assertSame('Minimal Score', $json['title']);
-		$this->assertNull($json['titleShort']);
+		$this->assertNull($json['titlesShort']);
 		$this->assertNull($json['composer']);
 		$this->assertNull($json['arranger']);
 		$this->assertNull($json['publisher']);

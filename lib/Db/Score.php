@@ -16,7 +16,7 @@ use OCP\DB\Types;
  * @method void setId(int $value)
  * @method string getTitle()
  * @method void setTitle(string $value)
- * @method string|null getTitleShort()
+ * @method string|null getTitlesShort()
  * @method string|null getComposer()
  * @method void setComposer(?string $value)
  * @method string|null getArranger()
@@ -40,7 +40,7 @@ use OCP\DB\Types;
  */
 class Score extends Entity implements JsonSerializable {
 	protected string $title = '';
-	protected ?string $titleShort = null;
+	protected ?string $titlesShort = null;
 	protected ?string $composer = null;
 	protected ?string $arranger = null;
 	protected ?string $publisher = null;
@@ -61,7 +61,7 @@ class Score extends Entity implements JsonSerializable {
 
 	public function __construct() {
 		$this->addType('title', Types::STRING);
-		$this->addType('titleShort', Types::STRING);
+		$this->addType('titlesShort', Types::STRING);
 		$this->addType('composer', Types::STRING);
 		$this->addType('arranger', Types::STRING);
 		$this->addType('publisher', Types::STRING);
@@ -79,7 +79,7 @@ class Score extends Entity implements JsonSerializable {
 		return [
 			'id' => $this->id,
 			'title' => $this->title,
-			'titleShort' => $this->decodeJsonArray($this->titleShort, 'titleShort'),
+			'titlesShort' => $this->decodeJsonArray($this->titlesShort, 'titlesShort'),
 			'composer' => $this->composer,
 			'arranger' => $this->arranger,
 			'publisher' => $this->publisher,
@@ -101,12 +101,12 @@ class Score extends Entity implements JsonSerializable {
 	 *
 	 * Handles JSON encoding when saving to database.
 	 *
-	 * @param list<string>|string|null $titleShort Array or JSON string
+	 * @param list<string>|string|null $titlesShort Array or JSON string
 	 * @psalm-suppress PossiblyUnusedMethod - Called by Entity framework and API
 	 */
-	public function setTitleShort(array|string|null $titleShort): void {
-		$content = is_string($titleShort) ? $titleShort : $this->encodeJsonArray($titleShort, 'titleShort');
-		$this->setter('titleShort', [$content]);
+	public function setTitlesShort(array|string|null $titlesShort): void {
+		$content = is_string($titlesShort) ? $titlesShort : $this->encodeJsonArray($titlesShort, 'titlesShort');
+		$this->setter('titlesShort', [$content]);
 	}
 
 	/**

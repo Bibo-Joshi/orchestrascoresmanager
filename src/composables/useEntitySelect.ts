@@ -46,7 +46,7 @@ export function createScoreOptions(
 			return !excludeInBook || score.scoreBook === null
 		})
 		.map((score) => ({
-			label: formatEntityLabel(score.title, score.titleShort),
+			label: formatEntityLabel(score.title, score.titlesShort),
 			value: score.id,
 			entity: score,
 		}))
@@ -78,7 +78,7 @@ export function filterScores(option: EntityOption<Score>, _label: string, search
 	const score = option.entity
 	return (
 		score.title.toLowerCase().includes(searchLower)
-		|| (score.titleShort?.some((alias) => alias.toLowerCase().includes(searchLower)) ?? false)
+		|| (score.titlesShort?.some((alias) => alias.toLowerCase().includes(searchLower)) ?? false)
 	)
 }
 

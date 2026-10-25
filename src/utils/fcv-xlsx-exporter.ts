@@ -235,7 +235,7 @@ function flattenEntries(
 				}
 				result.push({
 					title: score.title,
-					shortTitles: score.titleShort ?? [],
+					shortTitles: score.titlesShort ?? [],
 					index: entry.index,
 					indexDisplay,
 				})
@@ -249,7 +249,7 @@ function flattenEntries(
 			}
 			result.push({
 				title: entry.score.title,
-				shortTitles: entry.score.titleShort ?? [],
+				shortTitles: entry.score.titlesShort ?? [],
 				index: (entry.score as ScoreIndexed).index,
 				indexDisplay,
 			})
