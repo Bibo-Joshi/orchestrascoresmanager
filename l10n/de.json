@@ -289,6 +289,11 @@
     "Playtime" : "Spielzeit",
     "Moderation & Breaks" : "Moderation & Pausen",
     "Overall Duration" : "Gesamtdauer",
-    "Invalid duration format" : "Ungültiges Spieldauerformat"
+    "Invalid duration format" : "Ungültiges Spieldauerformat",
+    "Share" : "Teilen",
+    "Shared on" : "Geteilt am",
+    "Sharing failed: " : "Teilen fehlgeschlagen: ",
+    "Image could not be generated" : "Bild konnte nicht erzeugt werden",
+    "Image downloaded and share text copied to clipboard" : "Bild heruntergeladen und Text in die Zwischenablage kopiert"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

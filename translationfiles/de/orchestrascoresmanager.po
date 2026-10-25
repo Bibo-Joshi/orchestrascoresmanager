@@ -944,6 +944,21 @@ msgstr "Gesamtdauer"
 msgid "Invalid duration format"
 msgstr "Ungültiges Spieldauerformat"
 
+msgid "Share"
+msgstr "Teilen"
+
+msgid "Shared on"
+msgstr "Geteilt am"
+
+msgid "Sharing failed: "
+msgstr "Teilen fehlgeschlagen: "
+
+msgid "Image could not be generated"
+msgstr "Bild konnte nicht erzeugt werden"
+
+msgid "Image downloaded and share text copied to clipboard"
+msgstr "Bild heruntergeladen und Text in die Zwischenablage kopiert"
+
 #~ msgid "Select groups..."
 #~ msgstr "Gruppen auswählen..."
 

@@ -37,6 +37,7 @@
     "ag-grid-community": "^36.2.0",
     "ag-grid-vue3": "^36.2.0",
     "exceljs": "^4.4.0",
+    "html-to-image": "^1.11.13",
     "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.7",
     "lodash.debounce": "^4.0.8",
