@@ -99,10 +99,9 @@ const draftLabel = t('Draft').toUpperCase()
 
 		span {
 			padding: 30px 40px;
-			color: transparent;
+			color: rgba(0, 0, 0, 0.1);
 			font-size: 90px;
 			font-weight: bold;
-			-webkit-text-stroke: 2px rgba(0, 0, 0, 0.12);
 		}
 	}
 }
