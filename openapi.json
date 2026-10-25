@@ -3967,7 +3967,7 @@
                                         "type": "array",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "The short titles (aliases) of the score",
+                                        "description": "The short titles of the score",
                                         "items": {
                                             "type": "string"
                                         }
@@ -4199,7 +4199,7 @@
                                         "type": "array",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "The short titles (aliases) of the score",
+                                        "description": "The short titles of the score",
                                         "items": {
                                             "type": "string"
                                         }

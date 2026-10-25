@@ -73,7 +73,7 @@ class ScoreApiController extends OCSController {
 	 * Add a new score
 	 *
 	 * @param string $title The title of the score
-	 * @param list<string>|null $titlesShort The short titles (aliases) of the score
+	 * @param list<string>|null $titlesShort The short titles of the score
 	 * @param string|null $composer The composer of the score
 	 * @param string|null $arranger The arranger of the score
 	 * @param string|null $publisher The publisher of the score
@@ -149,7 +149,7 @@ class ScoreApiController extends OCSController {
 	 *
 	 * @param int $id The ID of the score to update
 	 * @param string|null $title The title of the score
-	 * @param list<string>|null $titlesShort The short titles (aliases) of the score
+	 * @param list<string>|null $titlesShort The short titles of the score
 	 * @param string|null $composer The composer of the score
 	 * @param string|null $arranger The arranger of the score
 	 * @param string|null $publisher The publisher of the score

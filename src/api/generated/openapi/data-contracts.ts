@@ -442,7 +442,7 @@ export interface ScoreApiPostScorePayload {
   /** The title of the score */
   title: string;
   /**
-   * The short titles (aliases) of the score
+   * The short titles of the score
    * @default null
    */
   titlesShort?: string[] | null;
@@ -535,7 +535,7 @@ export interface ScoreApiPatchScorePayload {
    */
   title?: string | null;
   /**
-   * The short titles (aliases) of the score
+   * The short titles of the score
    * @default null
    */
   titlesShort?: string[] | null;

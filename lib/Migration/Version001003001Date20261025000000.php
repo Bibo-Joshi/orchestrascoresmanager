@@ -5,24 +5,20 @@ declare(strict_types=1);
 namespace OCA\OrchestraScoresManager\Migration;
 
 use Closure;
-use OC\DB\SchemaWrapper;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\QueryBuilder\IQueryBuilder;
-use OCP\DB\Types;
 use OCP\IDBConnection;
 use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 /**
- * Migration to support multiple short titles (aliases) per score.
+ * Migration step 2/3 to support multiple short titles (aliases) per score.
  *
- * The single-valued title_short column of osm_scores is replaced by titles_short,
- * which stores a JSON-encoded list of strings, similar to medley_contents.
- * Existing values are converted to one-item lists.
+ * Copies the values of osm_scores.title_short into osm_scores.titles_short as one-item JSON lists.
  *
  * @psalm-suppress UnusedClass - Migration class discovered by NextCloud framework
  */
-class Version000007000Date20261025000000 extends SimpleMigrationStep {
+class Version001003001Date20261025000000 extends SimpleMigrationStep {
 
 	public function __construct(
 		private readonly IDBConnection $db,
@@ -33,22 +29,11 @@ class Version000007000Date20261025000000 extends SimpleMigrationStep {
 	}
 
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
-		$schema = $schemaClosure();
-
-		if ($schema->hasTable('osm_scores')) {
-			$table = $schema->getTable('osm_scores');
-			if (!$table->hasColumn('titles_short')) {
-				$table->addColumn('titles_short', Types::STRING, [
-					'notnull' => false,
-					'length' => 4000,
-				]);
-			}
-		}
-
-		return $schema;
+		return null;
 	}
 
 	public function postSchemaChange(IOutput $output, Closure $schemaClosure, array $options): void {
+		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
 		if (!$schema->hasTable('osm_scores') || !$schema->getTable('osm_scores')->hasColumn('title_short')) {
 			return;
@@ -72,9 +57,5 @@ class Version000007000Date20261025000000 extends SimpleMigrationStep {
 				->executeStatement();
 		}
 		$result->closeCursor();
-
-		$cleanup = new SchemaWrapper($this->db);
-		$cleanup->getTable('osm_scores')->dropColumn('title_short');
-		$this->db->migrateToSchema($cleanup->getWrappedSchema());
 	}
 }
