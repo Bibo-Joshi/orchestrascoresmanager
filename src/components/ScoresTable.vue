@@ -278,6 +278,10 @@ const columnEditHandlers: Record<string, ColumnEditHandler> = {
 		const contents = parseArrayValue(newValue)
 		await scoresStore.updateScoreFieldApi(id, 'medleyContents', contents)
 	},
+	titleShort: async (id, newValue) => {
+		const titleShort = parseArrayValue(newValue)
+		await scoresStore.updateScoreFieldApi(id, 'titleShort', titleShort)
+	},
 	gemaIds: async (id, newValue) => {
 		const gemaIds = parseArrayValue(newValue)
 		await scoresStore.updateScoreFieldApi(id, 'gemaIds', gemaIds)
@@ -548,7 +552,7 @@ const columnDefs = computed<ColDef[]>(() => {
 			editable: false,
 			valueGetter: scoreBookIndexValueGetter,
 		},
-		{ field: 'titleShort', headerName: t('Short Title') },
+		{ field: 'titleShort', headerName: t('Short Titles'), valueParser: (params) => parseArrayValue(params.newValue) },
 		{
 			field: 'composer',
 			headerName: t('Composer'),

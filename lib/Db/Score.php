@@ -17,7 +17,6 @@ use OCP\DB\Types;
  * @method string getTitle()
  * @method void setTitle(string $value)
  * @method string|null getTitleShort()
- * @method void setTitleShort(?string $value)
  * @method string|null getComposer()
  * @method void setComposer(?string $value)
  * @method string|null getArranger()
@@ -80,7 +79,7 @@ class Score extends Entity implements JsonSerializable {
 		return [
 			'id' => $this->id,
 			'title' => $this->title,
-			'titleShort' => $this->titleShort,
+			'titleShort' => $this->decodeJsonArray($this->titleShort, 'titleShort'),
 			'composer' => $this->composer,
 			'arranger' => $this->arranger,
 			'publisher' => $this->publisher,
@@ -95,6 +94,19 @@ class Score extends Entity implements JsonSerializable {
 			'scoreBook' => $this->scoreBook,
 			'duration' => $this->duration,
 		];
+	}
+
+	/**
+	 * Set short titles (aliases) array.
+	 *
+	 * Handles JSON encoding when saving to database.
+	 *
+	 * @param list<string>|string|null $titleShort Array or JSON string
+	 * @psalm-suppress PossiblyUnusedMethod - Called by Entity framework and API
+	 */
+	public function setTitleShort(array|string|null $titleShort): void {
+		$content = is_string($titleShort) ? $titleShort : $this->encodeJsonArray($titleShort, 'titleShort');
+		$this->setter('titleShort', [$content]);
 	}
 
 	/**

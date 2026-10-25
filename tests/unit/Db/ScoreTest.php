@@ -152,7 +152,7 @@ final class ScoreTest extends TestCase {
 		$score = new Score();
 		$score->setId(1);
 		$score->setTitle('Complete Score');
-		$score->setTitleShort('CS');
+		$score->setTitleShort(['CS', 'Complete']);
 		$score->setComposer('Composer Name');
 		$score->setArranger('Arranger Name');
 		$score->setPublisher('Publisher Name');
@@ -171,7 +171,7 @@ final class ScoreTest extends TestCase {
 
 		$this->assertSame(1, $json['id']);
 		$this->assertSame('Complete Score', $json['title']);
-		$this->assertSame('CS', $json['titleShort']);
+		$this->assertSame(['CS', 'Complete'], $json['titleShort']);
 		$this->assertSame('Composer Name', $json['composer']);
 		$this->assertSame('Arranger Name', $json['arranger']);
 		$this->assertSame('Publisher Name', $json['publisher']);

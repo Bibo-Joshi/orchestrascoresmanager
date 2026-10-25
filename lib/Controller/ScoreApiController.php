@@ -73,7 +73,7 @@ class ScoreApiController extends OCSController {
 	 * Add a new score
 	 *
 	 * @param string $title The title of the score
-	 * @param string|null $titleShort The short title of the score
+	 * @param list<string>|null $titleShort The short titles (aliases) of the score
 	 * @param string|null $composer The composer of the score
 	 * @param string|null $arranger The arranger of the score
 	 * @param string|null $publisher The publisher of the score
@@ -99,7 +99,7 @@ class ScoreApiController extends OCSController {
 	#[ApiRoute(verb: 'POST', url: '/scores')]
 	public function postScore(
 		string $title,
-		?string $titleShort = null,
+		?array $titleShort = null,
 		?string $composer = null,
 		?string $arranger = null,
 		?string $publisher = null,
@@ -149,7 +149,7 @@ class ScoreApiController extends OCSController {
 	 *
 	 * @param int $id The ID of the score to update
 	 * @param string|null $title The title of the score
-	 * @param string|null $titleShort The short title of the score
+	 * @param list<string>|null $titleShort The short titles (aliases) of the score
 	 * @param string|null $composer The composer of the score
 	 * @param string|null $arranger The arranger of the score
 	 * @param string|null $publisher The publisher of the score
@@ -179,7 +179,7 @@ class ScoreApiController extends OCSController {
 	public function patchScore(
 		int $id,
 		?string $title = null,
-		?string $titleShort = null,
+		?array $titleShort = null,
 		?string $composer = null,
 		?string $arranger = null,
 		?string $publisher = null,

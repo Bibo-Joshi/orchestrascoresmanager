@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Share setlists as image and text to messengers (#127)
+- Multiple short titles (aliases) per score; all aliases are listed in the folder collection index
 
 ## [1.2.2] - 2026-08-28
 

@@ -398,6 +398,9 @@ msgstr "In Ordnersammlung enthalten über Notenbuch »{name}«"
 msgid "Short Title"
 msgstr "Kurztitel"
 
+msgid "Short Titles"
+msgstr "Kurztitel"
+
 msgid "Composer"
 msgstr "Komponist"
 

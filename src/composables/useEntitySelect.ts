@@ -13,12 +13,13 @@ export interface EntityOption<T> {
 /**
  * Format a label for display in dropdown combining title and short title
  * @param title - Main title
- * @param titleShort - Optional short title
+ * @param titleShort - Optional short title or list of short titles (aliases)
  * @return Formatted label string
  */
-export function formatEntityLabel(title: string, titleShort?: string | null): string {
-	if (titleShort) {
-		return `${title} (${titleShort})`
+export function formatEntityLabel(title: string, titleShort?: string | string[] | null): string {
+	const shortTitles = Array.isArray(titleShort) ? titleShort.join(', ') : titleShort
+	if (shortTitles) {
+		return `${title} (${shortTitles})`
 	}
 	return title
 }
@@ -77,7 +78,7 @@ export function filterScores(option: EntityOption<Score>, _label: string, search
 	const score = option.entity
 	return (
 		score.title.toLowerCase().includes(searchLower)
-		|| (score.titleShort?.toLowerCase().includes(searchLower) ?? false)
+		|| (score.titleShort?.some((alias) => alias.toLowerCase().includes(searchLower)) ?? false)
 	)
 }
 

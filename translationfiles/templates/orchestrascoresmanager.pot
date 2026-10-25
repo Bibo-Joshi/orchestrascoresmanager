@@ -399,6 +399,9 @@ msgstr ""
 msgid "Short Title"
 msgstr ""
 
+msgid "Short Titles"
+msgstr ""
+
 msgid "Composer"
 msgstr ""
 

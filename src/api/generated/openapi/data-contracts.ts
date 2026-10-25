@@ -75,7 +75,7 @@ export interface Score {
   /** @format int64 */
   id: number;
   title: string;
-  titleShort: string | null;
+  titleShort: string[] | null;
   composer: string | null;
   arranger: string | null;
   publisher: string | null;
@@ -148,7 +148,7 @@ export interface ScoreIndexed {
   /** @format int64 */
   id: number;
   title: string;
-  titleShort: string | null;
+  titleShort: string[] | null;
   composer: string | null;
   arranger: string | null;
   publisher: string | null;
@@ -442,10 +442,10 @@ export interface ScoreApiPostScorePayload {
   /** The title of the score */
   title: string;
   /**
-   * The short title of the score
+   * The short titles (aliases) of the score
    * @default null
    */
-  titleShort?: string | null;
+  titleShort?: string[] | null;
   /**
    * The composer of the score
    * @default null
@@ -535,10 +535,10 @@ export interface ScoreApiPatchScorePayload {
    */
   title?: string | null;
   /**
-   * The short title of the score
+   * The short titles (aliases) of the score
    * @default null
    */
-  titleShort?: string | null;
+  titleShort?: string[] | null;
   /**
    * The composer of the score
    * @default null

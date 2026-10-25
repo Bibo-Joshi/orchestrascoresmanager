@@ -113,6 +113,7 @@ OC.L10N.register(
     "Remove from book" : "Aus Notenbuch entfernen",
     "Included in folder collection via score book »{name}«" : "In Ordnersammlung enthalten über Notenbuch »{name}«",
     "Short Title" : "Kurztitel",
+    "Short Titles" : "Kurztitel",
     "Composer" : "Komponist",
     "Arranger" : "Arrangeur",
     "Publisher" : "Verlag",

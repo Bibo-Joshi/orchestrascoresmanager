@@ -10,7 +10,7 @@ namespace OCA\OrchestraScoresManager;
  * @psalm-type OrchestraScoresManagerScore = array{
  *     id: int,
  *     title: string,
- *     titleShort: string|null,
+ *     titleShort: list<string>|null,
  *     composer: string|null,
  *     arranger: string|null,
  *     publisher: string|null,
@@ -29,7 +29,7 @@ namespace OCA\OrchestraScoresManager;
  * @psalm-type OrchestraScoresManagerScoreIndexed = array{
  *     id: int,
  *     title: string,
- *     titleShort: string|null,
+ *     titleShort: list<string>|null,
  *     composer: string|null,
  *     arranger: string|null,
  *     publisher: string|null,
