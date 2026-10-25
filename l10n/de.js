@@ -296,6 +296,10 @@ OC.L10N.register(
     "Shared on" : "Geteilt am",
     "Sharing failed: " : "Teilen fehlgeschlagen: ",
     "Image could not be generated" : "Bild konnte nicht erzeugt werden",
-    "Image downloaded and share text copied to clipboard" : "Bild heruntergeladen und Text in die Zwischenablage kopiert"
+    "Image downloaded and share text copied to clipboard" : "Bild heruntergeladen und Text in die Zwischenablage kopiert",
+    "Share setlist" : "Setlist teilen",
+    "Review the image and press \"Share\" to send it to a messenger." : "Prüfe das Bild und drücke „Teilen“, um es an einen Messenger zu senden.",
+    "Setlist image" : "Setlist-Bild",
+    "Close" : "Schließen"
 },
 "nplurals=2; plural=(n != 1);");

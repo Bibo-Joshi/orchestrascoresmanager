@@ -959,6 +959,18 @@ msgstr "Bild konnte nicht erzeugt werden"
 msgid "Image downloaded and share text copied to clipboard"
 msgstr "Bild heruntergeladen und Text in die Zwischenablage kopiert"
 
+msgid "Share setlist"
+msgstr "Setlist teilen"
+
+msgid "Review the image and press \"Share\" to send it to a messenger."
+msgstr "Prüfe das Bild und drücke „Teilen“, um es an einen Messenger zu senden."
+
+msgid "Setlist image"
+msgstr "Setlist-Bild"
+
+msgid "Close"
+msgstr "Schließen"
+
 #~ msgid "Select groups..."
 #~ msgstr "Gruppen auswählen..."
 
