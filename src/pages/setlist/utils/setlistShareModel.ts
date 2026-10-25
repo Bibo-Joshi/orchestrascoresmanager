@@ -107,7 +107,7 @@ export function buildSetlistShareModel(data: SetlistShareData): SetlistShareMode
 
 	const sharedOn = `${t('Shared on')} ${formatDateTime(data.sharedAt ?? new Date())}`
 	const date = setlist.startDateTime ? formatDate(new Date(setlist.startDateTime)) : null
-	const separator = ' • '
+	const separator = ' · '
 
 	const subtitleLines = [
 		[date, folderCollection ? folderCollection.title : null].filter((part): part is string => part !== null).join(separator),
