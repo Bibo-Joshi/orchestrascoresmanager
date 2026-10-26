@@ -60,7 +60,7 @@ const emit = defineEmits<{
 
 <style lang="scss" scoped>
 .summary {
-	padding: 0 10px 10px;
+	padding: 0 0 10px 0;
 	color: var(--color-text-maxcontrast);
 }
 
