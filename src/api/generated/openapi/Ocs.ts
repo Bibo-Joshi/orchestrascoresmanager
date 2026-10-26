@@ -860,7 +860,7 @@ export class Ocs<
        * Sort field (default date)
        * @default null
        */
-      sortBy?: "createdAt" | "date" | "name" | null;
+      sortBy?: "creation" | "date" | "name" | null;
       /**
        * Sort order (default DESC)
        * @default null

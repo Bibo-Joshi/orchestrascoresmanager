@@ -337,7 +337,7 @@ class ScoreApiController extends OCSController {
 	 * @param int $id The ID of the score
 	 * @param int|null $limit Maximum number of setlists to return (default 50, max 500)
 	 * @param string|null $cursor Cursor from a previous response. Explicit limit/sortBy/sortOrder must match the cursor.
-	 * @param 'createdAt'|'date'|'name'|null $sortBy Sort field (default date)
+	 * @param 'creation'|'date'|'name'|null $sortBy Sort field (default date)
 	 * @param 'ASC'|'DESC'|'asc'|'desc'|null $sortOrder Sort order (default DESC)
 	 *
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerSetlistPage, array{}> the setlists and pagination info

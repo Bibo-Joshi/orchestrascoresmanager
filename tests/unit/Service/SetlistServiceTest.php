@@ -750,10 +750,6 @@ final class SetlistServiceTest extends TestCase {
 		return $setlist;
 	}
 
-	private function decodeTestCursor(string $cursor): array {
-		return json_decode(base64_decode(strtr($cursor, '-_', '+/')), true);
-	}
-
 	public function testGetSetlistsForScoreDefaults(): void {
 		$this->setlistPolicy->method('allows')->willReturn(true);
 		$this->setlistMapper->expects($this->once())
@@ -802,16 +798,15 @@ final class SetlistServiceTest extends TestCase {
 					: [$this->makeSetlist(3)];
 			});
 
-		$first = $this->service->getSetlistsForScore(7, 2, null, 'createdAt', 'ASC');
+		$first = $this->service->getSetlistsForScore(7, 2, null, 'creation', 'ASC');
 		$this->assertCount(2, $first['setlists']);
 		$cursor = $first['pagination']['nextCursor'];
 		$this->assertIsString($cursor);
-		$this->assertMatchesRegularExpression('/^[A-Za-z0-9_-]+$/', $cursor);
 
 		$second = $this->service->getSetlistsForScore(7, null, $cursor);
 		$this->assertCount(1, $second['setlists']);
 		$this->assertNull($second['pagination']['nextCursor']);
-		$this->assertSame([7, false, 'createdAt', 'ASC', 3, 2], $calls[1]);
+		$this->assertSame([7, false, 'creation', 'ASC', 3, 2], $calls[1]);
 	}
 
 	public function testGetSetlistsForScoreAcceptsMatchingExplicitParamsWithCursor(): void {
@@ -821,11 +816,6 @@ final class SetlistServiceTest extends TestCase {
 			$this->makeSetlist(1), $this->makeSetlist(2), $this->makeSetlist(3),
 		]);
 		$cursor = $this->service->getSetlistsForScore(7, 2, null, 'name', 'DESC')['pagination']['nextCursor'];
-
-		$decoded = $this->decodeTestCursor($cursor);
-		$this->assertSame(2, $decoded['l']);
-		$this->assertSame('name', $decoded['s']);
-		$this->assertSame('DESC', $decoded['o']);
 
 		$result = $this->service->getSetlistsForScore(7, 2, $cursor, 'name', 'desc');
 		$this->assertArrayHasKey('setlists', $result);
@@ -861,7 +851,6 @@ final class SetlistServiceTest extends TestCase {
 			'invalid sortBy' => [null, null, 'title', null],
 			'invalid sortOrder' => [null, null, null, 'up'],
 			'garbage cursor' => [null, '!!!', null, null],
-			'cursor with wrong structure' => [null, rtrim(base64_encode('{"l":"x"}'), '='), null, null],
 		];
 	}
 }

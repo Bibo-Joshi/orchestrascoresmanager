@@ -168,7 +168,7 @@ msgstr ""
 msgid "Invalid limit parameter. Must be between 1 and %d."
 msgstr ""
 
-msgid "Invalid sortBy parameter. Must be \"createdAt\", \"date\", or \"name\"."
+msgid "Invalid sortBy parameter. Must be \"creation\", \"date\", or \"name\"."
 msgstr ""
 
 msgid "Invalid sortOrder parameter. Must be \"ASC\" or \"DESC\"."
@@ -751,10 +751,18 @@ msgstr ""
 msgid "This score has not appeared in any setlist"
 msgstr ""
 
+msgid "This score is part of %n setlist"
+msgid_plural "This score is part of %n setlists"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Draft"
 msgstr ""
 
 msgid "Load more"
+msgstr ""
+
+msgid "Failed to load more setlists"
 msgstr ""
 
 msgid "Failed to load setlist"

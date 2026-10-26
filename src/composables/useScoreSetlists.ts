@@ -1,7 +1,9 @@
 import type { Setlist } from '@/api/generated/openapi/data-contracts'
 
+import { showError } from '@nextcloud/dialogs'
 import { ref } from 'vue'
 import { apiClients } from '@/api/client'
+import { t } from '@/utils/l10n'
 
 /**
  * Composable for loading the setlists a score appears in, page by page.
@@ -10,9 +12,10 @@ export function useScoreSetlists() {
 	const setlists = ref<Setlist[]>([])
 	const total = ref(0)
 	const nextCursor = ref<string | null>(null)
-	const loading = ref(false)
-	const loadingMore = ref(false)
-	const loadError = ref(false)
+	const isLoading = ref(false)
+	const isLoaded = ref(false)
+	const isLoadingMore = ref(false)
+	const isLoadedMore = ref(false)
 
 	// Guards against responses of an outdated score overwriting newer state
 	let requestToken = 0
@@ -27,9 +30,10 @@ export function useScoreSetlists() {
 		setlists.value = []
 		total.value = 0
 		nextCursor.value = null
-		loadError.value = false
-		loadingMore.value = false
-		loading.value = true
+		isLoaded.value = false
+		isLoadedMore.value = false
+		isLoadingMore.value = false
+		isLoading.value = true
 
 		try {
 			const response = await apiClients.default.scoreApiGetScoreSetlists(scoreId)
@@ -40,15 +44,15 @@ export function useScoreSetlists() {
 			setlists.value = data.setlists
 			total.value = data.pagination.total
 			nextCursor.value = data.pagination.nextCursor
+			isLoaded.value = true
 		} catch (error) {
 			if (token !== requestToken) {
 				return
 			}
 			console.error('Failed to load setlists for score', error)
-			loadError.value = true
 		} finally {
 			if (token === requestToken) {
-				loading.value = false
+				isLoading.value = false
 			}
 		}
 	}
@@ -60,11 +64,12 @@ export function useScoreSetlists() {
 	 */
 	async function loadMore(scoreId: number) {
 		const cursor = nextCursor.value
-		if (cursor === null || loadingMore.value || loading.value) {
+		if (cursor === null || isLoadingMore.value || isLoading.value) {
 			return
 		}
 		const token = requestToken
-		loadingMore.value = true
+		isLoadingMore.value = true
+		isLoadedMore.value = false
 
 		try {
 			const response = await apiClients.default.scoreApiGetScoreSetlists(scoreId, { cursor })
@@ -75,15 +80,16 @@ export function useScoreSetlists() {
 			setlists.value = [...setlists.value, ...data.setlists]
 			total.value = data.pagination.total
 			nextCursor.value = data.pagination.nextCursor
+			isLoadedMore.value = true
 		} catch (error) {
 			if (token !== requestToken) {
 				return
 			}
 			console.error('Failed to load more setlists for score', error)
-			loadError.value = true
+			showError(t('Failed to load more setlists'))
 		} finally {
 			if (token === requestToken) {
-				loadingMore.value = false
+				isLoadingMore.value = false
 			}
 		}
 	}
@@ -92,9 +98,10 @@ export function useScoreSetlists() {
 		setlists,
 		total,
 		nextCursor,
-		loading,
-		loadingMore,
-		loadError,
+		isLoading,
+		isLoaded,
+		isLoadingMore,
+		isLoadedMore,
 		load,
 		loadMore,
 	}

@@ -162,8 +162,8 @@ msgstr "Der Parameter \"%s\" stimmt nicht mit dem Cursor überein."
 msgid "Invalid limit parameter. Must be between 1 and %d."
 msgstr "Ungültiger Limit-Parameter. Muss zwischen 1 und %d liegen."
 
-msgid "Invalid sortBy parameter. Must be \"createdAt\", \"date\", or \"name\"."
-msgstr "Ungültiger sortBy-Parameter. Muss \"createdAt\", \"date\" oder \"name\" sein."
+msgid "Invalid sortBy parameter. Must be \"creation\", \"date\", or \"name\"."
+msgstr "Ungültiger sortBy-Parameter. Muss \"creation\", \"date\" oder \"name\" sein."
 
 msgid "Invalid sortOrder parameter. Must be \"ASC\" or \"DESC\"."
 msgstr "Ungültiger sortOrder-Parameter. Muss \"ASC\" oder \"DESC\" sein."
@@ -739,11 +739,19 @@ msgstr "In keiner Setlist verwendet"
 msgid "This score has not appeared in any setlist"
 msgstr "Diese Partitur ist in keiner Setlist enthalten"
 
+msgid "This score is part of %n setlist"
+msgid_plural "This score is part of %n setlists"
+msgstr[0] "Diese Partitur ist Teil von %n Setlist"
+msgstr[1] "Diese Partitur ist Teil von %n Setlisten"
+
 msgid "Draft"
 msgstr "Entwurf"
 
 msgid "Load more"
 msgstr "Mehr laden"
+
+msgid "Failed to load more setlists"
+msgstr "Weitere Setlisten konnten nicht geladen werden"
 
 msgid "Failed to load setlist"
 msgstr "Setlist konnte nicht geladen werden"

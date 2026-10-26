@@ -95,11 +95,12 @@ class SetlistMapper extends QBMapper {
 
 	/**
 	 * Find a page of setlists that contain the given score, sorted by the given column.
-	 * Setlists without a creation timestamp column are sorted by id when sorting by 'createdAt'.
+	 * Sorting by 'creation' uses the order of creation (id), as setlists have no creation timestamp.
+	 * Setlists without a start date are considered newer than any setlist with a start date when sorting by 'date'.
 	 *
 	 * @param int $scoreId
 	 * @param bool $publishedOnly Restrict to published setlists
-	 * @param string $sortBy One of 'createdAt', 'date', 'name'
+	 * @param string $sortBy One of 'creation', 'date', 'name'
 	 * @param string $sortOrder 'ASC' or 'DESC'
 	 * @param int $limit Maximum number of setlists to return
 	 * @param int $offset Number of setlists to skip
@@ -117,7 +118,13 @@ class SetlistMapper extends QBMapper {
 			'date' => 'start_date_time',
 			default => 'id',
 		};
-		$qb->orderBy($column, $direction);
+		if ($column === 'start_date_time') {
+			// portable NULL ordering: unscheduled setlists count as newer than all scheduled ones
+			$qb->orderBy($qb->createFunction('CASE WHEN start_date_time IS NULL THEN 1 ELSE 0 END'), $direction);
+			$qb->addOrderBy($column, $direction);
+		} else {
+			$qb->orderBy($column, $direction);
+		}
 		if ($column !== 'id') {
 			$qb->addOrderBy('id', $direction);
 		}

@@ -1,7 +1,7 @@
 <template>
 	<ContentStateWrapper
-		:loading="loading"
-		:error="loadError"
+		:loading="isLoading"
+		:error="!isLoading && !isLoaded"
 		:isEmpty="setlists.length === 0"
 		:errorText="t('Failed to fetch setlists. Please reload the page.')"
 		:emptyText="t('Not used in any setlist')"
@@ -9,6 +9,9 @@
 		<template #emptyIcon>
 			<SetlistIcon :size="64" />
 		</template>
+		<p class="summary">
+			{{ n('This score is part of %n setlist', 'This score is part of %n setlists', total) }}
+		</p>
 		<ul>
 			<NcListItem
 				v-for="setlist in setlists"
@@ -22,7 +25,7 @@
 			</NcListItem>
 		</ul>
 		<div v-if="hasMore" class="load-more">
-			<NcButton :disabled="loadingMore" @click="emit('loadMore')">
+			<NcButton :disabled="isLoadingMore" @click="emit('loadMore')">
 				{{ t('Load more') }}
 			</NcButton>
 		</div>
@@ -37,13 +40,14 @@ import NcListItem from '@nextcloud/vue/components/NcListItem'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
 import { formatDateTimeStr } from '@/composables/useDateFormatting'
 import { PencilCircleIcon, SetlistIcon } from '@/icons/vue-material'
-import { t } from '@/utils/l10n'
+import { n, t } from '@/utils/l10n'
 
 interface Props {
 	setlists: Setlist[]
-	loading: boolean
-	loadingMore: boolean
-	loadError: boolean
+	total: number
+	isLoading: boolean
+	isLoaded: boolean
+	isLoadingMore: boolean
 	hasMore: boolean
 }
 
@@ -55,6 +59,11 @@ const emit = defineEmits<{
 </script>
 
 <style lang="scss" scoped>
+.summary {
+	padding: 0 10px 10px;
+	color: var(--color-text-maxcontrast);
+}
+
 .load-more {
 	display: flex;
 	justify-content: center;

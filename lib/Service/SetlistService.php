@@ -24,7 +24,7 @@ use OCP\IUserSession;
 class SetlistService {
 	private const DEFAULT_PAGE_LIMIT = 50;
 	private const MAX_PAGE_LIMIT = 500;
-	private const SORT_FIELDS = ['createdAt', 'date', 'name'];
+	private const SORT_FIELDS = ['creation', 'date', 'name'];
 
 	/** @psalm-suppress PossiblyUnusedMethod - Constructor used by DI container */
 	public function __construct(
@@ -80,7 +80,7 @@ class SetlistService {
 	 * @param int $scoreId
 	 * @param int|null $limit Page size (default 50, max 500)
 	 * @param string|null $cursor Opaque cursor returned by a previous call
-	 * @param string|null $sortBy One of 'createdAt', 'date' (default), 'name'
+	 * @param string|null $sortBy One of 'creation', 'date' (default), 'name'
 	 * @param string|null $sortOrder 'ASC' or 'DESC' (default), case-insensitive
 	 * @return array{setlists: list<array>, pagination: array{nextCursor: string|null, total: int}}
 	 * @throws Exception
@@ -115,7 +115,7 @@ class SetlistService {
 			throw new InvalidArgumentException($this->l->t('Invalid limit parameter. Must be between 1 and %d.', [self::MAX_PAGE_LIMIT]));
 		}
 		if (!in_array($sortBy, self::SORT_FIELDS, true)) {
-			throw new InvalidArgumentException($this->l->t('Invalid sortBy parameter. Must be "createdAt", "date", or "name".'));
+			throw new InvalidArgumentException($this->l->t('Invalid sortBy parameter. Must be "creation", "date", or "name".'));
 		}
 		if (!in_array($sortOrder, ['ASC', 'DESC'], true)) {
 			throw new InvalidArgumentException($this->l->t('Invalid sortOrder parameter. Must be "ASC" or "DESC".'));
@@ -132,7 +132,7 @@ class SetlistService {
 		$setlists = array_slice($setlists, 0, $limit);
 
 		return [
-			'setlists' => array_map(fn (Setlist $setlist) => $this->serializeSetlist($setlist), $setlists),
+			'setlists' => array_values(array_map(fn (Setlist $setlist) => $this->serializeSetlist($setlist), $setlists)),
 			'pagination' => [
 				'nextCursor' => $hasMore ? $this->encodeCursor($limit, $sortBy, $sortOrder, $offset + $limit) : null,
 				'total' => $this->setlistMapper->countByScoreId($scoreId, $publishedOnly),

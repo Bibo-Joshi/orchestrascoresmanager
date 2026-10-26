@@ -23,7 +23,7 @@
 			<EntityFolderCollectionsList type="score" :entityId="scoreSidebarStore.selectedScore.id" />
 		</NcAppSidebarTab>
 		<NcAppSidebarTab
-			v-if="scoreSetlists.total.value > 0 || scoreSetlists.loadError.value"
+			v-if="scoreSetlists.total.value > 0 || (!scoreSetlists.isLoading.value && !scoreSetlists.isLoaded.value)"
 			id="setlists"
 			:name="t('Setlists')">
 			<template #icon>
@@ -31,9 +31,10 @@
 			</template>
 			<ScoreSetlistsList
 				:setlists="scoreSetlists.setlists.value"
-				:loading="scoreSetlists.loading.value"
-				:loadingMore="scoreSetlists.loadingMore.value"
-				:loadError="scoreSetlists.loadError.value"
+				:total="scoreSetlists.total.value"
+				:isLoading="scoreSetlists.isLoading.value"
+				:isLoaded="scoreSetlists.isLoaded.value"
+				:isLoadingMore="scoreSetlists.isLoadingMore.value"
 				:hasMore="scoreSetlists.nextCursor.value !== null"
 				@loadMore="scoreSetlists.loadMore(scoreSidebarStore.selectedScore.id)" />
 		</NcAppSidebarTab>
