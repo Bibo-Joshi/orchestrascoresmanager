@@ -51,13 +51,12 @@ export interface ApiConfig<SecurityDataType = unknown>
   format?: ResponseType;
 }
 
-export enum ContentType {
-  Json = "application/json",
-  JsonApi = "application/vnd.api+json",
-  FormData = "multipart/form-data",
-  UrlEncoded = "application/x-www-form-urlencoded",
-  Text = "text/plain",
-}
+export type ContentType =
+  | "application/json"
+  | "application/vnd.api+json"
+  | "multipart/form-data"
+  | "application/x-www-form-urlencoded"
+  | "text/plain";
 
 export class HttpClient<SecurityDataType = unknown> {
   public instance: AxiosInstance;
@@ -154,7 +153,7 @@ export class HttpClient<SecurityDataType = unknown> {
     const responseFormat = format || this.format || undefined;
 
     if (
-      type === ContentType.FormData &&
+      type === "multipart/form-data" &&
       body &&
       body !== null &&
       typeof body === "object"
@@ -163,7 +162,7 @@ export class HttpClient<SecurityDataType = unknown> {
     }
 
     if (
-      type === ContentType.Text &&
+      type === "text/plain" &&
       body &&
       body !== null &&
       typeof body !== "string"

@@ -702,6 +702,38 @@
                     }
                 }
             },
+            "SetlistPage": {
+                "type": "object",
+                "required": [
+                    "setlists",
+                    "pagination"
+                ],
+                "properties": {
+                    "setlists": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Setlist"
+                        }
+                    },
+                    "pagination": {
+                        "type": "object",
+                        "required": [
+                            "nextCursor",
+                            "total"
+                        ],
+                        "properties": {
+                            "nextCursor": {
+                                "type": "string",
+                                "nullable": true
+                            },
+                            "total": {
+                                "type": "integer",
+                                "format": "int64"
+                            }
+                        }
+                    }
+                }
+            },
             "Tag": {
                 "type": "object",
                 "required": [
@@ -5062,141 +5094,118 @@
             }
         },
         "/ocs/v2.php/apps/orchestrascoresmanager/scores/{id}/setlists": {
-            "operationId": "score_api-get-score-setlists",
-            "summary": "Get the setlists a specific score appears in (only setlists the user may see)",
-            "description": "the setlists and pagination info",
-            "tags": [
-                "score_api"
-            ],
-            "security": [
-                {
-                    "bearer_auth": []
-                },
-                {
-                    "basic_auth": []
-                }
-            ],
-            "parameters": [
-                {
-                    "name": "id",
-                    "in": "path",
-                    "description": "The ID of the score",
-                    "required": true,
-                    "schema": {
-                        "type": "integer",
-                        "format": "int64"
+            "get": {
+                "operationId": "score_api-get-score-setlists",
+                "summary": "Get the setlists a specific score appears in (only setlists the user may see)",
+                "description": "the setlists and pagination info",
+                "tags": [
+                    "score_api"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
                     }
-                },
-                {
-                    "name": "limit",
-                    "in": "query",
-                    "description": "Maximum number of setlists to return (default 50, max 500)",
-                    "schema": {
-                        "type": "integer",
-                        "format": "int64",
-                        "nullable": true
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "The ID of the score",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximum number of setlists to return (default 50, max 500)",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "nullable": true,
+                            "default": null
+                        }
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "description": "Cursor from a previous response. Explicit limit/sortBy/sortOrder must match the cursor.",
+                        "schema": {
+                            "type": "string",
+                            "nullable": true,
+                            "default": null
+                        }
+                    },
+                    {
+                        "name": "sortBy",
+                        "in": "query",
+                        "description": "Sort field (default date)",
+                        "schema": {
+                            "type": "string",
+                            "nullable": true,
+                            "default": null,
+                            "enum": [
+                                "createdAt",
+                                "date",
+                                "name"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "sortOrder",
+                        "in": "query",
+                        "description": "Sort order (default DESC)",
+                        "schema": {
+                            "type": "string",
+                            "nullable": true,
+                            "default": null,
+                            "enum": [
+                                "ASC",
+                                "DESC",
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
                     }
-                },
-                {
-                    "name": "cursor",
-                    "in": "query",
-                    "description": "Cursor from a previous response. Explicit limit/sortBy/sortOrder must match the cursor.",
-                    "schema": {
-                        "type": "string",
-                        "nullable": true
-                    }
-                },
-                {
-                    "name": "sortBy",
-                    "in": "query",
-                    "description": "Sort field (default date)",
-                    "schema": {
-                        "type": "string",
-                        "nullable": true,
-                        "enum": [
-                            "createdAt",
-                            "date",
-                            "name"
-                        ]
-                    }
-                },
-                {
-                    "name": "sortOrder",
-                    "in": "query",
-                    "description": "Sort order (default DESC)",
-                    "schema": {
-                        "type": "string",
-                        "nullable": true,
-                        "enum": [
-                            "ASC",
-                            "DESC",
-                            "asc",
-                            "desc"
-                        ]
-                    }
-                },
-                {
-                    "name": "OCS-APIRequest",
-                    "in": "header",
-                    "description": "Required to be true for the API request to pass",
-                    "required": true,
-                    "schema": {
-                        "type": "boolean",
-                        "default": true
-                    }
-                }
-            ],
-            "responses": {
-                "200": {
-                    "description": "Successful response with the page of setlists",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "required": [
-                                    "ocs"
-                                ],
-                                "properties": {
-                                    "ocs": {
-                                        "type": "object",
-                                        "required": [
-                                            "meta",
-                                            "data"
-                                        ],
-                                        "properties": {
-                                            "meta": {
-                                                "$ref": "#/components/schemas/OCSMeta"
-                                            },
-                                            "data": {
-                                                "type": "object",
-                                                "required": [
-                                                    "setlists",
-                                                    "pagination"
-                                                ],
-                                                "properties": {
-                                                    "setlists": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "$ref": "#/components/schemas/Setlist"
-                                                        }
-                                                    },
-                                                    "pagination": {
-                                                        "type": "object",
-                                                        "required": [
-                                                            "nextCursor",
-                                                            "total"
-                                                        ],
-                                                        "properties": {
-                                                            "nextCursor": {
-                                                                "type": "string",
-                                                                "nullable": true
-                                                            },
-                                                            "total": {
-                                                                "type": "integer",
-                                                                "format": "int64"
-                                                            }
-                                                        }
-                                                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response with the page of setlists",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "$ref": "#/components/schemas/SetlistPage"
                                                 }
                                             }
                                         }
@@ -5204,85 +5213,85 @@
                                 }
                             }
                         }
-                    }
-                },
-                "400": {
-                    "description": "if the parameters are invalid",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "required": [
-                                    "ocs"
-                                ],
-                                "properties": {
-                                    "ocs": {
-                                        "type": "object",
-                                        "required": [
-                                            "meta",
-                                            "data"
-                                        ],
-                                        "properties": {
-                                            "meta": {
-                                                "$ref": "#/components/schemas/OCSMeta"
-                                            },
-                                            "data": {}
+                    },
+                    "400": {
+                        "description": "if the parameters are invalid",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {}
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                },
-                "403": {
-                    "description": "if the user does not have permission",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "required": [
-                                    "ocs"
-                                ],
-                                "properties": {
-                                    "ocs": {
-                                        "type": "object",
-                                        "required": [
-                                            "meta",
-                                            "data"
-                                        ],
-                                        "properties": {
-                                            "meta": {
-                                                "$ref": "#/components/schemas/OCSMeta"
-                                            },
-                                            "data": {}
+                    },
+                    "403": {
+                        "description": "if the user does not have permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {}
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                },
-                "401": {
-                    "description": "Current user is not logged in",
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "required": [
-                                    "ocs"
-                                ],
-                                "properties": {
-                                    "ocs": {
-                                        "type": "object",
-                                        "required": [
-                                            "meta",
-                                            "data"
-                                        ],
-                                        "properties": {
-                                            "meta": {
-                                                "$ref": "#/components/schemas/OCSMeta"
-                                            },
-                                            "data": {}
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {}
+                                            }
                                         }
                                     }
                                 }
