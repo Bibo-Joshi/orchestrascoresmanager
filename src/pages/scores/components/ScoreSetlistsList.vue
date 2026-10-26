@@ -9,9 +9,11 @@
 		<template #emptyIcon>
 			<SetlistIcon :size="64" />
 		</template>
-		<p class="summary">
-			{{ n('This score is part of %n setlist', 'This score is part of %n setlists', total) }}
-		</p>
+		<div class="summary">
+			<h4>
+				{{ n('This score is part of %n setlist', 'This score is part of %n setlists', total) }}
+			</h4>
+		</div>
 		<ul>
 			<NcListItem
 				v-for="setlist in setlists"
@@ -60,8 +62,15 @@ const emit = defineEmits<{
 
 <style lang="scss" scoped>
 .summary {
-	padding: 0 0 10px 0;
-	color: var(--color-text-maxcontrast);
+	padding: 8px;
+	border-bottom: 1px solid var(--color-border);
+	margin-bottom: 8px;
+
+	h4 {
+		margin: 0;
+		font-size: 0.9em;
+		color: var(--color-text-maxcontrast);
+	}
 }
 
 .load-more {
