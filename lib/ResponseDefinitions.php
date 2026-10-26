@@ -92,6 +92,14 @@ namespace OCA\OrchestraScoresManager;
  *     author: OrchestraScoresManagerCommentAuthor,
  *     scoreId: int
  * }
+ * @psalm-type OrchestraScoresManagerScoreAudio = array{
+ *     id: int,
+ *     scoreId: int,
+ *     provider: string|null,
+ *     providerId: string|null,
+ *     link: string|null,
+ *     comment: string|null
+ * }
  * @psalm-type OrchestraScoresManagerFolderCollectionVersion = array{
  *     id: int,
  *     folderCollectionId: int,

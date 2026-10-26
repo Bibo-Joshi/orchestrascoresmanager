@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-10-26 13:36+0000\n"
+"POT-Creation-Date: 2026-10-26 16:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -99,6 +99,32 @@ msgid ""
 msgstr ""
 
 msgid "New version must start at least one day after the current version"
+msgstr ""
+
+#, php-format
+msgid "The comment must not be longer than %d characters"
+msgstr ""
+
+msgid "Audio example not found"
+msgstr ""
+
+msgid "Either a link or a provider with provider ID is required"
+msgstr ""
+
+msgid "An audio example must not contain both a link and a provider"
+msgstr ""
+
+msgid "Provider and provider ID must be set together"
+msgstr ""
+
+#, php-format
+msgid "Unsupported audio provider \"%s\""
+msgstr ""
+
+msgid "Invalid provider ID"
+msgstr ""
+
+msgid "The link must be a valid http(s) URL"
 msgstr ""
 
 msgid "Cannot delete score book with linked scores. Remove all scores first."
@@ -379,6 +405,9 @@ msgid "Comments"
 msgstr ""
 
 msgid "Folder Collections"
+msgstr ""
+
+msgid "Audio Examples"
 msgstr ""
 
 msgid "Invalid duration format. Use (HH:)MM:SS"
@@ -698,6 +727,47 @@ msgid "Creating score failed: "
 msgstr ""
 
 msgid "Create score"
+msgstr ""
+
+msgid "Delete Audio Example"
+msgstr ""
+
+msgid ""
+"Are you sure you want to delete this audio example? This action cannot be "
+"undone."
+msgstr ""
+
+msgid "Failed to delete audio example: "
+msgstr ""
+
+msgid "Delete audio example"
+msgstr ""
+
+msgid "Please enter a valid http(s) URL"
+msgstr ""
+
+msgid "Detected provider: {provider}"
+msgstr ""
+
+msgid "Failed to add audio example: "
+msgstr ""
+
+msgid "Failed to fetch audio examples. Please reload the page."
+msgstr ""
+
+msgid "No audio examples yet"
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+msgid "Link to an audio example …"
+msgstr ""
+
+msgid "Comment (optional)"
+msgstr ""
+
+msgid "Add audio example"
 msgstr ""
 
 msgid "Delete Comment"

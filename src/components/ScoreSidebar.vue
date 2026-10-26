@@ -23,6 +23,14 @@
 			<EntityFolderCollectionsList type="score" :entityId="scoreSidebarStore.selectedScore.id" />
 		</NcAppSidebarTab>
 		<NcAppSidebarTab
+			id="audioexamples"
+			:name="t('Audio Examples')">
+			<template #icon>
+				<AudioIcon :size="20" />
+			</template>
+			<AudioExamplesList :scoreId="scoreSidebarStore.selectedScore.id" />
+		</NcAppSidebarTab>
+		<NcAppSidebarTab
 			v-if="scoreSetlists.total.value > 0 || (!scoreSetlists.isLoading.value && !scoreSetlists.isLoaded.value)"
 			id="setlists"
 			:name="t('Setlists')">
@@ -57,11 +65,12 @@ import { watch } from 'vue'
 import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
 import EntityFolderCollectionsList from '@/components/EntityFolderCollectionsList.vue'
+import AudioExamplesList from '@/pages/scores/components/AudioExamplesList.vue'
 import CommentsList from '@/pages/scores/components/CommentsList.vue'
 import ScoreBookInfo from '@/pages/scores/components/ScoreBookInfo.vue'
 import ScoreSetlistsList from '@/pages/scores/components/ScoreSetlistsList.vue'
 import { useScoreSetlists } from '@/composables/useScoreSetlists'
-import { CommentIcon, FolderCollectionIcon, ScoreBookIcon, SetlistIcon } from '@/icons/vue-material'
+import { AudioIcon, CommentIcon, FolderCollectionIcon, ScoreBookIcon, SetlistIcon } from '@/icons/vue-material'
 import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import { t } from '@/utils/l10n.ts'
 

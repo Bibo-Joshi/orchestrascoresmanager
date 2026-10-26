@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OCA\OrchestraScoresManager\Db;
 
-use InvalidArgumentException;
 use JsonSerializable;
 use OCP\AppFramework\Db\Entity;
 use OCP\DB\Types;
@@ -14,6 +13,7 @@ use OCP\DB\Types;
  *
  * Exactly one source type is used: either a generic link (provider and providerId are null)
  * or a known provider (provider and providerId are set, link is null).
+ * The invariant is validated by ScoreAudioService and, where supported, by a database CHECK constraint.
  *
  * @psalm-suppress PropertyNotSetInConstructor
  * @method int getId()
@@ -42,23 +42,6 @@ class ScoreAudio extends Entity implements JsonSerializable {
 		$this->addType('providerId', Types::STRING);
 		$this->addType('link', Types::STRING);
 		$this->addType('comment', Types::STRING);
-	}
-
-	/**
-	 * Validate that the entity has exactly one type of source.
-	 *
-	 * @throws InvalidArgumentException If the source combination is invalid
-	 */
-	public function validateSource(): void {
-		$hasProvider = $this->provider !== null || $this->providerId !== null;
-		$hasLink = $this->link !== null;
-
-		if ($hasProvider === $hasLink) {
-			throw new InvalidArgumentException('An audio example must have either a link or a provider with provider ID');
-		}
-		if ($hasProvider && ($this->provider === null || $this->providerId === null)) {
-			throw new InvalidArgumentException('Provider and provider ID must be set together');
-		}
 	}
 
 	public function jsonSerialize(): array {

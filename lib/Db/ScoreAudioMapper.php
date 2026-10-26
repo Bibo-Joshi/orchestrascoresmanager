@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace OCA\OrchestraScoresManager\Db;
 
 use OCP\AppFramework\Db\DoesNotExistException;
-use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
@@ -52,35 +51,5 @@ class ScoreAudioMapper extends QBMapper {
 			->where($qb->expr()->eq('score_id', $qb->createNamedParameter($scoreId, IQueryBuilder::PARAM_INT)))
 			->orderBy('id', 'ASC');
 		return $this->findEntities($qb);
-	}
-
-	/**
-	 * Insert an audio example after validating its source.
-	 *
-	 * @param Entity $entity
-	 * @return ScoreAudio
-	 * @throws \InvalidArgumentException If the source is invalid
-	 * @throws Exception
-	 */
-	public function insert(Entity $entity): Entity {
-		if ($entity instanceof ScoreAudio) {
-			$entity->validateSource();
-		}
-		return parent::insert($entity);
-	}
-
-	/**
-	 * Update an audio example after validating its source.
-	 *
-	 * @param Entity $entity
-	 * @return ScoreAudio
-	 * @throws \InvalidArgumentException If the source is invalid
-	 * @throws Exception
-	 */
-	public function update(Entity $entity): Entity {
-		if ($entity instanceof ScoreAudio) {
-			$entity->validateSource();
-		}
-		return parent::update($entity);
 	}
 }

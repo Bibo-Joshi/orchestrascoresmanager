@@ -48,6 +48,10 @@ import {
   ScoreApiPostScoreCommentPayload,
   ScoreApiPostScoreData,
   ScoreApiPostScorePayload,
+  ScoreAudioApiDeleteAudioExampleData,
+  ScoreAudioApiGetScoreAudioExamplesData,
+  ScoreAudioApiPostScoreAudioExampleData,
+  ScoreAudioApiPostScoreAudioExamplePayload,
   ScoreBookApiDeleteScoreBookData,
   ScoreBookApiDeleteScoreBookScoreData,
   ScoreBookApiGetScoreBookData,
@@ -881,6 +885,90 @@ export class Ocs<
       path: `/ocs/v2.php/apps/orchestrascoresmanager/scores/${id}/setlists`,
       method: "GET",
       query: query,
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the list of audio examples
+   *
+   * @tags score_audio_api
+   * @name ScoreAudioApiGetScoreAudioExamples
+   * @summary Get all audio examples for a specific score
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/scores/{id}/audio-examples
+   * @secure
+   */
+  scoreAudioApiGetScoreAudioExamples = (
+    id: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ScoreAudioApiGetScoreAudioExamplesData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/scores/${id}/audio-examples`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Either `link` (generic example) or `provider` together with `providerId` (provider-specific example) must be given. the created audio example
+   *
+   * @tags score_audio_api
+   * @name ScoreAudioApiPostScoreAudioExample
+   * @summary Add an audio example to a specific score
+   * @request POST:/ocs/v2.php/apps/orchestrascoresmanager/scores/{id}/audio-examples
+   * @secure
+   */
+  scoreAudioApiPostScoreAudioExample = (
+    id: number,
+    data?: ScoreAudioApiPostScoreAudioExamplePayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ScoreAudioApiPostScoreAudioExampleData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/scores/${id}/audio-examples`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description empty response
+   *
+   * @tags score_audio_api
+   * @name ScoreAudioApiDeleteAudioExample
+   * @summary Delete an audio example
+   * @request DELETE:/ocs/v2.php/apps/orchestrascoresmanager/audio-examples/{id}
+   * @secure
+   */
+  scoreAudioApiDeleteAudioExample = (id: number, params: RequestParams = {}) =>
+    this.request<
+      ScoreAudioApiDeleteAudioExampleData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/audio-examples/${id}`,
+      method: "DELETE",
       secure: true,
       format: "json",
       ...params,
