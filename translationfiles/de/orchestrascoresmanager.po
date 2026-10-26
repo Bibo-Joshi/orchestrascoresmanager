@@ -154,6 +154,21 @@ msgstr "Setlist-Eintrag mit ID %d nicht gefunden"
 msgid "Invalid filter parameter. Must be \"all\", \"future\", or \"past\"."
 msgstr "Ungültiger Filter-Parameter. Muss \"all\", \"future\" oder \"past\" sein."
 
+msgid "The parameter \"%s\" does not match the cursor."
+msgstr "Der Parameter \"%s\" stimmt nicht mit dem Cursor überein."
+
+msgid "Invalid limit parameter. Must be between 1 and %d."
+msgstr "Ungültiger Limit-Parameter. Muss zwischen 1 und %d liegen."
+
+msgid "Invalid sortBy parameter. Must be \"createdAt\", \"date\", or \"name\"."
+msgstr "Ungültiger sortBy-Parameter. Muss \"createdAt\", \"date\" oder \"name\" sein."
+
+msgid "Invalid sortOrder parameter. Must be \"ASC\" or \"DESC\"."
+msgstr "Ungültiger sortOrder-Parameter. Muss \"ASC\" oder \"DESC\" sein."
+
+msgid "Invalid cursor."
+msgstr "Ungültiger Cursor."
+
 msgid "Setlist not found"
 msgstr "Setlist nicht gefunden"
 
@@ -976,6 +991,18 @@ msgstr "Gesamtdauer"
 
 msgid "Invalid duration format"
 msgstr "Ungültiges Spieldauerformat"
+
+msgid "Failed to fetch setlists. Please reload the page."
+msgstr "Setlisten konnten nicht geladen werden. Bitte laden Sie die Seite neu."
+
+msgid "Not used in any setlist"
+msgstr "In keiner Setlist verwendet"
+
+msgid "This score has not appeared in any setlist"
+msgstr "Diese Partitur ist in keiner Setlist enthalten"
+
+msgid "Load more"
+msgstr "Mehr laden"
 
 #~ msgid "Select groups..."
 #~ msgstr "Gruppen auswählen..."

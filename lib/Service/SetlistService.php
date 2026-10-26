@@ -22,6 +22,10 @@ use OCP\IUserSession;
  * Service for managing Setlists and their entries.
  */
 class SetlistService {
+	private const DEFAULT_PAGE_LIMIT = 50;
+	private const MAX_PAGE_LIMIT = 500;
+	private const SORT_FIELDS = ['createdAt', 'date', 'name'];
+
 	/** @psalm-suppress PossiblyUnusedMethod - Constructor used by DI container */
 	public function __construct(
 		private readonly SetlistMapper $setlistMapper,
@@ -64,6 +68,106 @@ class SetlistService {
 		}
 
 		return array_map(fn ($setlist) => $this->serializeSetlist($setlist), $allowedSetlists);
+	}
+
+	/**
+	 * Get a page of the setlists containing a score.
+	 * Only setlists the current user may read are returned and counted.
+	 *
+	 * If a cursor is passed, it carries the limit and sorting parameters. Explicitly passed
+	 * parameters must match the encoded ones.
+	 *
+	 * @param int $scoreId
+	 * @param int|null $limit Page size (default 50, max 500)
+	 * @param string|null $cursor Opaque cursor returned by a previous call
+	 * @param string|null $sortBy One of 'createdAt', 'date' (default), 'name'
+	 * @param string|null $sortOrder 'ASC' or 'DESC' (default), case-insensitive
+	 * @return array{setlists: list<array>, pagination: array{nextCursor: string|null, total: int}}
+	 * @throws Exception
+	 * @throws InvalidArgumentException
+	 */
+	public function getSetlistsForScore(int $scoreId, ?int $limit = null, ?string $cursor = null, ?string $sortBy = null, ?string $sortOrder = null): array {
+		$sortOrder = $sortOrder === null ? null : strtoupper($sortOrder);
+		$offset = 0;
+
+		if ($cursor !== null) {
+			$decoded = $this->decodeCursor($cursor);
+			foreach ([
+				'limit' => [$limit, $decoded['limit']],
+				'sortBy' => [$sortBy, $decoded['sortBy']],
+				'sortOrder' => [$sortOrder, $decoded['sortOrder']],
+			] as $name => [$explicit, $encoded]) {
+				if ($explicit !== null && $explicit !== $encoded) {
+					throw new InvalidArgumentException($this->l->t('The parameter "%s" does not match the cursor.', [$name]));
+				}
+			}
+			$limit = $decoded['limit'];
+			$sortBy = $decoded['sortBy'];
+			$sortOrder = $decoded['sortOrder'];
+			$offset = $decoded['offset'];
+		}
+
+		$limit ??= self::DEFAULT_PAGE_LIMIT;
+		$sortBy ??= 'date';
+		$sortOrder ??= 'DESC';
+
+		if ($limit < 1 || $limit > self::MAX_PAGE_LIMIT) {
+			throw new InvalidArgumentException($this->l->t('Invalid limit parameter. Must be between 1 and %d.', [self::MAX_PAGE_LIMIT]));
+		}
+		if (!in_array($sortBy, self::SORT_FIELDS, true)) {
+			throw new InvalidArgumentException($this->l->t('Invalid sortBy parameter. Must be "createdAt", "date", or "name".'));
+		}
+		if (!in_array($sortOrder, ['ASC', 'DESC'], true)) {
+			throw new InvalidArgumentException($this->l->t('Invalid sortOrder parameter. Must be "ASC" or "DESC".'));
+		}
+
+		// Drafts/unpublished setlists are only readable by editors, see SetlistPolicy
+		$unpublishedProbe = new Setlist();
+		$unpublishedProbe->setIsPublished(false);
+		$publishedOnly = !$this->setlistPolicy->allows(PolicyInterface::ACTION_READ, $unpublishedProbe);
+
+		// fetch one extra row to find out whether there is a next page
+		$setlists = $this->setlistMapper->findByScoreId($scoreId, $publishedOnly, $sortBy, $sortOrder, $limit + 1, $offset);
+		$hasMore = count($setlists) > $limit;
+		$setlists = array_slice($setlists, 0, $limit);
+
+		return [
+			'setlists' => array_map(fn (Setlist $setlist) => $this->serializeSetlist($setlist), $setlists),
+			'pagination' => [
+				'nextCursor' => $hasMore ? $this->encodeCursor($limit, $sortBy, $sortOrder, $offset + $limit) : null,
+				'total' => $this->setlistMapper->countByScoreId($scoreId, $publishedOnly),
+			],
+		];
+	}
+
+	/**
+	 * @param int $limit
+	 * @param string $sortBy
+	 * @param string $sortOrder
+	 * @param int $offset
+	 * @return string URL-safe cursor
+	 */
+	private function encodeCursor(int $limit, string $sortBy, string $sortOrder, int $offset): string {
+		$json = json_encode(['l' => $limit, 's' => $sortBy, 'o' => $sortOrder, 'p' => $offset], JSON_THROW_ON_ERROR);
+		return rtrim(strtr(base64_encode($json), '+/', '-_'), '=');
+	}
+
+	/**
+	 * @param string $cursor
+	 * @return array{limit: int, sortBy: string, sortOrder: string, offset: int}
+	 * @throws InvalidArgumentException If the cursor is malformed
+	 */
+	private function decodeCursor(string $cursor): array {
+		$json = base64_decode(strtr($cursor, '-_', '+/'), true);
+		$data = $json === false ? null : json_decode($json, true);
+		if (!is_array($data)
+			|| !isset($data['l'], $data['s'], $data['o'], $data['p'])
+			|| !is_int($data['l']) || !is_string($data['s']) || !is_string($data['o']) || !is_int($data['p'])
+			|| $data['p'] < 0
+		) {
+			throw new InvalidArgumentException($this->l->t('Invalid cursor.'));
+		}
+		return ['limit' => $data['l'], 'sortBy' => $data['s'], 'sortOrder' => $data['o'], 'offset' => $data['p']];
 	}
 
 	/**

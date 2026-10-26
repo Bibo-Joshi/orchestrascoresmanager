@@ -40,6 +40,7 @@ import {
   ScoreApiDeleteScoreData,
   ScoreApiGetScoreCommentsData,
   ScoreApiGetScoreFolderCollectionsData,
+  ScoreApiGetScoreSetlistsData,
   ScoreApiGetScoresData,
   ScoreApiPatchScoreData,
   ScoreApiPatchScorePayload,
@@ -828,6 +829,48 @@ export class Ocs<
     >({
       path: `/ocs/v2.php/apps/orchestrascoresmanager/scores/${id}/foldercollections`,
       method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the setlists and pagination info
+   *
+   * @tags score_api
+   * @name ScoreApiGetScoreSetlists
+   * @summary Get the setlists a specific score appears in (only setlists the user may see)
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/scores/{id}/setlists
+   * @secure
+   */
+  scoreApiGetScoreSetlists = (
+    id: number,
+    query?: {
+      /**
+       * Maximum number of setlists to return (default 50, max 500)
+       * @format int64
+       */
+      limit?: number | null;
+      /** Cursor from a previous response. Explicit limit/sortBy/sortOrder must match the cursor. */
+      cursor?: string | null;
+      /** Sort field (default date) */
+      sortBy?: "createdAt" | "date" | "name" | null;
+      /** Sort order (default DESC) */
+      sortOrder?: "ASC" | "DESC" | "asc" | "desc" | null;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ScoreApiGetScoreSetlistsData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/scores/${id}/setlists`,
+      method: "GET",
+      query: query,
       secure: true,
       format: "json",
       ...params,

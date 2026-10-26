@@ -94,6 +94,78 @@ class SetlistMapper extends QBMapper {
 	}
 
 	/**
+	 * Find a page of setlists that contain the given score, sorted by the given column.
+	 * Setlists without a creation timestamp column are sorted by id when sorting by 'createdAt'.
+	 *
+	 * @param int $scoreId
+	 * @param bool $publishedOnly Restrict to published setlists
+	 * @param string $sortBy One of 'createdAt', 'date', 'name'
+	 * @param string $sortOrder 'ASC' or 'DESC'
+	 * @param int $limit Maximum number of setlists to return
+	 * @param int $offset Number of setlists to skip
+	 * @return Setlist[]
+	 * @throws Exception
+	 */
+	public function findByScoreId(int $scoreId, bool $publishedOnly, string $sortBy, string $sortOrder, int $limit, int $offset): array {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select('*')->from($this->getTableName());
+		$this->applyScoreFilter($qb, $scoreId, $publishedOnly);
+
+		$direction = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
+		$column = match ($sortBy) {
+			'name' => 'title',
+			'date' => 'start_date_time',
+			default => 'id',
+		};
+		$qb->orderBy($column, $direction);
+		if ($column !== 'id') {
+			$qb->addOrderBy('id', $direction);
+		}
+		$qb->setMaxResults($limit)->setFirstResult($offset);
+
+		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Count the setlists that contain the given score.
+	 *
+	 * @param int $scoreId
+	 * @param bool $publishedOnly Restrict to published setlists
+	 * @return int
+	 * @throws Exception
+	 */
+	public function countByScoreId(int $scoreId, bool $publishedOnly): int {
+		$qb = $this->db->getQueryBuilder();
+		$qb->select($qb->func()->count('*'))->from($this->getTableName());
+		$this->applyScoreFilter($qb, $scoreId, $publishedOnly);
+
+		$result = $qb->executeQuery();
+		$count = (int)$result->fetchOne();
+		$result->closeCursor();
+		return $count;
+	}
+
+	/**
+	 * Restrict the query to setlists containing the score (and optionally only published ones).
+	 *
+	 * @param IQueryBuilder $qb
+	 * @param int $scoreId
+	 * @param bool $publishedOnly
+	 * @return void
+	 */
+	private function applyScoreFilter(IQueryBuilder $qb, int $scoreId, bool $publishedOnly): void {
+		$sub = $this->db->getQueryBuilder();
+		$sub->select('setlist_id')
+			->from('osm_setlist_entries')
+			->where($sub->expr()->eq('score_id', $qb->createNamedParameter($scoreId, IQueryBuilder::PARAM_INT)));
+
+		$qb->where($qb->expr()->in('id', $qb->createFunction($sub->getSQL())));
+		if ($publishedOnly) {
+			$qb->andWhere($qb->expr()->eq('is_published', $qb->createNamedParameter(true, IQueryBuilder::PARAM_BOOL)));
+		}
+	}
+
+	/**
 	 * Apply isDraft and isPublished filters to query builder if provided
 	 *
 	 * @param IQueryBuilder $qb

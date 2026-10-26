@@ -42,6 +42,11 @@ OC.L10N.register(
     "Each entry must have an id field" : "Jeder Eintrag muss ein ID-Feld haben",
     "Setlist entry with id %d not found" : "Setlist-Eintrag mit ID %d nicht gefunden",
     "Invalid filter parameter. Must be \"all\", \"future\", or \"past\"." : "Ungültiger Filter-Parameter. Muss \"all\", \"future\" oder \"past\" sein.",
+    "The parameter \"%s\" does not match the cursor." : "Der Parameter \"%s\" stimmt nicht mit dem Cursor überein.",
+    "Invalid limit parameter. Must be between 1 and %d." : "Ungültiger Limit-Parameter. Muss zwischen 1 und %d liegen.",
+    "Invalid sortBy parameter. Must be \"createdAt\", \"date\", or \"name\"." : "Ungültiger sortBy-Parameter. Muss \"createdAt\", \"date\" oder \"name\" sein.",
+    "Invalid sortOrder parameter. Must be \"ASC\" or \"DESC\"." : "Ungültiger sortOrder-Parameter. Muss \"ASC\" oder \"DESC\" sein.",
+    "Invalid cursor." : "Ungültiger Cursor.",
     "Setlist not found" : "Setlist nicht gefunden",
     "Either scoreId or breakDuration must be set" : "Entweder scoreId oder breakDuration muss gesetzt sein",
     "Only one of scoreId or breakDuration can be set" : "Nur eines von scoreId oder breakDuration kann gesetzt sein",
@@ -302,6 +307,10 @@ OC.L10N.register(
     "Playtime" : "Spielzeit",
     "Moderation & Breaks" : "Moderation & Pausen",
     "Overall Duration" : "Gesamtdauer",
-    "Invalid duration format" : "Ungültiges Spieldauerformat"
+    "Invalid duration format" : "Ungültiges Spieldauerformat",
+    "Failed to fetch setlists. Please reload the page." : "Setlisten konnten nicht geladen werden. Bitte laden Sie die Seite neu.",
+    "Not used in any setlist" : "In keiner Setlist verwendet",
+    "This score has not appeared in any setlist" : "Diese Partitur ist in keiner Setlist enthalten",
+    "Load more" : "Mehr laden"
 },
 "nplurals=2; plural=(n != 1);");

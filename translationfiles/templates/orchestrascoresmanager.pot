@@ -160,6 +160,21 @@ msgstr ""
 msgid "Invalid filter parameter. Must be \"all\", \"future\", or \"past\"."
 msgstr ""
 
+msgid "The parameter \"%s\" does not match the cursor."
+msgstr ""
+
+msgid "Invalid limit parameter. Must be between 1 and %d."
+msgstr ""
+
+msgid "Invalid sortBy parameter. Must be \"createdAt\", \"date\", or \"name\"."
+msgstr ""
+
+msgid "Invalid sortOrder parameter. Must be \"ASC\" or \"DESC\"."
+msgstr ""
+
+msgid "Invalid cursor."
+msgstr ""
+
 msgid "Setlist not found"
 msgstr ""
 
@@ -987,4 +1002,16 @@ msgid "Overall Duration"
 msgstr ""
 
 msgid "Invalid duration format"
+msgstr ""
+
+msgid "Failed to fetch setlists. Please reload the page."
+msgstr ""
+
+msgid "Not used in any setlist"
+msgstr ""
+
+msgid "This score has not appeared in any setlist"
+msgstr ""
+
+msgid "Load more"
 msgstr ""

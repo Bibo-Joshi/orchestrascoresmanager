@@ -656,6 +656,20 @@ export interface ScoreApiGetScoreFolderCollectionsData {
   };
 }
 
+export interface ScoreApiGetScoreSetlistsData {
+  ocs: {
+    meta: OCSMeta;
+    data: {
+      setlists: Setlist[];
+      pagination: {
+        nextCursor: string | null;
+        /** @format int64 */
+        total: number;
+      };
+    };
+  };
+}
+
 export interface ScoreBookApiGetScoreBooksData {
   ocs: {
     meta: OCSMeta;
