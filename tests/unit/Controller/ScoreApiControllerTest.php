@@ -14,6 +14,7 @@ use OCA\OrchestraScoresManager\Service\CommentService;
 use OCA\OrchestraScoresManager\Service\Exceptions\PermissionDeniedException;
 use OCA\OrchestraScoresManager\Service\FolderCollectionService;
 use OCA\OrchestraScoresManager\Service\ScoreService;
+use OCA\OrchestraScoresManager\Service\SetlistService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
@@ -32,6 +33,7 @@ final class ScoreApiControllerTest extends TestCase {
 	private ScoreService $scoreService;
 	private CommentService $commentService;
 	private FolderCollectionService $folderCollectionService;
+	private SetlistService $setlistService;
 	private IRequest $request;
 	private ScoreApiController $controller;
 
@@ -44,6 +46,7 @@ final class ScoreApiControllerTest extends TestCase {
 		$this->scoreService = $this->createMock(ScoreService::class);
 		$this->commentService = $this->createMock(CommentService::class);
 		$this->folderCollectionService = $this->createMock(FolderCollectionService::class);
+		$this->setlistService = $this->createMock(SetlistService::class);
 		$this->request = $this->createMock(IRequest::class);
 
 		$this->controller = new ScoreApiController(
@@ -54,7 +57,8 @@ final class ScoreApiControllerTest extends TestCase {
 			$this->tagMapper,
 			$this->scoreService,
 			$this->commentService,
-			$this->folderCollectionService
+			$this->folderCollectionService,
+			$this->setlistService
 		);
 	}
 
@@ -335,5 +339,33 @@ final class ScoreApiControllerTest extends TestCase {
 		$this->expectExceptionMessage('Cannot view folder collections');
 
 		$this->controller->getScoreFolderCollections(1);
+	}
+
+	public function testGetScoreSetlistsReturnsPage(): void {
+		$page = [
+			'setlists' => [['id' => 1, 'title' => 'Concert']],
+			'pagination' => ['nextCursor' => null, 'total' => 1],
+		];
+
+		$this->setlistService->expects($this->once())
+			->method('getSetlistsForScore')
+			->with(5, 10, 'abc', 'name', 'ASC')
+			->willReturn($page);
+
+		$response = $this->controller->getScoreSetlists(5, 10, 'abc', 'name', 'ASC');
+
+		$this->assertInstanceOf(DataResponse::class, $response);
+		$this->assertEquals($page, $response->getData());
+		$this->assertEquals(Http::STATUS_OK, $response->getStatus());
+	}
+
+	public function testGetScoreSetlistsThrowsOCSBadRequestOnInvalidArguments(): void {
+		$this->setlistService->expects($this->once())
+			->method('getSetlistsForScore')
+			->willThrowException(new \InvalidArgumentException('Invalid cursor.'));
+
+		$this->expectException(OCSBadRequestException::class);
+
+		$this->controller->getScoreSetlists(5, null, 'broken');
 	}
 }

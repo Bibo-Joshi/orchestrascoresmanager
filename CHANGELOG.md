@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Share setlists as image and text to messengers (#127)
 - Multiple short titles (aliases) per score; all aliases are listed in the folder collection index
+- Setlist history tab in the score sidebar and `GET scores/{id}/setlists` API endpoint with cursor-based pagination (#125)
 
 ## [1.2.2] - 2026-08-28
 

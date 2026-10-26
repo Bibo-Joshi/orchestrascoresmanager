@@ -13,6 +13,7 @@ use OCA\OrchestraScoresManager\ResponseDefinitions;
 use OCA\OrchestraScoresManager\Service\CommentService;
 use OCA\OrchestraScoresManager\Service\FolderCollectionService;
 use OCA\OrchestraScoresManager\Service\ScoreService;
+use OCA\OrchestraScoresManager\Service\SetlistService;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -29,6 +30,7 @@ use OCP\IRequest;
  * @psalm-import-type OrchestraScoresManagerComment from ResponseDefinitions
  * @psalm-import-type OrchestraScoresManagerFolderCollection from ResponseDefinitions
  * @psalm-import-type OrchestraScoresManagerFolderCollectionScore from ResponseDefinitions
+ * @psalm-import-type OrchestraScoresManagerSetlistPage from ResponseDefinitions
  * @psalm-suppress UnusedClass - Controller discovered by NextCloud framework
  */
 #[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
@@ -44,6 +46,7 @@ class ScoreApiController extends OCSController {
 		private readonly ScoreService $scoreService,
 		private readonly CommentService $commentService,
 		private readonly FolderCollectionService $folderCollectionService,
+		private readonly SetlistService $setlistService,
 	) {
 		parent::__construct($appName, $request);
 	}
@@ -326,5 +329,29 @@ class ScoreApiController extends OCSController {
 	public function getScoreFolderCollections(int $id): DataResponse {
 		$folderCollections = $this->callService(fn () => $this->folderCollectionService->getFolderCollectionsForScore($id));
 		return new DataResponse($folderCollections);
+	}
+
+	/**
+	 * Get the setlists a specific score appears in (only setlists the user may see)
+	 *
+	 * @param int $id The ID of the score
+	 * @param int|null $limit Maximum number of setlists to return (default 50, max 500)
+	 * @param string|null $cursor Cursor from a previous response. Explicit limit/sortBy/sortOrder must match the cursor.
+	 * @param 'creation'|'date'|'name'|null $sortBy Sort field (default date)
+	 * @param 'ASC'|'DESC'|'asc'|'desc'|null $sortOrder Sort order (default DESC)
+	 *
+	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerSetlistPage, array{}> the setlists and pagination info
+	 *
+	 * 200: Successful response with the page of setlists
+	 * 400: Bad request
+	 * 403: Forbidden
+	 * @throws OCSBadRequestException if the parameters are invalid
+	 * @throws OCSForbiddenException if the user does not have permission
+	 */
+	#[NoAdminRequired]
+	#[ApiRoute(verb: 'GET', url: '/scores/{id}/setlists')]
+	public function getScoreSetlists(int $id, ?int $limit = null, ?string $cursor = null, ?string $sortBy = null, ?string $sortOrder = null): DataResponse {
+		$page = $this->callService(fn () => $this->setlistService->getSetlistsForScore($id, $limit, $cursor, $sortBy, $sortOrder));
+		return new DataResponse($page);
 	}
 }

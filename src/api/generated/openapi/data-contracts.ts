@@ -202,6 +202,15 @@ export interface SetlistEntry {
   scoreId: number | null;
 }
 
+export interface SetlistPage {
+  setlists: Setlist[];
+  pagination: {
+    nextCursor: string | null;
+    /** @format int64 */
+    total: number;
+  };
+}
+
 export interface Tag {
   /** @format int64 */
   id: number;
@@ -653,6 +662,13 @@ export interface ScoreApiGetScoreFolderCollectionsData {
   ocs: {
     meta: OCSMeta;
     data: FolderCollectionScore[];
+  };
+}
+
+export interface ScoreApiGetScoreSetlistsData {
+  ocs: {
+    meta: OCSMeta;
+    data: SetlistPage;
   };
 }
 

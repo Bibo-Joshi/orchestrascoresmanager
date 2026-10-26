@@ -23,6 +23,22 @@
 			<EntityFolderCollectionsList type="score" :entityId="scoreSidebarStore.selectedScore.id" />
 		</NcAppSidebarTab>
 		<NcAppSidebarTab
+			v-if="scoreSetlists.total.value > 0 || (!scoreSetlists.isLoading.value && !scoreSetlists.isLoaded.value)"
+			id="setlists"
+			:name="t('Setlists')">
+			<template #icon>
+				<SetlistIcon :size="20" />
+			</template>
+			<ScoreSetlistsList
+				:setlists="scoreSetlists.setlists.value"
+				:total="scoreSetlists.total.value"
+				:isLoading="scoreSetlists.isLoading.value"
+				:isLoaded="scoreSetlists.isLoaded.value"
+				:isLoadingMore="scoreSetlists.isLoadingMore.value"
+				:hasMore="scoreSetlists.nextCursor.value !== null"
+				@loadMore="scoreSetlists.loadMore(scoreSidebarStore.selectedScore.id)" />
+		</NcAppSidebarTab>
+		<NcAppSidebarTab
 			v-if="scoreSidebarStore.selectedScore.scoreBook !== null"
 			id="scorebook"
 			:name="t('Score Book')">
@@ -37,12 +53,15 @@
 </template>
 
 <script setup lang="ts">
+import { watch } from 'vue'
 import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
 import EntityFolderCollectionsList from '@/components/EntityFolderCollectionsList.vue'
 import CommentsList from '@/pages/scores/components/CommentsList.vue'
 import ScoreBookInfo from '@/pages/scores/components/ScoreBookInfo.vue'
-import { CommentIcon, FolderCollectionIcon, ScoreBookIcon } from '@/icons/vue-material'
+import ScoreSetlistsList from '@/pages/scores/components/ScoreSetlistsList.vue'
+import { useScoreSetlists } from '@/composables/useScoreSetlists'
+import { CommentIcon, FolderCollectionIcon, ScoreBookIcon, SetlistIcon } from '@/icons/vue-material'
 import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import { t } from '@/utils/l10n.ts'
 
@@ -53,4 +72,16 @@ interface Props {
 defineProps<Props>()
 
 const scoreSidebarStore = useScoreSidebarStore()
+const scoreSetlists = useScoreSetlists()
+
+// Load the setlist history on demand when the sidebar is opened for a score
+watch(
+	() => [scoreSidebarStore.isOpen, scoreSidebarStore.selectedScore?.id] as const,
+	([isOpen, scoreId]) => {
+		if (isOpen && scoreId !== undefined) {
+			scoreSetlists.load(scoreId)
+		}
+	},
+	{ immediate: true },
+)
 </script>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-10-25 20:40+0000\n"
+"POT-Creation-Date: 2026-10-26 13:36+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
 msgid "Insufficient permissions"
 msgstr ""
@@ -158,6 +159,23 @@ msgid "Setlist entry with id %d not found"
 msgstr ""
 
 msgid "Invalid filter parameter. Must be \"all\", \"future\", or \"past\"."
+msgstr ""
+
+#, php-format
+msgid "The parameter \"%s\" does not match the cursor."
+msgstr ""
+
+#, php-format
+msgid "Invalid limit parameter. Must be between 1 and %d."
+msgstr ""
+
+msgid "Invalid sortBy parameter. Must be \"creation\", \"date\", or \"name\"."
+msgstr ""
+
+msgid "Invalid sortOrder parameter. Must be \"ASC\" or \"DESC\"."
+msgstr ""
+
+msgid "Invalid cursor."
 msgstr ""
 
 msgid "Setlist not found"
@@ -725,6 +743,26 @@ msgstr ""
 msgid "Scores in this book"
 msgstr ""
 
+msgid "Failed to fetch setlists. Please reload the page."
+msgstr ""
+
+msgid "Not used in any setlist"
+msgstr ""
+
+msgid "This score has not appeared in any setlist"
+msgstr ""
+
+msgid "Draft"
+msgstr ""
+
+msgid "Load more"
+msgstr ""
+
+msgid "This score is part of %n setlist"
+msgid_plural "This score is part of %n setlists"
+msgstr[0] ""
+msgstr[1] ""
+
 msgid "Failed to load setlist"
 msgstr ""
 
@@ -810,9 +848,6 @@ msgid "Setlist image"
 msgstr ""
 
 msgid "Close"
-msgstr ""
-
-msgid "Draft"
 msgstr ""
 
 msgid "Invalid duration format. Use (HH:)MM"
@@ -945,6 +980,9 @@ msgid "Index is valid"
 msgstr ""
 
 msgid "Enter the position index in the collection"
+msgstr ""
+
+msgid "Failed to load more setlists"
 msgstr ""
 
 msgid "Setlist"

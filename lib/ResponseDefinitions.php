@@ -128,6 +128,10 @@ namespace OCA\OrchestraScoresManager;
  *     isDraft: bool,
  *     isPublished: bool
  * }
+ * @psalm-type OrchestraScoresManagerSetlistPage = array{
+ *     setlists: list<OrchestraScoresManagerSetlist>,
+ *     pagination: array{nextCursor: string|null, total: int}
+ * }
  * @psalm-type OrchestraScoresManagerSetlistEntry = array{
  *     id: int,
  *     setlistId: int,

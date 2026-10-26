@@ -742,4 +742,115 @@ final class SetlistServiceTest extends TestCase {
 		$this->assertArrayHasKey('folderCollectionVersionId', $result);
 		$this->assertNull($result['folderCollectionVersionId']);
 	}
+
+	private function makeSetlist(int $id): Setlist {
+		$setlist = new Setlist();
+		$setlist->setId($id);
+		$setlist->setTitle('Setlist ' . $id);
+		return $setlist;
+	}
+
+	public function testGetSetlistsForScoreDefaults(): void {
+		$this->setlistPolicy->method('allows')->willReturn(true);
+		$this->setlistMapper->expects($this->once())
+			->method('findByScoreId')
+			->with(7, false, 'date', 'DESC', 51, 0)
+			->willReturn([$this->makeSetlist(1)]);
+		$this->setlistMapper->expects($this->once())
+			->method('countByScoreId')
+			->with(7, false)
+			->willReturn(1);
+
+		$result = $this->service->getSetlistsForScore(7);
+
+		$this->assertCount(1, $result['setlists']);
+		$this->assertSame(1, $result['setlists'][0]['id']);
+		$this->assertNull($result['pagination']['nextCursor']);
+		$this->assertSame(1, $result['pagination']['total']);
+	}
+
+	public function testGetSetlistsForScoreRestrictsToPublishedWhenUnpublishedNotReadable(): void {
+		$this->setlistPolicy->method('allows')->willReturn(false);
+		$this->setlistMapper->expects($this->once())
+			->method('findByScoreId')
+			->with(7, true, 'name', 'ASC', 11, 0)
+			->willReturn([]);
+		$this->setlistMapper->expects($this->once())
+			->method('countByScoreId')
+			->with(7, true)
+			->willReturn(0);
+
+		$result = $this->service->getSetlistsForScore(7, 10, null, 'name', 'asc');
+
+		$this->assertSame([], $result['setlists']);
+		$this->assertSame(0, $result['pagination']['total']);
+	}
+
+	public function testGetSetlistsForScoreReturnsNextCursorAndCursorRoundTrip(): void {
+		$this->setlistPolicy->method('allows')->willReturn(true);
+		$this->setlistMapper->method('countByScoreId')->willReturn(3);
+		$calls = [];
+		$this->setlistMapper->method('findByScoreId')
+			->willReturnCallback(function (...$args) use (&$calls) {
+				$calls[] = $args;
+				return count($calls) === 1
+					? [$this->makeSetlist(1), $this->makeSetlist(2), $this->makeSetlist(3)]
+					: [$this->makeSetlist(3)];
+			});
+
+		$first = $this->service->getSetlistsForScore(7, 2, null, 'creation', 'ASC');
+		$this->assertCount(2, $first['setlists']);
+		$cursor = $first['pagination']['nextCursor'];
+		$this->assertIsString($cursor);
+
+		$second = $this->service->getSetlistsForScore(7, null, $cursor);
+		$this->assertCount(1, $second['setlists']);
+		$this->assertNull($second['pagination']['nextCursor']);
+		$this->assertSame([7, false, 'creation', 'ASC', 3, 2], $calls[1]);
+	}
+
+	public function testGetSetlistsForScoreAcceptsMatchingExplicitParamsWithCursor(): void {
+		$this->setlistPolicy->method('allows')->willReturn(true);
+		$this->setlistMapper->method('countByScoreId')->willReturn(5);
+		$this->setlistMapper->method('findByScoreId')->willReturn([
+			$this->makeSetlist(1), $this->makeSetlist(2), $this->makeSetlist(3),
+		]);
+		$cursor = $this->service->getSetlistsForScore(7, 2, null, 'name', 'DESC')['pagination']['nextCursor'];
+
+		$result = $this->service->getSetlistsForScore(7, 2, $cursor, 'name', 'desc');
+		$this->assertArrayHasKey('setlists', $result);
+	}
+
+	public function testGetSetlistsForScoreRejectsMismatchingParamsWithCursor(): void {
+		$this->setlistPolicy->method('allows')->willReturn(true);
+		$this->setlistMapper->method('countByScoreId')->willReturn(5);
+		$this->setlistMapper->method('findByScoreId')->willReturn([
+			$this->makeSetlist(1), $this->makeSetlist(2), $this->makeSetlist(3),
+		]);
+		$cursor = $this->service->getSetlistsForScore(7, 2, null, 'name', 'DESC')['pagination']['nextCursor'];
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->service->getSetlistsForScore(7, 2, $cursor, 'date');
+	}
+
+	#[DataProvider('invalidParamsProvider')]
+	public function testGetSetlistsForScoreRejectsInvalidParams(?int $limit, ?string $cursor, ?string $sortBy, ?string $sortOrder): void {
+		$this->setlistMapper->expects($this->never())->method('findByScoreId');
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->service->getSetlistsForScore(7, $limit, $cursor, $sortBy, $sortOrder);
+	}
+
+	/**
+	 * @return array<string, array{int|null, string|null, string|null, string|null}>
+	 */
+	public static function invalidParamsProvider(): array {
+		return [
+			'limit too small' => [0, null, null, null],
+			'limit too large' => [501, null, null, null],
+			'invalid sortBy' => [null, null, 'title', null],
+			'invalid sortOrder' => [null, null, null, 'up'],
+			'garbage cursor' => [null, '!!!', null, null],
+		];
+	}
 }
