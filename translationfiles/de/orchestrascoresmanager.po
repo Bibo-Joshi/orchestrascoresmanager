@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-10-25 20:40+0000\n"
+"POT-Creation-Date: 2026-10-26 10:06+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -154,9 +154,11 @@ msgstr "Setlist-Eintrag mit ID %d nicht gefunden"
 msgid "Invalid filter parameter. Must be \"all\", \"future\", or \"past\"."
 msgstr "Ungültiger Filter-Parameter. Muss \"all\", \"future\" oder \"past\" sein."
 
+#, php-format
 msgid "The parameter \"%s\" does not match the cursor."
 msgstr "Der Parameter \"%s\" stimmt nicht mit dem Cursor überein."
 
+#, php-format
 msgid "Invalid limit parameter. Must be between 1 and %d."
 msgstr "Ungültiger Limit-Parameter. Muss zwischen 1 und %d liegen."
 
@@ -728,6 +730,21 @@ msgstr "Kommentar senden"
 msgid "Scores in this book"
 msgstr "Partituren in diesem Notenbuch"
 
+msgid "Failed to fetch setlists. Please reload the page."
+msgstr "Setlisten konnten nicht geladen werden. Bitte laden Sie die Seite neu."
+
+msgid "Not used in any setlist"
+msgstr "In keiner Setlist verwendet"
+
+msgid "This score has not appeared in any setlist"
+msgstr "Diese Partitur ist in keiner Setlist enthalten"
+
+msgid "Draft"
+msgstr "Entwurf"
+
+msgid "Load more"
+msgstr "Mehr laden"
+
 msgid "Failed to load setlist"
 msgstr "Setlist konnte nicht geladen werden"
 
@@ -814,9 +831,6 @@ msgstr "Setlist-Bild"
 
 msgid "Close"
 msgstr "Schließen"
-
-msgid "Draft"
-msgstr "Entwurf"
 
 msgid "Invalid duration format. Use (HH:)MM"
 msgstr "Ungültiges Dauerformat. Verwenden Sie (HH:)MM"
@@ -991,18 +1005,6 @@ msgstr "Gesamtdauer"
 
 msgid "Invalid duration format"
 msgstr "Ungültiges Spieldauerformat"
-
-msgid "Failed to fetch setlists. Please reload the page."
-msgstr "Setlisten konnten nicht geladen werden. Bitte laden Sie die Seite neu."
-
-msgid "Not used in any setlist"
-msgstr "In keiner Setlist verwendet"
-
-msgid "This score has not appeared in any setlist"
-msgstr "Diese Partitur ist in keiner Setlist enthalten"
-
-msgid "Load more"
-msgstr "Mehr laden"
 
 #~ msgid "Select groups..."
 #~ msgstr "Gruppen auswählen..."

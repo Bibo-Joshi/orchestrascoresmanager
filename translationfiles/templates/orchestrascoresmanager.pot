@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-10-25 20:40+0000\n"
+"POT-Creation-Date: 2026-10-26 10:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -160,9 +160,11 @@ msgstr ""
 msgid "Invalid filter parameter. Must be \"all\", \"future\", or \"past\"."
 msgstr ""
 
+#, php-format
 msgid "The parameter \"%s\" does not match the cursor."
 msgstr ""
 
+#, php-format
 msgid "Invalid limit parameter. Must be between 1 and %d."
 msgstr ""
 
@@ -740,6 +742,21 @@ msgstr ""
 msgid "Scores in this book"
 msgstr ""
 
+msgid "Failed to fetch setlists. Please reload the page."
+msgstr ""
+
+msgid "Not used in any setlist"
+msgstr ""
+
+msgid "This score has not appeared in any setlist"
+msgstr ""
+
+msgid "Draft"
+msgstr ""
+
+msgid "Load more"
+msgstr ""
+
 msgid "Failed to load setlist"
 msgstr ""
 
@@ -825,9 +842,6 @@ msgid "Setlist image"
 msgstr ""
 
 msgid "Close"
-msgstr ""
-
-msgid "Draft"
 msgstr ""
 
 msgid "Invalid duration format. Use (HH:)MM"
@@ -1002,16 +1016,4 @@ msgid "Overall Duration"
 msgstr ""
 
 msgid "Invalid duration format"
-msgstr ""
-
-msgid "Failed to fetch setlists. Please reload the page."
-msgstr ""
-
-msgid "Not used in any setlist"
-msgstr ""
-
-msgid "This score has not appeared in any setlist"
-msgstr ""
-
-msgid "Load more"
 msgstr ""

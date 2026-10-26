@@ -222,6 +222,11 @@ OC.L10N.register(
     "Learn more" : "Mehr erfahren",
     "Submit comment" : "Kommentar senden",
     "Scores in this book" : "Partituren in diesem Notenbuch",
+    "Failed to fetch setlists. Please reload the page." : "Setlisten konnten nicht geladen werden. Bitte laden Sie die Seite neu.",
+    "Not used in any setlist" : "In keiner Setlist verwendet",
+    "This score has not appeared in any setlist" : "Diese Partitur ist in keiner Setlist enthalten",
+    "Draft" : "Entwurf",
+    "Load more" : "Mehr laden",
     "Failed to load setlist" : "Setlist konnte nicht geladen werden",
     "Break" : "Pause",
     "Failed to load available scores" : "Verfügbare Partituren konnten nicht geladen werden",
@@ -251,7 +256,6 @@ OC.L10N.register(
     "Review the image and press \"Share\" to send it to a messenger." : "Prüfe das Bild und drücke „Teilen“, um es an einen Messenger zu senden.",
     "Setlist image" : "Setlist-Bild",
     "Close" : "Schließen",
-    "Draft" : "Entwurf",
     "Invalid duration format. Use (HH:)MM" : "Ungültiges Dauerformat. Verwenden Sie (HH:)MM",
     "Failed to update setlist: " : "Setliste konnte nicht aktualisiert werden: ",
     "Start Date & Time" : "Startdatum & -zeit",
@@ -307,10 +311,6 @@ OC.L10N.register(
     "Playtime" : "Spielzeit",
     "Moderation & Breaks" : "Moderation & Pausen",
     "Overall Duration" : "Gesamtdauer",
-    "Invalid duration format" : "Ungültiges Spieldauerformat",
-    "Failed to fetch setlists. Please reload the page." : "Setlisten konnten nicht geladen werden. Bitte laden Sie die Seite neu.",
-    "Not used in any setlist" : "In keiner Setlist verwendet",
-    "This score has not appeared in any setlist" : "Diese Partitur ist in keiner Setlist enthalten",
-    "Load more" : "Mehr laden"
+    "Invalid duration format" : "Ungültiges Spieldauerformat"
 },
 "nplurals=2; plural=(n != 1);");
