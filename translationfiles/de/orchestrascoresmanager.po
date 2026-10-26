@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-10-26 10:06+0000\n"
+"POT-Creation-Date: 2026-10-26 13:36+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -739,19 +739,16 @@ msgstr "In keiner Setlist verwendet"
 msgid "This score has not appeared in any setlist"
 msgstr "Diese Partitur ist in keiner Setlist enthalten"
 
-msgid "This score is part of %n setlist"
-msgid_plural "This score is part of %n setlists"
-msgstr[0] "Diese Partitur ist Teil von %n Setlist"
-msgstr[1] "Diese Partitur ist Teil von %n Setlisten"
-
 msgid "Draft"
 msgstr "Entwurf"
 
 msgid "Load more"
 msgstr "Mehr laden"
 
-msgid "Failed to load more setlists"
-msgstr "Weitere Setlisten konnten nicht geladen werden"
+msgid "This score is part of %n setlist"
+msgid_plural "This score is part of %n setlists"
+msgstr[0] "Diese Partitur ist Teil von %n Setlist"
+msgstr[1] "Diese Partitur ist Teil von %n Setlisten"
 
 msgid "Failed to load setlist"
 msgstr "Setlist konnte nicht geladen werden"
@@ -971,6 +968,9 @@ msgstr "Index ist gültig"
 
 msgid "Enter the position index in the collection"
 msgstr "Geben Sie den Positionsindex in der Sammlung ein"
+
+msgid "Failed to load more setlists"
+msgstr "Weitere Setlisten konnten nicht geladen werden"
 
 msgid "Setlist"
 msgstr "Setlist"
