@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-10-25 15:16+0000\n"
+"POT-Creation-Date: 2026-10-25 20:40+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -395,7 +395,7 @@ msgstr "Aus Notenbuch entfernen"
 msgid "Included in folder collection via score book »{name}«"
 msgstr "In Ordnersammlung enthalten über Notenbuch »{name}«"
 
-msgid "Short Title"
+msgid "Short Titles"
 msgstr "Kurztitel"
 
 msgid "Composer"
@@ -649,6 +649,9 @@ msgstr "Partituren"
 
 msgid "Open"
 msgstr "Öffnen"
+
+msgid "Short Title"
+msgstr "Kurztitel"
 
 msgid "Editor"
 msgstr "Herausgeber"

@@ -207,20 +207,20 @@ function getIndexGroup(index: number): string {
  *
  * @param entries - Collection entries
  * @param isIndexed - Whether the collection is indexed
- * @return Flat list of items with title, shortTitle, and index
+ * @return Flat list of items with title, shortTitles, and index
  */
 function flattenEntries(
 	entries: CollectionEntry[],
 	isIndexed: boolean,
 ): {
 	title: string
-	shortTitle: string | null
+	shortTitles: string[]
 	index?: number
 	indexDisplay?: string
 }[] {
 	const result: {
 		title: string
-		shortTitle: string | null
+		shortTitles: string[]
 		index?: number
 		indexDisplay?: string
 	}[] = []
@@ -235,7 +235,7 @@ function flattenEntries(
 				}
 				result.push({
 					title: score.title,
-					shortTitle: score.titleShort ?? null,
+					shortTitles: score.titlesShort ?? [],
 					index: entry.index,
 					indexDisplay,
 				})
@@ -249,7 +249,7 @@ function flattenEntries(
 			}
 			result.push({
 				title: entry.score.title,
-				shortTitle: entry.score.titleShort ?? null,
+				shortTitles: entry.score.titlesShort ?? [],
 				index: (entry.score as ScoreIndexed).index,
 				indexDisplay,
 			})
@@ -421,13 +421,15 @@ function createIndexData(
 				indexDisplay: item.indexDisplay,
 			})
 
-			// Add short title if different from title
-			if (item.shortTitle && item.shortTitle !== item.title) {
-				indexItems.push({
-					text: item.shortTitle,
-					index: item.index,
-					indexDisplay: item.indexDisplay,
-				})
+			// Add all short titles that differ from the title
+			for (const shortTitle of item.shortTitles) {
+				if (shortTitle && shortTitle !== item.title) {
+					indexItems.push({
+						text: shortTitle,
+						index: item.index,
+						indexDisplay: item.indexDisplay,
+					})
+				}
 			}
 		}
 
@@ -454,11 +456,13 @@ function createIndexData(
 		const indexItems: { shortTitle: string, longTitle: string }[] = []
 
 		for (const item of flatItems) {
-			if (item.shortTitle && item.shortTitle !== item.title) {
-				indexItems.push({
-					shortTitle: item.shortTitle,
-					longTitle: item.title,
-				})
+			for (const shortTitle of item.shortTitles) {
+				if (shortTitle && shortTitle !== item.title) {
+					indexItems.push({
+						shortTitle,
+						longTitle: item.title,
+					})
+				}
 			}
 		}
 

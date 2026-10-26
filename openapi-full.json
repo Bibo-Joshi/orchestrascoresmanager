@@ -209,7 +209,7 @@
                 "required": [
                     "id",
                     "title",
-                    "titleShort",
+                    "titlesShort",
                     "composer",
                     "arranger",
                     "publisher",
@@ -232,9 +232,12 @@
                     "title": {
                         "type": "string"
                     },
-                    "titleShort": {
-                        "type": "string",
-                        "nullable": true
+                    "titlesShort": {
+                        "type": "array",
+                        "nullable": true,
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "composer": {
                         "type": "string",
@@ -491,7 +494,7 @@
                 "required": [
                     "id",
                     "title",
-                    "titleShort",
+                    "titlesShort",
                     "composer",
                     "arranger",
                     "publisher",
@@ -515,9 +518,12 @@
                     "title": {
                         "type": "string"
                     },
-                    "titleShort": {
-                        "type": "string",
-                        "nullable": true
+                    "titlesShort": {
+                        "type": "array",
+                        "nullable": true,
+                        "items": {
+                            "type": "string"
+                        }
                     },
                     "composer": {
                         "type": "string",
@@ -4261,11 +4267,14 @@
                                         "type": "string",
                                         "description": "The title of the score"
                                     },
-                                    "titleShort": {
-                                        "type": "string",
+                                    "titlesShort": {
+                                        "type": "array",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "The short title of the score"
+                                        "description": "The short titles of the score",
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     },
                                     "composer": {
                                         "type": "string",
@@ -4490,11 +4499,14 @@
                                         "default": null,
                                         "description": "The title of the score"
                                     },
-                                    "titleShort": {
-                                        "type": "string",
+                                    "titlesShort": {
+                                        "type": "array",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "The short title of the score"
+                                        "description": "The short titles of the score",
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     },
                                     "composer": {
                                         "type": "string",
