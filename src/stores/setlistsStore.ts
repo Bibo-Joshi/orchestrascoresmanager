@@ -49,78 +49,86 @@ export const useSetlistsStore = defineStore('setlists', () => {
 	}
 
 	/**
-	 * Get setlists filtered by criteria
+	 * Get a setlist's scheduled end time.
 	 *
-	 * @param isDraft - Filter by draft status
-	 * @param isPublished - Filter by published status
-	 * @param dateFilter - Filter by date: 'future', 'past', or 'unscheduled'
+	 * @param setlist - The setlist to inspect
+	 * @return The end time in milliseconds, or null when no start date is set
 	 */
-	function getFilteredSetlists(
-		isDraft?: boolean,
-		isPublished?: boolean,
-		dateFilter?: 'future' | 'past' | 'unscheduled',
-	): Setlist[] {
-		const now = new Date()
+	function getEndTime(setlist: Setlist): number | null {
+		if (!setlist.startDateTime) {
+			return null
+		}
 
-		return setlists.value.filter((setlist) => {
-			// Draft filter
-			if (isDraft !== undefined && setlist.isDraft !== isDraft) {
-				return false
+		return Date.parse(setlist.startDateTime) + (setlist.duration ?? 0) * 1000
+	}
+
+	/**
+	 * Check whether a setlist's scheduled duration has elapsed.
+	 *
+	 * @param setlist - The setlist to inspect
+	 * @param now - The current time in milliseconds
+	 * @return Whether the setlist has ended
+	 */
+	function isPast(setlist: Setlist, now: number): boolean {
+		const endTime = getEndTime(setlist)
+		return endTime !== null && endTime <= now
+	}
+
+	/**
+	 * Sort setlists by descending start date, with undated setlists first.
+	 *
+	 * @param items - The setlists to sort
+	 * @return A newly sorted setlist array
+	 */
+	function sortSetlists(items: Setlist[]): Setlist[] {
+		return [...items].sort((a, b) => {
+			if (!a.startDateTime && b.startDateTime) {
+				return -1
+			}
+			if (a.startDateTime && !b.startDateTime) {
+				return 1
 			}
 
-			// Published filter
-			if (isPublished !== undefined && setlist.isPublished !== isPublished) {
-				return false
-			}
-
-			// Date filter
-			if (dateFilter) {
-				if (dateFilter === 'unscheduled') {
-					if (setlist.startDateTime !== null) {
-						return false
-					}
-				} else if (dateFilter === 'future') {
-					if (setlist.startDateTime === null) {
-						return false
-					}
-					const setlistDate = new Date(setlist.startDateTime)
-					if (setlistDate <= now) {
-						return false
-					}
-				} else if (dateFilter === 'past') {
-					if (setlist.startDateTime === null) {
-						return false
-					}
-					const setlistDate = new Date(setlist.startDateTime)
-					if (setlistDate > now) {
-						return false
-					}
-				}
-			}
-
-			return true
+			const dateDifference = Date.parse(b.startDateTime ?? '') - Date.parse(a.startDateTime ?? '')
+			return dateDifference || b.id - a.id
 		})
 	}
 
 	/**
-	 * Get all drafts (both published and unpublished)
+	 * Get drafts that have not yet passed
 	 */
-	const drafts = computed(() => getFilteredSetlists(true, undefined, undefined))
+	const drafts = computed(() => {
+		const now = Date.now()
+		return sortSetlists(setlists.value.filter((setlist) => setlist.isDraft && !isPast(setlist, now)))
+	})
 
 	/**
-	 * Get future setlists (published only, including published drafts)
+	 * Get setlists that have not yet passed
 	 */
-	const futureSetlists = computed(() => getFilteredSetlists(undefined, true, 'future'))
+	const futureSetlists = computed(() => {
+		const now = Date.now()
+		return sortSetlists(setlists.value.filter((setlist) => {
+			const endTime = getEndTime(setlist)
+			return endTime !== null && endTime > now
+		}))
+	})
 
 	/**
-	 * Get unscheduled setlists (published only, including published drafts)
+	 * Get setlists without a start date
 	 */
-	const unscheduledSetlists = computed(() => getFilteredSetlists(undefined, true, 'unscheduled'))
+	const unscheduledSetlists = computed(() => {
+		const unscheduled = setlists.value.filter((setlist) => !setlist.startDateTime)
+		return sortSetlists(unscheduled)
+	})
 
 	/**
-	 * Get past setlists (published only, including published drafts)
+	 * Get setlists whose scheduled duration has elapsed
 	 */
-	const pastSetlists = computed(() => getFilteredSetlists(undefined, true, 'past'))
+	const pastSetlists = computed(() => {
+		const now = Date.now()
+		return sortSetlists(setlists.value.filter((setlist) => isPast(setlist, now)))
+	})
+	const hasPastDrafts = computed(() => pastSetlists.value.some((setlist) => setlist.isDraft))
 
 	/**
 	 * Get a specific setlist by ID
@@ -216,6 +224,7 @@ export const useSetlistsStore = defineStore('setlists', () => {
 		futureSetlists,
 		unscheduledSetlists,
 		pastSetlists,
+		hasPastDrafts,
 		initialize,
 		getSetlistById,
 		createSetlist,

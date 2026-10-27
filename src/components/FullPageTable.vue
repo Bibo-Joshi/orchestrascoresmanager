@@ -20,7 +20,7 @@ import type { ColDef, GridApi, GridOptions, GridReadyEvent } from 'ag-grid-commu
 import { isDarkTheme } from '@nextcloud/vue/functions/isDarkTheme'
 import { AllCommunityModule, LocaleModule } from 'ag-grid-community'
 import { AgGridVue } from 'ag-grid-vue3'
-import { computed, defineEmits, defineExpose, defineProps, ref, watch } from 'vue'
+import { computed, defineEmits, defineExpose, ref, watch } from 'vue'
 import { getAgGridLocaleText } from '../utils/agGridLocale.ts'
 import { nextcloudTheme } from '../utils/agGridTheme.ts'
 import { useBreakpoints } from '@/composables/useBreakpoints'

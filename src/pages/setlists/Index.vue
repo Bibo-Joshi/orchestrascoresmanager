@@ -26,6 +26,9 @@
 										:editable="editable" />
 								</ul>
 							</ContentStateWrapper>
+							<NcNoteCard v-if="setlistsStore.hasPastDrafts" type="info" class="drafts-hint">
+								{{ t('Drafts with a past date are included in the Past section below') }}
+							</NcNoteCard>
 						</template>
 					</ExpandableListItem>
 				</template>
@@ -119,6 +122,7 @@
 <script setup lang="ts">
 import { loadState } from '@nextcloud/initial-state'
 import { onMounted, reactive, ref } from 'vue'
+import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import AddSetlistButton from './components/AddSetlistButton.vue'
 import SetlistListItem from './components/SetlistListItem.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
@@ -150,5 +154,12 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .setlists-page {
 	padding: 16px;
+}
+
+.drafts-hint {
+	max-width: fit-content;
+	margin-left: 4px;
+	margin-top: 18px;
+	padding-right: 1rem;
 }
 </style>

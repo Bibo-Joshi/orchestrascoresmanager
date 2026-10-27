@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-10-26 13:36+0000\n"
+"POT-Creation-Date: 2026-10-27 15:32+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -887,6 +887,9 @@ msgstr "Keine Entwürfe"
 
 msgid "Create your first setlist draft"
 msgstr "Erstellen Sie Ihre erste Setlist"
+
+msgid "Drafts with a past date are included in the Past section below"
+msgstr "Entwürfe mit einem vergangenen Datum sind im Abschnitt „Vergangen“ unten enthalten"
 
 msgid "Future"
 msgstr "Zukünftig"

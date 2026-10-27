@@ -273,6 +273,7 @@ OC.L10N.register(
     "Drafts" : "Entwürfe",
     "No drafts" : "Keine Entwürfe",
     "Create your first setlist draft" : "Erstellen Sie Ihre erste Setlist",
+    "Drafts with a past date are included in the Past section below" : "Entwürfe mit einem vergangenen Datum sind im Abschnitt „Vergangen“ unten enthalten",
     "Future" : "Zukünftig",
     "No future setlists" : "Keine zukünftigen Setlisten",
     "Schedule your next performances" : "Planen Sie Ihre nächsten Auftritte",
