@@ -26,6 +26,9 @@
 										:editable="editable" />
 								</ul>
 							</ContentStateWrapper>
+							<p v-if="setlistsStore.hasPastDrafts" class="drafts-hint">
+								{{ t('Drafts with a past date are included in the Past section below') }}
+							</p>
 						</template>
 					</ExpandableListItem>
 				</template>
@@ -150,5 +153,9 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .setlists-page {
 	padding: 16px;
+}
+
+.drafts-hint {
+	margin: 8px 0 0;
 }
 </style>

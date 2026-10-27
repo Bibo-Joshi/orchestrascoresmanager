@@ -885,6 +885,9 @@ msgstr "Entwürfe"
 msgid "No drafts"
 msgstr "Keine Entwürfe"
 
+msgid "Drafts with a past date are included in the Past section below"
+msgstr "Entwürfe mit einem vergangenen Datum sind im Abschnitt „Vergangen“ unten enthalten"
+
 msgid "Create your first setlist draft"
 msgstr "Erstellen Sie Ihre erste Setlist"
 
