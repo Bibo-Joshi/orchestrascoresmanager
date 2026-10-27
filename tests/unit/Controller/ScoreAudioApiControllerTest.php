@@ -49,7 +49,7 @@ final class ScoreAudioApiControllerTest extends TestCase {
 		$response = $this->controller->getScoreAudioExamples(5);
 
 		$this->assertInstanceOf(DataResponse::class, $response);
-		$this->assertSame([$audio], $response->getData());
+		$this->assertSame(['audioExamples' => [$audio]], $response->getData());
 		$this->assertSame(Http::STATUS_OK, $response->getStatus());
 	}
 
@@ -78,10 +78,10 @@ final class ScoreAudioApiControllerTest extends TestCase {
 			->with(5, 'youtube', 'dQw4w9WgXcQ', null, 'Nice')
 			->willReturn($audio);
 
-		$response = $this->controller->postScoreAudioExample(5, 'youtube', 'dQw4w9WgXcQ', null, 'Nice');
+		$response = $this->controller->postScoreAudioExample(5, ['provider' => 'youtube', 'providerId' => 'dQw4w9WgXcQ'], 'Nice');
 
 		$this->assertInstanceOf(DataResponse::class, $response);
-		$this->assertSame($audio, $response->getData());
+		$this->assertSame(['audioExample' => $audio], $response->getData());
 		$this->assertSame(Http::STATUS_CREATED, $response->getStatus());
 	}
 
@@ -93,7 +93,7 @@ final class ScoreAudioApiControllerTest extends TestCase {
 			->with(5, null, null, 'https://example.org/a', null)
 			->willReturn($audio);
 
-		$response = $this->controller->postScoreAudioExample(5, link: 'https://example.org/a');
+		$response = $this->controller->postScoreAudioExample(5, ['link' => 'https://example.org/a']);
 
 		$this->assertSame(Http::STATUS_CREATED, $response->getStatus());
 	}
@@ -107,7 +107,29 @@ final class ScoreAudioApiControllerTest extends TestCase {
 		$this->expectException($expectedOCSException);
 		$this->expectExceptionMessage($message);
 
-		$this->controller->postScoreAudioExample(5, 'soundcloud', 'abc');
+		$this->controller->postScoreAudioExample(5, ['provider' => 'soundcloud', 'providerId' => 'abc']);
+	}
+
+	public function testPostScoreAudioExampleForwardsMixedSourceToService(): void {
+		$this->scoreAudioService->expects($this->once())
+			->method('createAudioExample')
+			->with(5, 'youtube', null, 'https://example.org/a', null)
+			->willThrowException(new \InvalidArgumentException('An audio example must not contain both a link and a provider'));
+
+		$this->expectException(OCSBadRequestException::class);
+
+		$this->controller->postScoreAudioExample(5, ['provider' => 'youtube', 'link' => 'https://example.org/a']);
+	}
+
+	#[TestWith([['link' => 5]])]
+	#[TestWith([['provider' => 'youtube', 'providerId' => ['a']]])]
+	#[TestWith([['provider' => ['youtube'], 'providerId' => 'abc']])]
+	public function testPostScoreAudioExampleRejectsNonStringValues(array $audioExample): void {
+		$this->scoreAudioService->expects($this->never())->method('createAudioExample');
+
+		$this->expectException(OCSBadRequestException::class);
+
+		$this->controller->postScoreAudioExample(5, $audioExample);
 	}
 
 	public function testDeleteAudioExampleReturnsEmptyResponse(): void {

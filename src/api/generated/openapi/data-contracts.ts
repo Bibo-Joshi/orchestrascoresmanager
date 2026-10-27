@@ -686,26 +686,22 @@ export interface ScoreApiGetScoreSetlistsData {
 export interface ScoreAudioApiGetScoreAudioExamplesData {
   ocs: {
     meta: OCSMeta;
-    data: ScoreAudio[];
+    data: {
+      audioExamples: ScoreAudio[];
+    };
   };
 }
 
 export interface ScoreAudioApiPostScoreAudioExamplePayload {
-  /**
-   * The provider of the audio example, e.g. 'youtube'. Must be null for generic examples
-   * @default null
-   */
-  provider?: string | null;
-  /**
-   * The provider-specific identifier. Must be null for generic examples
-   * @default null
-   */
-  providerId?: string | null;
-  /**
-   * The external URL for generic examples. Must be null for provider-specific examples
-   * @default null
-   */
-  link?: string | null;
+  /** The source of the audio example */
+  audioExample:
+    | {
+        link: string;
+      }
+    | {
+        provider: string;
+        providerId: string;
+      };
   /**
    * Optional description of the audio example
    * @default null
@@ -716,7 +712,9 @@ export interface ScoreAudioApiPostScoreAudioExamplePayload {
 export interface ScoreAudioApiPostScoreAudioExampleData {
   ocs: {
     meta: OCSMeta;
-    data: ScoreAudio;
+    data: {
+      audioExample: ScoreAudio;
+    };
   };
 }
 

@@ -890,7 +890,7 @@ export class Ocs<
       ...params,
     });
   /**
-   * @description the list of audio examples
+   * @description the audio examples of the score
    *
    * @tags score_audio_api
    * @name ScoreAudioApiGetScoreAudioExamples
@@ -918,7 +918,7 @@ export class Ocs<
       ...params,
     });
   /**
-   * @description Either `link` (generic example) or `provider` together with `providerId` (provider-specific example) must be given. the created audio example
+   * @description The source of the audio example is either a generic `link` or a known `provider` together with its `providerId`. the created audio example
    *
    * @tags score_audio_api
    * @name ScoreAudioApiPostScoreAudioExample
@@ -928,7 +928,7 @@ export class Ocs<
    */
   scoreAudioApiPostScoreAudioExample = (
     id: number,
-    data?: ScoreAudioApiPostScoreAudioExamplePayload,
+    data: ScoreAudioApiPostScoreAudioExamplePayload,
     params: RequestParams = {},
   ) =>
     this.request<

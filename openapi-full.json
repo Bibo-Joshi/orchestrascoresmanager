@@ -5646,7 +5646,7 @@
             "get": {
                 "operationId": "score_audio_api-get-score-audio-examples",
                 "summary": "Get all audio examples for a specific score",
-                "description": "the list of audio examples",
+                "description": "the audio examples of the score",
                 "tags": [
                     "score_audio_api"
                 ],
@@ -5702,9 +5702,17 @@
                                                     "$ref": "#/components/schemas/OCSMeta"
                                                 },
                                                 "data": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "$ref": "#/components/schemas/ScoreAudio"
+                                                    "type": "object",
+                                                    "required": [
+                                                        "audioExamples"
+                                                    ],
+                                                    "properties": {
+                                                        "audioExamples": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/ScoreAudio"
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -5803,7 +5811,7 @@
             "post": {
                 "operationId": "score_audio_api-post-score-audio-example",
                 "summary": "Add an audio example to a specific score",
-                "description": "Either `link` (generic example) or `provider` together with `providerId` (provider-specific example) must be given.\nthe created audio example",
+                "description": "The source of the audio example is either a generic `link` or a known `provider` together with its `providerId`.\nthe created audio example",
                 "tags": [
                     "score_audio_api"
                 ],
@@ -5816,29 +5824,45 @@
                     }
                 ],
                 "requestBody": {
-                    "required": false,
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "audioExample"
+                                ],
                                 "properties": {
-                                    "provider": {
-                                        "type": "string",
-                                        "nullable": true,
-                                        "default": null,
-                                        "description": "The provider of the audio example, e.g. 'youtube'. Must be null for generic examples"
-                                    },
-                                    "providerId": {
-                                        "type": "string",
-                                        "nullable": true,
-                                        "default": null,
-                                        "description": "The provider-specific identifier. Must be null for generic examples"
-                                    },
-                                    "link": {
-                                        "type": "string",
-                                        "nullable": true,
-                                        "default": null,
-                                        "description": "The external URL for generic examples. Must be null for provider-specific examples"
+                                    "audioExample": {
+                                        "description": "The source of the audio example",
+                                        "anyOf": [
+                                            {
+                                                "type": "object",
+                                                "required": [
+                                                    "link"
+                                                ],
+                                                "properties": {
+                                                    "link": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "object",
+                                                "required": [
+                                                    "provider",
+                                                    "providerId"
+                                                ],
+                                                "properties": {
+                                                    "provider": {
+                                                        "type": "string"
+                                                    },
+                                                    "providerId": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        ]
                                     },
                                     "comment": {
                                         "type": "string",
@@ -5895,7 +5919,15 @@
                                                     "$ref": "#/components/schemas/OCSMeta"
                                                 },
                                                 "data": {
-                                                    "$ref": "#/components/schemas/ScoreAudio"
+                                                    "type": "object",
+                                                    "required": [
+                                                        "audioExample"
+                                                    ],
+                                                    "properties": {
+                                                        "audioExample": {
+                                                            "$ref": "#/components/schemas/ScoreAudio"
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }

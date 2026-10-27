@@ -37,7 +37,7 @@ class ScoreAudioApiController extends OCSController {
 	 *
 	 * @param int $id The ID of the score
 	 *
-	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerScoreAudio>, array{}> the list of audio examples
+	 * @return DataResponse<Http::STATUS_OK, array{audioExamples: list<OrchestraScoresManagerScoreAudio>}, array{}> the audio examples of the score
 	 *
 	 * 200: Successful response with the list of audio examples
 	 * 400: Bad request
@@ -49,21 +49,19 @@ class ScoreAudioApiController extends OCSController {
 	#[ApiRoute(verb: 'GET', url: '/scores/{id}/audio-examples')]
 	public function getScoreAudioExamples(int $id): DataResponse {
 		$audios = $this->callService(fn () => $this->scoreAudioService->getAudioExamplesForScore($id));
-		return new DataResponse($audios);
+		return new DataResponse(['audioExamples' => $audios]);
 	}
 
 	/**
 	 * Add an audio example to a specific score
 	 *
-	 * Either `link` (generic example) or `provider` together with `providerId` (provider-specific example) must be given.
+	 * The source of the audio example is either a generic `link` or a known `provider` together with its `providerId`.
 	 *
 	 * @param int $id The ID of the score
-	 * @param string|null $provider The provider of the audio example, e.g. 'youtube'. Must be null for generic examples
-	 * @param string|null $providerId The provider-specific identifier. Must be null for generic examples
-	 * @param string|null $link The external URL for generic examples. Must be null for provider-specific examples
+	 * @param array{link: string}|array{provider: string, providerId: string} $audioExample The source of the audio example
 	 * @param string|null $comment Optional description of the audio example
 	 *
-	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerScoreAudio, array{}> the created audio example
+	 * @return DataResponse<Http::STATUS_CREATED, array{audioExample: OrchestraScoresManagerScoreAudio}, array{}> the created audio example
 	 *
 	 * 201: Successful creation of the audio example
 	 * 400: Bad request
@@ -75,15 +73,24 @@ class ScoreAudioApiController extends OCSController {
 	#[ApiRoute(verb: 'POST', url: '/scores/{id}/audio-examples')]
 	public function postScoreAudioExample(
 		int $id,
-		?string $provider = null,
-		?string $providerId = null,
-		?string $link = null,
+		array $audioExample,
 		?string $comment = null,
 	): DataResponse {
+		$link = $audioExample['link'] ?? null;
+		$provider = $audioExample['provider'] ?? null;
+		$providerId = $audioExample['providerId'] ?? null;
+		if (
+			(isset($audioExample['link']) && !is_string($link))
+			|| (isset($audioExample['provider']) && !is_string($provider))
+			|| (isset($audioExample['providerId']) && !is_string($providerId))
+		) {
+			throw new OCSBadRequestException('The audio example source must only contain string values');
+		}
+
 		$created = $this->callService(
 			fn () => $this->scoreAudioService->createAudioExample($id, $provider, $providerId, $link, $comment)
 		);
-		return new DataResponse($created, Http::STATUS_CREATED);
+		return new DataResponse(['audioExample' => $created], Http::STATUS_CREATED);
 	}
 
 	/**

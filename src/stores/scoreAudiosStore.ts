@@ -32,7 +32,7 @@ export const useScoreAudiosStore = defineStore('scoreAudios', () => {
 		try {
 			const response = await apiClients.default.scoreAudioApiGetScoreAudioExamples(scoreId)
 			if (token === requestToken) {
-				audios.value = response.data.ocs.data
+				audios.value = response.data.ocs.data.audioExamples
 			}
 		} catch (error) {
 			if (token === requestToken) {
@@ -56,7 +56,7 @@ export const useScoreAudiosStore = defineStore('scoreAudios', () => {
 	 */
 	async function createAudio(scoreId: number, payload: ScoreAudioApiPostScoreAudioExamplePayload): Promise<ScoreAudio> {
 		const response = await apiClients.default.scoreAudioApiPostScoreAudioExample(scoreId, payload)
-		const created = response.data.ocs.data
+		const created = response.data.ocs.data.audioExample
 		if (created.scoreId === currentScoreId.value) {
 			audios.value.push(created)
 		}

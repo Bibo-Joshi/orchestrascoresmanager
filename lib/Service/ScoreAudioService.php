@@ -46,8 +46,9 @@ class ScoreAudioService {
 	/**
 	 * Create a new audio example for a score if authorized.
 	 *
-	 * Mirrors the database constraint that an audio example has exactly one type of source: either a generic
-	 * link (without provider and provider ID) or a supported provider with provider ID (without link).
+	 * Enforces that an audio example has exactly one type of source: either a generic link (without provider
+	 * and provider ID) or a supported provider with provider ID (without link). The database does not
+	 * enforce this invariant, so this validation is the only guard.
 	 *
 	 * @param int $scoreId The ID of the score
 	 * @param string|null $provider The provider identifier, e.g. 'youtube'

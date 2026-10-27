@@ -88,9 +88,12 @@ async function submitAudio() {
 		async () => {
 			await scoreAudiosStore.createAudio(
 				props.scoreId,
-				source !== null
-					? { provider: source.provider, providerId: source.providerId, comment }
-					: { link: newUrl.value.trim(), comment },
+				{
+					audioExample: source !== null
+						? { provider: source.provider, providerId: source.providerId }
+						: { link: newUrl.value.trim() },
+					comment,
+				},
 			)
 			newUrl.value = ''
 			newComment.value = ''
