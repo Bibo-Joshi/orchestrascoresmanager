@@ -68,6 +68,7 @@
 <script setup lang="ts">
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { computed, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePickerNative from '@nextcloud/vue/components/NcDateTimePickerNative'
@@ -88,6 +89,7 @@ interface Props {
 defineProps<Props>()
 
 const setlistsStore = useSetlistsStore()
+const router = useRouter()
 const { buttonSize, buttonText } = useBreakpoints()
 
 const showCreateDialog = ref(false)
@@ -138,7 +140,7 @@ async function handleSubmit() {
 
 	await tryShowError(
 		async () => {
-			await setlistsStore.createSetlist(
+			const created = await setlistsStore.createSetlist(
 				title,
 				form.description || null,
 				startDateTimeStr,
@@ -148,6 +150,7 @@ async function handleSubmit() {
 			showSuccess(t('Setlist created'))
 			showCreateDialog.value = false
 			resetForm()
+			await router.push({ name: 'setlist', params: { id: created.id } })
 		},
 		t('Creating setlist failed: '),
 	)
