@@ -35,6 +35,12 @@ export { default as PencilCircleIcon } from 'vue-material-design-icons/PencilCir
 // Comment icons
 export { default as CommentIcon } from 'vue-material-design-icons/CommentTextOutline.vue'
 
+// Audio example icons
+export { default as AudioIcon } from 'vue-material-design-icons/Headphones.vue'
+export { default as YoutubeIcon } from 'vue-material-design-icons/Youtube.vue'
+export { default as SpotifyIcon } from 'vue-material-design-icons/Spotify.vue'
+export { default as AppleMusicIcon } from 'vue-material-design-icons/Apple.vue'
+
 // Navigation/Tree icons
 export { default as ExpandedIcon } from 'vue-material-design-icons/ChevronDown.vue'
 export { default as CollapsedIcon } from 'vue-material-design-icons/ChevronRight.vue'

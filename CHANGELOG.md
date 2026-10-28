@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Share setlists as image and text to messengers (#127)
+- Link external audio examples (generic URLs or YouTube, Spotify, Apple Music, Deezer and Amazon Music) to scores via a new "Audio Examples" tab in the score sidebar (#124)
 - Multiple short titles (aliases) per score; all aliases are listed in the folder collection index
 - Setlist history tab in the score sidebar and `GET scores/{id}/setlists` API endpoint with cursor-based pagination (#125)
 

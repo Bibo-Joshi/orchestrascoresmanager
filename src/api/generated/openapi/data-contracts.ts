@@ -95,6 +95,17 @@ export interface Score {
   viaScoreBook?: true;
 }
 
+export interface ScoreAudio {
+  /** @format int64 */
+  id: number;
+  /** @format int64 */
+  scoreId: number;
+  provider: string | null;
+  providerId: string | null;
+  link: string | null;
+  comment: string | null;
+}
+
 export interface ScoreBook {
   /** @format int64 */
   id: number;
@@ -669,6 +680,46 @@ export interface ScoreApiGetScoreSetlistsData {
   ocs: {
     meta: OCSMeta;
     data: SetlistPage;
+  };
+}
+
+export interface ScoreAudioApiGetScoreAudioExamplesData {
+  ocs: {
+    meta: OCSMeta;
+    data: {
+      audioExamples: ScoreAudio[];
+    };
+  };
+}
+
+export interface ScoreAudioApiPostScoreAudioExamplePayload {
+  /** The source of the audio example */
+  audioExample:
+    | {
+        link: string;
+      }
+    | {
+        provider: string;
+        providerId: string;
+      };
+  /**
+   * Optional description of the audio example
+   * @default null
+   */
+  comment?: string | null;
+}
+
+export interface ScoreAudioApiPostScoreAudioExampleData {
+  ocs: {
+    meta: OCSMeta;
+    data: ScoreAudio;
+  };
+}
+
+export interface ScoreAudioApiDeleteAudioExampleData {
+  ocs: {
+    meta: OCSMeta;
+    data: object;
   };
 }
 
