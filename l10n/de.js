@@ -221,7 +221,6 @@ OC.L10N.register(
     "Delete Audio Example" : "Hörbeispiel löschen",
     "Are you sure you want to delete this audio example? This action cannot be undone." : "Möchten Sie dieses Hörbeispiel wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
     "Failed to delete audio example: " : "Hörbeispiel konnte nicht gelöscht werden: ",
-    "Delete audio example" : "Hörbeispiel löschen",
     "Please enter a valid http(s) URL" : "Bitte geben Sie eine gültige http(s)-URL ein",
     "Detected provider: {provider}" : "Erkannter Anbieter: {provider}",
     "Failed to add audio example: " : "Hörbeispiel konnte nicht hinzugefügt werden: ",
