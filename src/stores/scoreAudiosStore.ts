@@ -56,7 +56,7 @@ export const useScoreAudiosStore = defineStore('scoreAudios', () => {
 	 */
 	async function createAudio(scoreId: number, payload: ScoreAudioApiPostScoreAudioExamplePayload): Promise<ScoreAudio> {
 		const response = await apiClients.default.scoreAudioApiPostScoreAudioExample(scoreId, payload)
-		const created = response.data.ocs.data.audioExample
+		const created = response.data.ocs.data
 		if (created.scoreId === currentScoreId.value) {
 			audios.value.push(created)
 		}

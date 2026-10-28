@@ -712,9 +712,7 @@ export interface ScoreAudioApiPostScoreAudioExamplePayload {
 export interface ScoreAudioApiPostScoreAudioExampleData {
   ocs: {
     meta: OCSMeta;
-    data: {
-      audioExample: ScoreAudio;
-    };
+    data: ScoreAudio;
   };
 }
 

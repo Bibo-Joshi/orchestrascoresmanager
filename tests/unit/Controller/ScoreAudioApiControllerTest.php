@@ -81,7 +81,7 @@ final class ScoreAudioApiControllerTest extends TestCase {
 		$response = $this->controller->postScoreAudioExample(5, ['provider' => 'youtube', 'providerId' => 'dQw4w9WgXcQ'], 'Nice');
 
 		$this->assertInstanceOf(DataResponse::class, $response);
-		$this->assertSame(['audioExample' => $audio], $response->getData());
+		$this->assertSame($audio, $response->getData());
 		$this->assertSame(Http::STATUS_CREATED, $response->getStatus());
 	}
 

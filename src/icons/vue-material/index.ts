@@ -37,8 +37,6 @@ export { default as CommentIcon } from 'vue-material-design-icons/CommentTextOut
 
 // Audio example icons
 export { default as AudioIcon } from 'vue-material-design-icons/Headphones.vue'
-export { default as AudioLinkIcon } from 'vue-material-design-icons/LinkVariant.vue'
-export { default as AudioProviderIcon } from 'vue-material-design-icons/MusicCircle.vue'
 export { default as YoutubeIcon } from 'vue-material-design-icons/Youtube.vue'
 export { default as SpotifyIcon } from 'vue-material-design-icons/Spotify.vue'
 export { default as AppleMusicIcon } from 'vue-material-design-icons/Apple.vue'

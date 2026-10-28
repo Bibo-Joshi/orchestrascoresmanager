@@ -8,7 +8,8 @@
 		<NcAppSidebarTab
 			v-if="editable"
 			id="comments"
-			:name="t('Comments')">
+			:name="t('Comments')"
+			:order="-2">
 			<template #icon>
 				<CommentIcon :size="20" />
 			</template>
@@ -24,7 +25,8 @@
 		</NcAppSidebarTab>
 		<NcAppSidebarTab
 			id="audioexamples"
-			:name="t('Audio Examples')">
+			:name="t('Audio Examples')"
+			:order="-1">
 			<template #icon>
 				<AudioIcon :size="20" />
 			</template>

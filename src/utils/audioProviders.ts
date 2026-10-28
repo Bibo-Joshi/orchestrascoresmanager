@@ -1,7 +1,7 @@
 import type { Component } from 'vue'
 import type { ScoreAudio } from '@/api/generated/openapi/data-contracts'
 
-import { AppleMusicIcon, AudioLinkIcon, AudioProviderIcon, SpotifyIcon, YoutubeIcon } from '@/icons/vue-material'
+import { AppleMusicIcon, AudioIcon, SpotifyIcon, YoutubeIcon } from '@/icons/vue-material'
 
 export type AudioProviderId = 'youtube' | 'spotify' | 'apple-music' | 'deezer' | 'amazon-music'
 
@@ -107,9 +107,14 @@ const PROVIDERS: AudioProviderConfig[] = [
 	{
 		id: 'deezer',
 		name: 'Deezer',
-		icon: AudioProviderIcon,
-		buildUrl: (id) => `https://www.deezer.com/${id}`,
+		icon: AudioIcon,
+		buildUrl: (id) => id.startsWith('s/') ? `https://link.deezer.com/${id}` : `https://www.deezer.com/${id}`,
 		extractId: (url) => {
+			if (url.hostname === 'link.deezer.com') {
+				// Short share links cannot be resolved to a content ID without network access, so they are kept as-is
+				const [type, id] = pathSegments(url)
+				return type === 's' && /^[A-Za-z0-9]+$/.test(id ?? '') ? `s/${id}` : null
+			}
 			if (url.hostname !== 'www.deezer.com' && url.hostname !== 'deezer.com') {
 				return null
 			}
@@ -123,7 +128,7 @@ const PROVIDERS: AudioProviderConfig[] = [
 	{
 		id: 'amazon-music',
 		name: 'Amazon Music',
-		icon: AudioProviderIcon,
+		icon: AudioIcon,
 		buildUrl: (id) => `https://music.amazon.com/${id}`,
 		extractId: (url) => {
 			if (!/^music\.amazon\.[a-z]{2,3}(\.[a-z]{2})?$/.test(url.hostname)) {
@@ -210,7 +215,7 @@ export function getAudioUrl(audio: ScoreAudio): string | null {
  * @param audio - The audio example
  */
 export function getAudioIcon(audio: ScoreAudio): Component {
-	return getAudioProvider(audio.provider)?.icon ?? AudioLinkIcon
+	return getAudioProvider(audio.provider)?.icon ?? AudioIcon
 }
 
 /**

@@ -5919,15 +5919,7 @@
                                                     "$ref": "#/components/schemas/OCSMeta"
                                                 },
                                                 "data": {
-                                                    "type": "object",
-                                                    "required": [
-                                                        "audioExample"
-                                                    ],
-                                                    "properties": {
-                                                        "audioExample": {
-                                                            "$ref": "#/components/schemas/ScoreAudio"
-                                                        }
-                                                    }
+                                                    "$ref": "#/components/schemas/ScoreAudio"
                                                 }
                                             }
                                         }

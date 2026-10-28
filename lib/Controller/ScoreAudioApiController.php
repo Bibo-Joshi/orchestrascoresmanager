@@ -61,7 +61,7 @@ class ScoreAudioApiController extends OCSController {
 	 * @param array{link: string}|array{provider: string, providerId: string} $audioExample The source of the audio example
 	 * @param string|null $comment Optional description of the audio example
 	 *
-	 * @return DataResponse<Http::STATUS_CREATED, array{audioExample: OrchestraScoresManagerScoreAudio}, array{}> the created audio example
+	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerScoreAudio, array{}> the created audio example
 	 *
 	 * 201: Successful creation of the audio example
 	 * 400: Bad request
@@ -90,7 +90,7 @@ class ScoreAudioApiController extends OCSController {
 		$created = $this->callService(
 			fn () => $this->scoreAudioService->createAudioExample($id, $provider, $providerId, $link, $comment)
 		);
-		return new DataResponse(['audioExample' => $created], Http::STATUS_CREATED);
+		return new DataResponse($created, Http::STATUS_CREATED);
 	}
 
 	/**

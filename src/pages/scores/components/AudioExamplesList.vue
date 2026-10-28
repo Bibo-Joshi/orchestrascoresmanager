@@ -21,23 +21,27 @@
 				<NcTextField
 					v-model="newComment"
 					:label="t('Comment (optional)')" />
-				<NcButton
-					:disabled="submitting || !isUrlValid"
-					variant="primary"
-					type="submit">
-					<template #icon>
-						<NcLoadingIcon v-if="submitting" :size="20" />
-						<AddIcon v-else :size="20" />
-					</template>
-					{{ t('Add audio example') }}
-				</NcButton>
+				<div class="new-audio-actions">
+					<NcButton
+						:disabled="submitting || !isUrlValid"
+						variant="primary"
+						:aria-label="t('Add audio example')"
+						type="submit">
+						<template #icon>
+							<NcLoadingIcon v-if="submitting" :size="20" />
+							<ConfirmIcon v-else :size="20" />
+						</template>
+					</NcButton>
+				</div>
 			</form>
 		</template>
 		<template #default>
-			<AudioExampleItem
-				v-for="audio in scoreAudiosStore.audios"
-				:key="audio.id"
-				:audio="audio" />
+			<ul>
+				<AudioExampleItem
+					v-for="audio in scoreAudiosStore.audios"
+					:key="audio.id"
+					:audio="audio" />
+			</ul>
 		</template>
 	</ContentStateWrapper>
 </template>
@@ -49,7 +53,7 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import AudioExampleItem from './AudioExampleItem.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
-import { AddIcon, AudioIcon } from '@/icons/vue-material'
+import { AudioIcon, ConfirmIcon } from '@/icons/vue-material'
 import { useScoreAudiosStore } from '@/stores/scoreAudiosStore'
 import { getAudioProvider, isValidHttpUrl, parseAudioUrl } from '@/utils/audioProviders'
 import { tryShowError } from '@/utils/errorHandling'
@@ -115,5 +119,10 @@ watch(() => props.scoreId, (scoreId) => {
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
+}
+
+.new-audio-actions {
+	display: flex;
+	justify-content: flex-end;
 }
 </style>
