@@ -156,13 +156,23 @@ jobs:
 
       - name: PHPUnit
         working-directory: apps/${{ env.APP_NAME }}
-        run: composer run test:unit:coverage
+        run: |
+          composer run test:unit:coverage
+          echo "Coverage report generated at clover.xml"
+          cat clover.xml
+          echo "Coverage report generated at apps/${{ env.APP_NAME }}/clover.xml"
+          cat apps/${{ env.APP_NAME }}/clover.xml
+
+      - name: upload coverage-html dir as artifact
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          path: apps/${{ env.APP_NAME }}/coverage-html
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: apps/${{ env.APP_NAME }}/build/coverage/clover.xml
+          files: apps/${{ env.APP_NAME }}/clover.xml
           flags: php-backend
           fail_ci_if_error: true
 
