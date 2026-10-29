@@ -104,7 +104,11 @@ jobs:
           extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite, mysql, pdo_mysql, pgsql, pdo_pgsql
           coverage: pcov
           ini-file: development
-          ini-values: disable_functions=
+          ini-values: >
+              disable_functions=,
+              pcov.enabled=1,
+              pcov.directory=${{ github.workspace }}/apps/${{ env.APP_NAME }},
+              pcov.exclude=~(vendor|vendor-bin|tests)~
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
