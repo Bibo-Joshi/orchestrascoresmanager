@@ -159,7 +159,7 @@ jobs:
         run: composer run test:unit:coverage
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5.5.4
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/${{ env.APP_NAME }}/build/coverage/clover.xml
