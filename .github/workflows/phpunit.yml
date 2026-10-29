@@ -102,9 +102,13 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite, mysql, pdo_mysql, pgsql, pdo_pgsql
-          coverage: none
+          coverage: pcov
           ini-file: development
-          ini-values: disable_functions=
+          ini-values: >
+              disable_functions=,
+              pcov.enabled=1,
+              pcov.directory=${{ github.workspace }}/apps/${{ env.APP_NAME }},
+              pcov.exclude=~(vendor|vendor-bin|tests)~
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -156,7 +160,15 @@ jobs:
 
       - name: PHPUnit
         working-directory: apps/${{ env.APP_NAME }}
-        run: composer run test:unit
+        run: composer run test:unit:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/${{ env.APP_NAME }}/clover.xml
+          flags: php-backend
+          fail_ci_if_error: true
 
       - name: Print logs
         if: always()

@@ -21,3 +21,4 @@ translationtool.phar
 /import_script/*.egg-info/
 /import_script/.env
 
+/build/
