@@ -102,7 +102,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-versions }}
           extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite, mysql, pdo_mysql, pgsql, pdo_pgsql
-          coverage: none
+          coverage: ${{ (matrix.php-versions == '8.4' && matrix.server-versions == 'stable34' && matrix.database == 'sqlite') && 'pcov' || 'none' }}
           ini-file: development
           ini-values: disable_functions=
         env:
@@ -155,8 +155,23 @@ jobs:
           ./occ app:enable --force ${{ env.APP_NAME }}
 
       - name: PHPUnit
+        if: ${{ !(matrix.php-versions == '8.4' && matrix.server-versions == 'stable34' && matrix.database == 'sqlite') }}
         working-directory: apps/${{ env.APP_NAME }}
         run: composer run test:unit
+
+      - name: PHPUnit with coverage
+        if: ${{ matrix.php-versions == '8.4' && matrix.server-versions == 'stable34' && matrix.database == 'sqlite' }}
+        working-directory: apps/${{ env.APP_NAME }}
+        run: composer run test:unit:coverage
+
+      - name: Upload coverage to Codecov
+        if: ${{ matrix.php-versions == '8.4' && matrix.server-versions == 'stable34' && matrix.database == 'sqlite' }}
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5.5.4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/${{ env.APP_NAME }}/build/coverage/clover.xml
+          flags: php-backend
+          fail_ci_if_error: true
 
       - name: Print logs
         if: always()
