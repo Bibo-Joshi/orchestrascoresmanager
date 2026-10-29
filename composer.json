@@ -31,7 +31,7 @@
 		"cs:fix": "php-cs-fixer fix",
 		"psalm": "psalm --threads=1 --no-cache",
 		"test:unit": "vendor-bin/phpunit/vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml --colors=always --fail-on-warning --fail-on-risky",
-		"test:unit:coverage": "vendor-bin/phpunit/vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml --colors=always --fail-on-warning --fail-on-risky --coverage-clover clover.xml --coverage-html coverage-html",
+		"test:unit:coverage": "vendor-bin/phpunit/vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml --colors=always --fail-on-warning --fail-on-risky --coverage-clover clover.xml",
 		"openapi": "generate-spec --verbose",
 		"rector": "rector && composer cs:fix"
 	},
