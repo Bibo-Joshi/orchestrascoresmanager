@@ -160,8 +160,6 @@ jobs:
           composer run test:unit:coverage
           echo "Coverage report generated at clover.xml"
           cat clover.xml
-          echo "Coverage report generated at apps/${{ env.APP_NAME }}/clover.xml"
-          cat apps/${{ env.APP_NAME }}/clover.xml
 
       - name: upload coverage-html dir as artifact
         uses: actions/upload-artifact@v7.0.2
