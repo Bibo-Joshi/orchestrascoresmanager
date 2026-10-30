@@ -5,14 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0] - 2026-10-30
 
 ### Added
 
-- Share setlists as image and text to messengers (#127)
-- Link external audio examples (generic URLs or YouTube, Spotify, Apple Music, Deezer and Amazon Music) to scores via a new "Audio Examples" tab in the score sidebar (#124)
-- Multiple short titles (aliases) per score; all aliases are listed in the folder collection index
-- Setlist history tab in the score sidebar and `GET scores/{id}/setlists` API endpoint with cursor-based pagination (#125)
+- Add Coverage Tracking for the PHP Backend (#142)
+- Add Audio Example Links to Scores (#135)
+- Add Setlist History Tab for Scores (#134)
+- Support Multiple Short Titles Per Score (#133)
+- Add "Share to Messenger" Functionality to Setlists (#132)
+- Add Support for NC35 (#117)
+
+### Changed
+
+- Improve Setlist Overview Sorting (#139)
+- Redirect to New Setlist on Creation (#137)
+- Improve Touch UX for Setlist PDF Export (#129)
+- Overhaul ToC Generation for Print Output (#122)
+- Bump `nextcloud/ocp` package (#130)
+- Bump `nextcloud/ocp` package (#121)
+- Bump `nextcloud/ocp` package (#118)
+- Bump @nextcloud/eslint-config from 8.4.2 to 9.0.1 (#116)
+- Bump pinia from 3.0.4 to 4.0.3 (#109)
+- Bump @types/node from 26.0.1 to 26.6.3 (#108)
+- Bump @ag-grid-community/locale from 35.2.0 to 36.2.0 (#107)
+- Bump nextcloud/openapi-extractor in /vendor-bin/openapi-extractor (#106)
+- Bump ag-grid-community from 35.1.0 to 36.2.0 (#111)
+- Bump vue-tsc from 3.2.6 to 3.3.11 (#113)
+- Bump @nextcloud/dialogs from 7.4.0 to 7.5.0 (#114)
+- Bump vue from 3.5.39 to 3.5.43 (#115)
+- Bump `nextcloud/ocp` package (#99)
+
+### Deprecated
+
+### Removed
+
+- Drop Support for NC33 (#117)
+
+### Fixed
+
+- Remove Difficulty and Empty Comment Column from Compact Setlist View (#128)
+- Fix Codecov Upload (#143)
+- Fix AG Grid Theme Mode Detection (#120)
+
+### Security
+
+- Fix npm Audit (#131)
+- Fix npm Audit (#104)
 
 ## [1.2.2] - 2026-08-28
 
