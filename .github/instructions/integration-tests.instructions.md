@@ -1,3 +1,7 @@
+---
+applyTo: "tests/integration/**/*.php"
+---
+
 # NextCloud Mapper Integration Testing Guidelines
 
 ## Test Structure

@@ -1,3 +1,7 @@
+---
+applyTo: "lib/**/*.php"
+---
+
 # Copilot Instructions for `/lib` (PHP Backend)
 
 ## Architecture Pattern
@@ -156,63 +160,3 @@ Do NOT use translations for:
 - Use placeholders for dynamic values
 - Follow NextCloud's error message conventions
 - Document complex translation strings with comments
-
-## Testing
-
-### Unit Tests Required
-**ALWAYS** add or update unit tests for changes in `/lib`:
-- Create tests in `/tests/unit/` mirroring the `/lib` structure
-- Test files must end with `Test.php` (e.g., `TagTest.php`)
-- Use PHPUnit's `TestCase` as base class
-- Test business logic, edge cases, and error conditions
-
-### Test Structure
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace OCA\OrchestraScoresManager\Tests\Unit\Db;
-
-use PHPUnit\Framework\TestCase;
-
-final class YourClassTest extends TestCase {
-    public function testMethodName(): void {
-        // Arrange
-        // Act
-        // Assert
-    }
-}
-```
-
-### PATCH Endpoint Tests
-For PATCH endpoint tests, **ALWAYS** verify that the response includes unchanged fields:
-
-```php
-public function testPatchEntityUpdatesEntity(): void {
-    $entity = new Entity();
-    $entity->setId(1);
-    $entity->setField1('Original');
-    $entity->setField2('Unchanged');
-    
-    $updatedData = [
-        'id' => 1,
-        'field1' => 'Updated',
-        'field2' => 'Unchanged',  // Verify this is present
-    ];
-    
-    // ... mock setup ...
-    
-    $response = $this->controller->patchEntity(id: 1, field1: 'Updated');
-    
-    // Verify unchanged fields are present
-    $this->assertArrayHasKey('field2', $response->getData());
-    $this->assertEquals('Unchanged', $response->getData()['field2']);
-}
-```
-
-### Running Tests
-Execute tests with: `composer run test:unit`
-
-### Verification
-**ALWAYS** verify tests pass before completing changes to `/lib`.
