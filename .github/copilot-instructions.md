@@ -81,13 +81,14 @@ The `.github/workflows/phpunit-sqlite.yml` workflow runs backend unit tests on p
 ## Translations (l10n/IL10N)
 
 See detailed guidelines in:
-- **Frontend (Vue/TypeScript)**: `/src/.github/copilot-instructions.md`
-- **Backend (PHP)**: `/lib/.github/copilot-instructions.md`
+- **Frontend (Vue/TypeScript)**: `/.github/instructions/frontend.instructions.md`
+- **Backend (PHP)**: `/.github/instructions/backend-lib.instructions.md`
 
 **Translation Files**: `/l10n/de.json` and `/l10n/de.js`
 
 ## Update These Instructions
 When making architectural decisions or identifying patterns that should be followed consistently:
-1. Update this file or add path-specific `.github/copilot-instructions.md` files
-2. Keep instructions concise and actionable
-3. Remove outdated patterns
+1. Update this file for repository-wide guidance
+2. Add or update path-specific files under `.github/instructions/*.instructions.md`
+3. Keep instructions concise and actionable
+4. Remove outdated patterns
