@@ -41,6 +41,7 @@ export function useBreakpoints() {
 	// Component helpers
 	const columnPin: ComputedRef<false | 'left'> = computed((): false | 'left' => isMobile.value ? false : 'left')
 	const buttonSize = computed(() => isDesktop.value ? 'normal' : 'small')
+	const actionsInline = computed(() => isDesktop.value ? 3 : isTablet.value ? 2 : 0)
 	function buttonText(text: string) {
 		return isMobile.value ? undefined : text
 	}
@@ -69,6 +70,7 @@ export function useBreakpoints() {
 		// Component helpers
 		columnPin,
 		buttonSize,
+		actionsInline,
 		buttonText,
 	}
 }

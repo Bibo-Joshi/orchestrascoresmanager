@@ -1,13 +1,4 @@
 <template>
-	<NcButton variant="primary"
-		:text="buttonText(t('Add Entry'))"
-		:size="buttonSize"
-		@click="showDialog = true">
-		<template #icon>
-			<AddIcon :size="20" />
-		</template>
-	</NcButton>
-
 	<NcDialog
 		v-model:open="showDialog"
 		:name="t('Add Setlist Entry')"
@@ -77,9 +68,8 @@ import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import FocusTrap from '@/components/FocusTrap.vue'
 import { apiClients } from '@/api/client'
-import { useBreakpoints } from '@/composables/useBreakpoints'
 import { createScoreOptions, filterScores } from '@/composables/useEntitySelect'
-import { AddIcon, CancelIcon, ConfirmIcon } from '@/icons/vue-material'
+import { CancelIcon, ConfirmIcon } from '@/icons/vue-material'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
 import { t } from '@/utils/l10n'
@@ -89,13 +79,13 @@ interface Props {
 	setlist: Setlist
 }
 
+/** Whether the dialog is open */
+const showDialog = defineModel<boolean>('open', { default: false })
+
 const props = defineProps<Props>()
 
 const setlistEntriesStore = useSetlistEntriesStore()
 const scoresStore = useScoresStore()
-const { buttonSize, buttonText } = useBreakpoints()
-
-const showDialog = ref(false)
 
 /**
  * Entry type options for the first dropdown

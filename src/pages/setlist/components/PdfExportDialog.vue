@@ -1,34 +1,4 @@
 <template>
-	<NcActions
-		:menuName="buttonText(t('Export'))"
-		:size="buttonSize"
-		:primary="true"
-		variant="primary"
-		:forceName="true">
-		<template #icon>
-			<DownloadIcon :size="20" />
-		</template>
-		<NcActionButton
-			:closeAfterClick="true"
-			@click="openDialog">
-			<template #icon>
-				<PDFIcon :size="20" />
-			</template>
-			{{ editable ? t('PDF Export') : buttonText(t('PDF Export')) }}
-		</NcActionButton>
-		<NcActionButton
-			v-if="editable"
-			:closeAfterClick="false"
-			:name="t('GEMA Report')"
-			:disabled="gemaExporting"
-			@click="onGemaExport">
-			<template #icon>
-				<LoadingIcon v-if="gemaExporting" :size="20" class="spin" />
-				<ExcelIcon v-else :size="20" />
-			</template>
-		</NcActionButton>
-	</NcActions>
-
 	<NcDialog
 		:name="t('Export PDF')"
 		:open="dialogOpen"
@@ -78,27 +48,22 @@
 import type { FolderCollection, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
 import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
 
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
-import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
-import { useBreakpoints } from '@/composables/useBreakpoints'
-import { CancelIcon, DownloadIcon, DragVerticalIcon, ExcelIcon, LoadingIcon, PDFIcon } from '@/icons/vue-material'
+import { CancelIcon, DownloadIcon, DragVerticalIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
 import { exportSetlistToPdf } from '@/utils/pdf-exporter'
-import { exportSetlistToGemaXlsx } from '@/utils/setlist-xlsx-exporter'
 
 interface Props {
 	setlist: Setlist
 	entries: SetlistEntry[]
-	editable: boolean
 	fcvScoresMap: Map<number, number>
 	fcvScoreBookIndicesMap: Map<number, number>
 	folderCollection: FolderCollection | null
@@ -106,20 +71,20 @@ interface Props {
 	getColumns: () => PdfColumnConfig[]
 }
 
+/** Whether the dialog is open */
+const dialogOpen = defineModel<boolean>('open', { default: false })
+
 const props = defineProps<Props>()
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
-const { buttonSize, buttonText } = useBreakpoints()
 
 interface DialogColumn extends PdfColumnConfig {
 	enabled: boolean
 }
 
-const dialogOpen = ref(false)
 const dialogColumns = ref<DialogColumn[]>([])
 const hasUserCustomizedColumns = ref(false)
-const gemaExporting = ref(false)
 
 /**
  * indicator if any of the pieces in the setlist has a comment
@@ -143,10 +108,9 @@ const DEFAULT_ENABLED_IDS: computed<ReadonlySet<PdfColumnId>> = computed(() => {
 })
 
 /**
- * Open the PDF export configuration dialog, populating it with the current
- * column order from the table.
+ * Populate the dialog with the current column order from the table.
  */
-function openDialog(): void {
+function populateColumns(): void {
 	const currentColumns = props.getColumns()
 		.filter((col) => col.label.trim() !== '')
 
@@ -156,9 +120,13 @@ function openDialog(): void {
 			enabled: DEFAULT_ENABLED_IDS.value.has(col.id),
 		}))
 	}
-
-	dialogOpen.value = true
 }
+
+watch(dialogOpen, (isOpen) => {
+	if (isOpen) {
+		populateColumns()
+	}
+})
 
 /**
  * Mark export columns as user-customized so defaults stop auto-refreshing.
@@ -192,37 +160,10 @@ async function onPdfExport(): Promise<void> {
 		t('Export failed: '),
 	)
 }
-
-/**
- * Export the GEMA report as an XLSX file.
- */
-async function onGemaExport(): Promise<void> {
-	gemaExporting.value = true
-	await tryShowError(
-		async () => {
-			await exportSetlistToGemaXlsx({
-				setlist: props.setlist,
-				entries: props.entries,
-				getScoreById: (id) => scoresStore.getScoreById(id),
-			})
-		},
-		t('Export failed: '),
-	)
-	gemaExporting.value = false
-}
 </script>
 
 <style lang="scss" scoped>
 .column-list {
 	padding: 1ex 0;
-}
-
-.spin {
-	animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-	from { transform: rotate(0deg); }
-	to { transform: rotate(360deg); }
 }
 </style>

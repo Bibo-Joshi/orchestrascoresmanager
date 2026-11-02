@@ -1,46 +1,100 @@
 <template>
 	<Layout :title="setlist?.title">
 		<template #headerActions>
-			<AddSetlistEntryButton
-				v-if="setlist && editable"
-				:setlist="setlist"
-				:editable="editable" />
-			<ExportMenu
-				v-if="setlist"
-				:setlist="setlist"
-				:entries="setlistEntries"
-				:editable="editable"
-				:fcvScoresMap="fcvScoresMap"
-				:fcvScoreBookIndicesMap="fcvScoreBookIndicesMap"
-				:folderCollection="folderCollection"
-				:getColumns="getPdfColumns" />
-			<SetlistShareButton
-				v-if="setlist"
-				:setlist="setlist"
-				:entries="setlistEntries"
-				:fcvScoresMap="fcvScoresMap"
-				:fcvScoreBookIndicesMap="fcvScoreBookIndicesMap"
-				:folderCollection="folderCollection" />
-			<NcButton
-				v-if="setlist && editable"
-				:size="buttonSize"
-				variant="primary"
-				:text="buttonText(t('Clone'))"
-				@click="showCloneDialog = true">
-				<template #icon>
-					<CloneIcon :size="20" />
+			<HeaderActions>
+				<NcActionButton
+					v-if="setlist && editable"
+					closeAfterClick
+					@click="showAddEntryDialog = true">
+					<template #icon>
+						<AddIcon :size="20" />
+					</template>
+					{{ t('Add Entry') }}
+				</NcActionButton>
+				<NcActionButton
+					v-if="setlist"
+					closeAfterClick
+					@click="showShareDialog = true">
+					<template #icon>
+						<ShareIcon :size="20" />
+					</template>
+					{{ t('Share') }}
+				</NcActionButton>
+				<NcActionButton
+					closeAfterClick
+					@click="handleDetailsButtonClick()">
+					<template #icon>
+						<InfoIcon :size="20" />
+					</template>
+					{{ t('Details') }}
+				</NcActionButton>
+				<NcActionButton
+					v-if="setlist"
+					closeAfterClick
+					@click="showPdfExportDialog = true">
+					<template #icon>
+						<PDFIcon :size="20" />
+					</template>
+					{{ t('PDF Export') }}
+				</NcActionButton>
+				<NcActionButton
+					v-if="setlist && editable"
+					:disabled="gemaExporting"
+					@click="exportGema">
+					<template #icon>
+						<LoadingIcon v-if="gemaExporting" :size="20" class="spin" />
+						<ExcelIcon v-else :size="20" />
+					</template>
+					{{ t('GEMA Report') }}
+				</NcActionButton>
+				<NcActionButton
+					v-if="setlist && editable"
+					closeAfterClick
+					@click="showCloneDialog = true">
+					<template #icon>
+						<CloneIcon :size="20" />
+					</template>
+					{{ t('Clone') }}
+				</NcActionButton>
+				<template v-if="setlistEntries.length > 0">
+					<NcActionSeparator />
+					<NcActionCaption :name="t('View Mode')" />
+					<NcActionRadio
+						v-model="viewMode"
+						value="full"
+						name="view-mode">
+						{{ t('Full View') }}
+					</NcActionRadio>
+					<NcActionRadio
+						v-model="viewMode"
+						value="compact"
+						name="view-mode">
+						{{ t('Compact View') }}
+					</NcActionRadio>
 				</template>
-			</NcButton>
-			<NcButton
-				variant="primary"
-				:size="buttonSize"
-				:text="buttonText(t('Details'))"
-				@click="handleDetailsButtonClick()">
-				<template #icon>
-					<InfoIcon :size="20" />
-				</template>
-			</NcButton>
-			<ViewModeMenu v-if="setlistEntries.length > 0" v-model:viewMode="viewMode" />
+			</HeaderActions>
+
+			<template v-if="setlist">
+				<AddSetlistEntryDialog
+					v-if="editable"
+					v-model:open="showAddEntryDialog"
+					:setlist="setlist" />
+				<PdfExportDialog
+					v-model:open="showPdfExportDialog"
+					:setlist="setlist"
+					:entries="setlistEntries"
+					:fcvScoresMap="fcvScoresMap"
+					:fcvScoreBookIndicesMap="fcvScoreBookIndicesMap"
+					:folderCollection="folderCollection"
+					:getColumns="getPdfColumns" />
+				<SetlistShareDialog
+					v-model:open="showShareDialog"
+					:setlist="setlist"
+					:entries="setlistEntries"
+					:fcvScoresMap="fcvScoresMap"
+					:fcvScoreBookIndicesMap="fcvScoreBookIndicesMap"
+					:folderCollection="folderCollection" />
+			</template>
 		</template>
 
 		<template #content>
@@ -85,19 +139,23 @@ import type { PdfColumnConfig } from '@/utils/pdf-exporter'
 import { loadState } from '@nextcloud/initial-state'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import NcButton from '@nextcloud/vue/components/NcButton'
-import AddSetlistEntryButton from './components/AddSetlistEntryButton.vue'
-import ExportMenu from './components/ExportMenu.vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
+import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
+import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
+import AddSetlistEntryDialog from './components/AddSetlistEntryDialog.vue'
+import PdfExportDialog from './components/PdfExportDialog.vue'
 import SetlistEntriesTable from './components/SetlistEntriesTable.vue'
 import SetlistPageSidebar from './components/SetlistPageSidebar.vue'
-import SetlistShareButton from './components/SetlistShareButton.vue'
-import ViewModeMenu from './components/ViewModeMenu.vue'
+import SetlistShareDialog from './components/SetlistShareDialog.vue'
 import CloneSetlistDialog from '@/components/CloneSetlistDialog.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
+import HeaderActions from '@/components/HeaderActions.vue'
 import Layout from '@/components/Layout.vue'
+import { useGemaExport } from './composables/useGemaExport.ts'
 import { apiClients } from '@/api/client'
 import { useBreakpoints } from '@/composables/useBreakpoints'
-import { CloneIcon, InfoIcon, SetlistIcon } from '@/icons/vue-material'
+import { AddIcon, CloneIcon, ExcelIcon, InfoIcon, LoadingIcon, PDFIcon, SetlistIcon, ShareIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoreSidebarStore } from '@/stores/scoreSidebarStore'
 import { useScoresStore } from '@/stores/scoresStore'
@@ -113,22 +171,25 @@ const setlistEntriesStore = useSetlistEntriesStore()
 const scoreSidebarStore = useScoreSidebarStore()
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
-const { buttonSize, buttonText, isDesktop } = useBreakpoints()
+const { isDesktop } = useBreakpoints()
 
 const loading = ref(false)
 const loadError = ref(false)
 const editable = ref<boolean>(!!loadState('orchestrascoresmanager', 'editable'))
 const viewMode = ref<'full' | 'compact'>(isDesktop.value ? 'full' : 'compact')
 const showCloneDialog = ref(false)
+const showAddEntryDialog = ref(false)
+const showPdfExportDialog = ref(false)
+const showShareDialog = ref(false)
 const fcvScoresMap = ref<Map<number, number>>(new Map())
 const fcvScoreBookIndicesMap = ref<Map<number, number>>(new Map())
 const folderCollection = ref<FolderCollection | null>(null)
 
-/** Ref to the SetlistEntriesTable so ExportMenu can read the current column order */
+/** Ref to the SetlistEntriesTable so PdfExportDialog can read the current column order */
 const tableRef = ref<{ getPdfColumns: () => PdfColumnConfig[] } | null>(null)
 
 /**
- * Return the currently displayed PDF columns from the table, used by ExportMenu.
+ * Return the currently displayed PDF columns from the table, used by PdfExportDialog.
  */
 function getPdfColumns(): PdfColumnConfig[] {
 	return tableRef.value?.getPdfColumns() ?? []
@@ -155,6 +216,8 @@ const setlistEntries = computed(() => {
 	}
 	return setlistEntriesStore.getEntriesBySetlistId(id)
 })
+
+const { gemaExporting, exportGema } = useGemaExport(() => setlist.value, () => setlistEntries.value)
 
 function handleDetailsButtonClick(): void {
 	if (scoreSidebarStore.isOpen) {
@@ -254,3 +317,14 @@ watch(
 	},
 )
 </script>
+
+<style lang="scss" scoped>
+.spin {
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+</style>

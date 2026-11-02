@@ -37,7 +37,18 @@
 		</template>
 
 		<template #headerActions>
-			<AddFolderCollectionButton :editable="editable" />
+			<HeaderActions>
+				<NcActionButton
+					v-if="editable"
+					closeAfterClick
+					@click="showAddDialog = true">
+					<template #icon>
+						<AddIcon :size="20" />
+					</template>
+					{{ t('Add') }}
+				</NcActionButton>
+			</HeaderActions>
+			<AddFolderCollectionDialog v-model:open="showAddDialog" />
 		</template>
 	</Layout>
 </template>
@@ -47,19 +58,21 @@ import type { FolderCollection } from '@/api/generated/openapi/data-contracts'
 
 import { loadState } from '@nextcloud/initial-state'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
-import AddFolderCollectionButton from './components/AddFolderCollectionButton.vue'
+import AddFolderCollectionDialog from './components/AddFolderCollectionDialog.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
+import HeaderActions from '@/components/HeaderActions.vue'
 import Layout from '@/components/Layout.vue'
-import { DeleteIcon, FolderCollectionIcon } from '@/icons/vue-material'
+import { AddIcon, DeleteIcon, FolderCollectionIcon } from '@/icons/vue-material'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
 
 const folderCollectionsStore = useFolderCollectionsStore()
+const showAddDialog = ref(false)
 
 // Load initial state from the server
 const editable = !!loadState('orchestrascoresmanager', 'editable')

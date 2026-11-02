@@ -1,14 +1,4 @@
 <template>
-	<NcButton v-if="editable"
-		:size="buttonSize"
-		variant="primary"
-		:text="buttonText(t('Add'))"
-		@click="openDialog">
-		<template #icon>
-			<AddIcon />
-		</template>
-	</NcButton>
-
 	<AddOrEditDialog
 		v-model:isOpen="showDialog"
 		:name="t('Add score to book')"
@@ -44,30 +34,29 @@ import type { Score } from '@/api/generated/openapi/data-contracts'
 import type { EntityOption } from '@/composables/useEntitySelect'
 
 import { showSuccess } from '@nextcloud/dialogs'
-import { computed, onMounted, ref } from 'vue'
-import NcButton from '@nextcloud/vue/components/NcButton'
+import { computed, onMounted, ref, watch } from 'vue'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import AddOrEditDialog from '@/components/AddOrEditDialog.vue'
-import { useBreakpoints } from '@/composables/useBreakpoints.ts'
 import {
 	createScoreOptions,
 	createScoreSelectable,
 	filterScores,
 } from '@/composables/useEntitySelect'
 import { useIndexValidation } from '@/composables/useIndexValidation'
-import { AddIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
 
 interface Props {
-	editable: boolean
 	scoreBookId: number
 	existingScoreIds: Set<number>
 	occupiedIndices: Set<number>
 }
+
+/** Whether the dialog is open */
+const showDialog = defineModel<boolean>('open', { default: false })
 
 const props = defineProps<Props>()
 
@@ -77,9 +66,7 @@ const emit = defineEmits<{
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
-const { buttonSize, buttonText } = useBreakpoints()
 
-const showDialog = ref(false)
 const loadingScores = ref(false)
 const loadScoresError = ref(false)
 const selectedScore = ref<EntityOption<Score> | null>(null)
@@ -128,14 +115,13 @@ onMounted(() => {
 	scoresStore.initialize()
 })
 
-/**
- * Open the dialog and load scores if needed
- */
-function openDialog() {
-	resetForm()
-	showDialog.value = true
-	ensureScoresLoaded()
-}
+// Reset the form and load scores if needed whenever the dialog is opened
+watch(showDialog, (isOpen) => {
+	if (isOpen) {
+		resetForm()
+		ensureScoresLoaded()
+	}
+})
 
 /**
  * Reset the form to initial state
