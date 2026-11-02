@@ -72,6 +72,7 @@ class SetlistMapper extends QBMapper {
 	 * Find all future setlists (start_date_time + duration >= now)
 	 * @param bool|null $isDraft Filter by draft status
 	 * @param bool|null $isPublished Filter by published status
+	 * @psalm-suppress PossiblyUnusedMethod - Unscoped variant for internal use, user-facing reads use the *Scoped methods
 	 * @return Setlist[]
 	 * @throws Exception
 	 */
@@ -105,6 +106,7 @@ class SetlistMapper extends QBMapper {
 	 * Find all past setlists (start_date_time + duration < now), ordered by start date descending.
 	 * @param bool|null $isDraft Filter by draft status
 	 * @param bool|null $isPublished Filter by published status
+	 * @psalm-suppress PossiblyUnusedMethod - Unscoped variant for internal use, user-facing reads use the *Scoped methods
 	 * @return Setlist[]
 	 * @throws Exception
 	 */
@@ -174,6 +176,7 @@ class SetlistMapper extends QBMapper {
 	 * @param string $sortOrder 'ASC' or 'DESC'
 	 * @param int $limit Maximum number of setlists to return
 	 * @param int $offset Number of setlists to skip
+	 * @psalm-suppress PossiblyUnusedMethod - Unscoped variant for internal use, user-facing reads use the *Scoped methods
 	 * @return Setlist[]
 	 * @throws Exception
 	 */
@@ -240,6 +243,7 @@ class SetlistMapper extends QBMapper {
 	 * Count the setlists that contain the given score.
 	 *
 	 * @param int $scoreId
+	 * @psalm-suppress PossiblyUnusedMethod - Unscoped variant for internal use, user-facing reads use the *Scoped methods
 	 * @return int
 	 * @throws Exception
 	 */

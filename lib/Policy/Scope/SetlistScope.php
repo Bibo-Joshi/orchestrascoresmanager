@@ -42,7 +42,7 @@ class SetlistScope implements EntityScopeInterface {
 			PolicyInterface::ACTION_SHARE => $this->permissionService->canCurrentUserEdit() ? null : self::DENY_CONDITION,
 			PolicyInterface::ACTION_READ => $this->permissionService->canCurrentUserEdit()
 				? null
-				: (string)$qb->expr()->eq(
+				: $qb->expr()->eq(
 					($alias === '' ? '' : $alias . '.') . 'is_published',
 					$qb->createNamedParameter(true, IQueryBuilder::PARAM_BOOL),
 				),

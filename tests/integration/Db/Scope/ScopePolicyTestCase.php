@@ -65,6 +65,13 @@ abstract class ScopePolicyTestCase extends MapperTestCase {
 		return $cases;
 	}
 
+	/**
+	 * Compares the two implementations of the same rule: Policy::allows() decides per entity in PHP,
+	 * Scope::apply() filters rows in SQL. Both must select the same rows.
+	 *
+	 * @param string $action Action to check
+	 * @param bool $canEdit Result of PermissionService::canCurrentUserEdit(), false also covers anonymous users
+	 */
 	#[DataProvider('actionScenarioProvider')]
 	public function testScopeMatchesPolicy(string $action, bool $canEdit): void {
 		$this->canEdit = $canEdit;
@@ -73,9 +80,11 @@ abstract class ScopePolicyTestCase extends MapperTestCase {
 		$policy = $this->createPolicy($permissionService);
 		$scope = $this->createScope($permissionService);
 
+		// Insert the test rows. This runs inside the transaction started by MapperTestCase and is rolled back afterwards.
 		$seeded = $this->seed();
 		$this->assertNotEmpty($seeded);
 
+		// Expected result: IDs of the rows for which the policy allows the action
 		$expected = [];
 		foreach ($seeded as $id => $entity) {
 			if ($policy->allows($action, $entity)) {
@@ -84,6 +93,9 @@ abstract class ScopePolicyTestCase extends MapperTestCase {
 		}
 		sort($expected);
 
+		// Actual result: SELECT id FROM <table> WHERE <scope condition> AND id IN (<seeded IDs>)
+		// The scope adds its condition to the query. The IN clause restricts the query to the seeded rows,
+		// so rows that already exist in the database do not influence the comparison.
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('id')->from($this->tableName());
 		$scope->apply($action, $qb);
@@ -96,12 +108,17 @@ abstract class ScopePolicyTestCase extends MapperTestCase {
 		$this->assertSame($expected, $actual);
 	}
 
+	/**
+	 * Unknown actions must be denied by default: the policy returns false and the scope matches no rows,
+	 * even for users with edit rights.
+	 */
 	public function testUnknownActionIsDenied(): void {
 		$permissionService = $this->createMock(PermissionService::class);
 		$permissionService->method('canCurrentUserEdit')->willReturn(true);
 		$seeded = $this->seed();
 
 		$this->assertFalse($this->createPolicy($permissionService)->allows('UNKNOWN', current($seeded)));
+		// SELECT id FROM <table> WHERE 1 = 0 AND id IN (<seeded IDs>) must return nothing
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('id')->from($this->tableName());
 		$this->createScope($permissionService)->apply('UNKNOWN', $qb);

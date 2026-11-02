@@ -10,6 +10,7 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 
 /**
  * Query scope mirroring ScoreBookPolicy.
+ * @psalm-suppress UnusedClass - Not wired into a mapper until a rule needs it
  */
 class ScoreBookScope implements EntityScopeInterface {
 	/** @psalm-suppress PossiblyUnusedMethod - Constructor used by DI container */

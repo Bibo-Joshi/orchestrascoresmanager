@@ -10,6 +10,7 @@ use OCP\DB\QueryBuilder\IQueryBuilder;
 
 /**
  * Query scope mirroring FolderCollectionPolicy.
+ * @psalm-suppress UnusedClass - Not wired into a mapper until a rule needs it
  */
 class FolderCollectionScope implements EntityScopeInterface {
 	/** @psalm-suppress PossiblyUnusedMethod - Constructor used by DI container */

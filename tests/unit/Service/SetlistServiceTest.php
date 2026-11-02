@@ -88,6 +88,9 @@ final class SetlistServiceTest extends TestCase {
 			->with(PolicyInterface::ACTION_READ, $isDraft, $isPublished)
 			->willReturn($setlists);
 
+		// the unscoped variant must not be used for user-facing reads
+		$this->setlistMapper->expects($this->never())
+			->method(substr($mapperMethod, 0, -strlen('Scoped')));
 		$this->setlistPolicy->expects($this->never())->method('allows');
 
 		$result = $this->service->getSetlists($filter, $isDraft, $isPublished);
@@ -748,6 +751,8 @@ final class SetlistServiceTest extends TestCase {
 	}
 
 	public function testGetSetlistsForScoreDefaults(): void {
+		$this->setlistMapper->expects($this->never())->method('findByScoreId');
+		$this->setlistMapper->expects($this->never())->method('countByScoreId');
 		$this->setlistMapper->expects($this->once())
 			->method('findByScoreIdScoped')
 			->with(PolicyInterface::ACTION_READ, 7, 'date', 'DESC', 51, 0)
@@ -766,6 +771,8 @@ final class SetlistServiceTest extends TestCase {
 	}
 
 	public function testGetSetlistsForScoreUsesScopedQueriesWithRequestedParams(): void {
+		$this->setlistMapper->expects($this->never())->method('findByScoreId');
+		$this->setlistMapper->expects($this->never())->method('countByScoreId');
 		$this->setlistPolicy->expects($this->never())->method('allows');
 		$this->setlistMapper->expects($this->once())
 			->method('findByScoreIdScoped')
