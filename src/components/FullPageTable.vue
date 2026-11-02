@@ -45,6 +45,10 @@ interface Props {
 	modules?: Module[]
 	rowDragManaged?: boolean
 	context?: Record<string, unknown>
+	/**
+	 * Search to search for using ag-grids quick filter
+	 */
+	searchText?: string | undefined
 }
 
 // Container ref for dynamic sizing
@@ -154,6 +158,11 @@ watch(() => props.data, () => {
 watch(() => props.columnDefs, () => {
 	// Grid will automatically update when columnDefs changes
 }, { deep: true })
+
+// Watch for text search changes
+watch(() => props.searchText, () => {
+	gridApi.value?.setGridOption('quickFilterText', props.searchText)
+})
 
 const defaultModules: Module[] = [AllCommunityModule, LocaleModule]
 
