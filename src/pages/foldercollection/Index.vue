@@ -31,12 +31,28 @@
 						:isIndexedCollection="isIndexed"
 						:folderCollectionScores="scores"
 						:scoreBookIndexMap="scoreBookIndexMap"
+						:searchText="searchText"
 						:onDeleteScore="handleDeleteScore" />
 				</template>
 			</ContentStateWrapper>
 		</template>
 
 		<template #headerActions>
+			<!-- Search in Table -->
+			<div
+				:style="{width: screenSizeCategory === 'mobile' ? '100%' : screenSizeCategory === 'tablet' ? '40ex' : '60ex'}">
+				<NcTextField
+					v-model="searchText"
+					trailingButtonIcon="close"
+					:placeholder="t('Search Score or Score details')"
+					:showTrailingButton="searchText !== ''"
+					@trailingButtonClick="searchText = undefined">
+					<template #icon>
+						<SearchIcon :size="20" />
+					</template>
+				</NcTextField>
+			</div>
+
 			<!-- Version Selector -->
 			<NcSelect
 				v-if="versions.length > 0"
@@ -92,6 +108,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
 import AddToCollectionButton from './components/AddToCollectionButton.vue'
 import ExportTocButton from './components/ExportTocButton.vue'
 import StartNewVersionButton from './components/StartNewVersionButton.vue'
@@ -102,8 +119,9 @@ import Layout from '@/components/Layout.vue'
 import ScoreSidebar from '@/components/ScoreSidebar.vue'
 import ScoresTable from '@/components/ScoresTable.vue'
 import { apiClients } from '@/api/client'
+import { useBreakpoints } from '@/composables/useBreakpoints'
 import { formatDateStr } from '@/composables/useDateFormatting'
-import { ScoreIcon } from '@/icons/vue-material'
+import { ScoreIcon, SearchIcon } from '@/icons/vue-material'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { useFolderCollectionVersionsStore } from '@/stores/folderCollectionVersionsStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
@@ -130,6 +148,7 @@ const router = useRouter()
 const folderCollectionsStore = useFolderCollectionsStore()
 const versionsStore = useFolderCollectionVersionsStore()
 const scoreBooksStore = useScoreBooksStore()
+const { screenSizeCategory } = useBreakpoints()
 
 const loading = ref(false)
 const loadError = ref(false)
@@ -137,6 +156,7 @@ const scores = ref<(Score | ScoreIndexed)[]>([])
 const scoreBooks = ref<(ScoreBook | ScoreBookIndexed)[]>([])
 const scoreBookScoresMap = ref<Map<number, Score[]>>(new Map())
 const editable = ref<boolean>(!!loadState('orchestrascoresmanager', 'editable'))
+const searchText = ref<string | undefined>(undefined)
 
 // Ref to access ScoresTable and its tableRef
 const scoresTableRef = ref<{ tableRef: { exportAsCsv?: (fileName?: string) => boolean } | null } | null>(null)
