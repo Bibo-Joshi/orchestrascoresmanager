@@ -152,6 +152,7 @@ OC.L10N.register(
     "No entries in this collection" : "Keine Einträge in dieser Sammlung",
     "Add scores or score books to this folder collection to see them here." : "Fügen Sie Partituren oder Notenbücher zu dieser Ordnersammlung hinzu, um sie hier zu sehen.",
     "You are viewing an inactive version. Scores and score books cannot be added or removed." : "Sie betrachten eine inaktive Version. Partituren und Notenbücher können nicht hinzugefügt oder entfernt werden.",
+    "Search Score or Score details" : "Partiturtitel und -details durchsuchen",
     "Select version" : "Version auswählen",
     "Score" : "Partitur",
     "Score added to collection" : "Partitur zur Sammlung hinzugefügt",
