@@ -86,6 +86,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
+import { apiClients } from '@/api/client'
 import { useBreakpoints } from '@/composables/useBreakpoints'
 import { CancelIcon, DownloadIcon, DragVerticalIcon, ExcelIcon, LoadingIcon, PDFIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
@@ -178,10 +179,14 @@ async function onPdfExport(): Promise<void> {
 
 	await tryShowError(
 		async () => {
+			// The Pinia store can still contain old tags after editing scores.
+			// Fetch the server's latest score metadata before generating the PDF.
+			const response = await apiClients.default.scoreApiGetScores()
+			const freshScores = new Map(response.data.ocs.data.map((score) => [score.id, score]))
 			exportSetlistToPdf({
 				setlist: props.setlist,
 				entries: props.entries,
-				getScoreById: (id) => scoresStore.getScoreById(id),
+				getScoreById: (id) => freshScores.get(id),
 				getScoreBookById: (id) => scoreBooksStore.getScoreBookById(id),
 				fcvScoresMap: props.fcvScoresMap,
 				fcvScoreBookIndicesMap: props.fcvScoreBookIndicesMap,
