@@ -25,17 +25,7 @@ class SetlistMapper extends QBMapper {
 	}
 
 	/**
-	 * @param bool|null $isDraft Filter by draft status
-	 * @param bool|null $isPublished Filter by published status
-	 * @return Setlist[]
-	 * @throws Exception
-	 */
-	public function findAll(?bool $isDraft = null, ?bool $isPublished = null): array {
-		return $this->findAllInternal(null, $isDraft, $isPublished);
-	}
-
-	/**
-	 * Like findAll, but restricted to the setlists the current user may access for the action.
+	 * Find all setlists the current user may access for the action.
 	 *
 	 * @param string $action One of the PolicyInterface::ACTION_* constants
 	 * @param bool|null $isDraft Filter by draft status
@@ -44,24 +34,11 @@ class SetlistMapper extends QBMapper {
 	 * @throws Exception
 	 */
 	public function findAllScoped(string $action, ?bool $isDraft = null, ?bool $isPublished = null): array {
-		return $this->findAllInternal($action, $isDraft, $isPublished);
-	}
-
-	/**
-	 * @param string|null $action Action to scope the query to, null for no scoping
-	 * @param bool|null $isDraft
-	 * @param bool|null $isPublished
-	 * @return Setlist[]
-	 * @throws Exception
-	 */
-	private function findAllInternal(?string $action, ?bool $isDraft, ?bool $isPublished): array {
 		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->getTableName());
 
-		if ($action !== null) {
-			$this->setlistScope->apply($action, $qb);
-		}
+		$this->setlistScope->apply($action, $qb);
 		$this->applyStatusFilters($qb, $isDraft, $isPublished);
 
 		$qb->orderBy('start_date_time', 'ASC');
@@ -69,19 +46,7 @@ class SetlistMapper extends QBMapper {
 	}
 
 	/**
-	 * Find all future setlists (start_date_time + duration >= now)
-	 * @param bool|null $isDraft Filter by draft status
-	 * @param bool|null $isPublished Filter by published status
-	 * @psalm-suppress PossiblyUnusedMethod - Unscoped variant for internal use, user-facing reads use the *Scoped methods
-	 * @return Setlist[]
-	 * @throws Exception
-	 */
-	public function findFuture(?bool $isDraft = null, ?bool $isPublished = null): array {
-		return $this->filterFuture($this->findAll($isDraft, $isPublished));
-	}
-
-	/**
-	 * Like findFuture, but restricted to the setlists the current user may access for the action.
+	 * Find all future setlists (start_date_time + duration >= now) that the current user may access for the action.
 	 *
 	 * @param string $action One of the PolicyInterface::ACTION_* constants
 	 * @param bool|null $isDraft Filter by draft status
@@ -103,19 +68,7 @@ class SetlistMapper extends QBMapper {
 	}
 
 	/**
-	 * Find all past setlists (start_date_time + duration < now), ordered by start date descending.
-	 * @param bool|null $isDraft Filter by draft status
-	 * @param bool|null $isPublished Filter by published status
-	 * @psalm-suppress PossiblyUnusedMethod - Unscoped variant for internal use, user-facing reads use the *Scoped methods
-	 * @return Setlist[]
-	 * @throws Exception
-	 */
-	public function findPast(?bool $isDraft = null, ?bool $isPublished = null): array {
-		return $this->filterPast($this->findAll($isDraft, $isPublished));
-	}
-
-	/**
-	 * Like findPast, but restricted to the setlists the current user may access for the action.
+	 * Find all past setlists (start_date_time + duration < now), ordered by start date descending, that the current user may access for the action.
 	 *
 	 * @param string $action One of the PolicyInterface::ACTION_* constants
 	 * @param bool|null $isDraft Filter by draft status
@@ -167,25 +120,10 @@ class SetlistMapper extends QBMapper {
 	}
 
 	/**
-	 * Find a page of setlists that contain the given score, sorted by the given column.
+	 * Find a page of setlists that contain the given score and that the current user may access for the action,
+	 * sorted by the given column.
 	 * Sorting by 'creation' uses the order of creation (id), as setlists have no creation timestamp.
 	 * Setlists without a start date are considered newer than any setlist with a start date when sorting by 'date'.
-	 *
-	 * @param int $scoreId
-	 * @param string $sortBy One of 'creation', 'date', 'name'
-	 * @param string $sortOrder 'ASC' or 'DESC'
-	 * @param int $limit Maximum number of setlists to return
-	 * @param int $offset Number of setlists to skip
-	 * @psalm-suppress PossiblyUnusedMethod - Unscoped variant for internal use, user-facing reads use the *Scoped methods
-	 * @return Setlist[]
-	 * @throws Exception
-	 */
-	public function findByScoreId(int $scoreId, string $sortBy, string $sortOrder, int $limit, int $offset): array {
-		return $this->findByScoreIdInternal(null, $scoreId, $sortBy, $sortOrder, $limit, $offset);
-	}
-
-	/**
-	 * Like findByScoreId, but restricted to the setlists the current user may access for the action.
 	 *
 	 * @param string $action One of the PolicyInterface::ACTION_* constants
 	 * @param int $scoreId
@@ -197,26 +135,10 @@ class SetlistMapper extends QBMapper {
 	 * @throws Exception
 	 */
 	public function findByScoreIdScoped(string $action, int $scoreId, string $sortBy, string $sortOrder, int $limit, int $offset): array {
-		return $this->findByScoreIdInternal($action, $scoreId, $sortBy, $sortOrder, $limit, $offset);
-	}
-
-	/**
-	 * @param string|null $action Action to scope the query to, null for no scoping
-	 * @param int $scoreId
-	 * @param string $sortBy
-	 * @param string $sortOrder
-	 * @param int $limit
-	 * @param int $offset
-	 * @return Setlist[]
-	 * @throws Exception
-	 */
-	private function findByScoreIdInternal(?string $action, int $scoreId, string $sortBy, string $sortOrder, int $limit, int $offset): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->getTableName());
 		$this->applyScoreFilter($qb, $scoreId);
-		if ($action !== null) {
-			$this->setlistScope->apply($action, $qb);
-		}
+		$this->setlistScope->apply($action, $qb);
 
 		$direction = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
 		$column = match ($sortBy) {
@@ -240,19 +162,7 @@ class SetlistMapper extends QBMapper {
 	}
 
 	/**
-	 * Count the setlists that contain the given score.
-	 *
-	 * @param int $scoreId
-	 * @psalm-suppress PossiblyUnusedMethod - Unscoped variant for internal use, user-facing reads use the *Scoped methods
-	 * @return int
-	 * @throws Exception
-	 */
-	public function countByScoreId(int $scoreId): int {
-		return $this->countByScoreIdInternal(null, $scoreId);
-	}
-
-	/**
-	 * Like countByScoreId, but restricted to the setlists the current user may access for the action.
+	 * Count the setlists that contain the given score and that the current user may access for the action.
 	 *
 	 * @param string $action One of the PolicyInterface::ACTION_* constants
 	 * @param int $scoreId
@@ -260,22 +170,10 @@ class SetlistMapper extends QBMapper {
 	 * @throws Exception
 	 */
 	public function countByScoreIdScoped(string $action, int $scoreId): int {
-		return $this->countByScoreIdInternal($action, $scoreId);
-	}
-
-	/**
-	 * @param string|null $action Action to scope the query to, null for no scoping
-	 * @param int $scoreId
-	 * @return int
-	 * @throws Exception
-	 */
-	private function countByScoreIdInternal(?string $action, int $scoreId): int {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select($qb->func()->count('*'))->from($this->getTableName());
 		$this->applyScoreFilter($qb, $scoreId);
-		if ($action !== null) {
-			$this->setlistScope->apply($action, $qb);
-		}
+		$this->setlistScope->apply($action, $qb);
 
 		$result = $qb->executeQuery();
 		$count = (int)$result->fetchOne();
