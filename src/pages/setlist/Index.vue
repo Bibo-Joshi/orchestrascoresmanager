@@ -12,6 +12,24 @@
 					{{ t('Add Entry') }}
 				</NcActionButton>
 				<NcActionButton
+					closeAfterClick
+					@click="handleDetailsButtonClick()">
+					<template #icon>
+						<InfoIcon :size="20" />
+					</template>
+					{{ t('Details') }}
+				</NcActionButton>
+				<NcActionButton
+					v-if="setlist && editable"
+					closeAfterClick
+					@click="showCloneDialog = true">
+					<template #icon>
+						<CloneIcon :size="20" />
+					</template>
+					{{ t('Clone') }}
+				</NcActionButton>
+				<NcActionSeparator />
+				<NcActionButton
 					v-if="setlist"
 					closeAfterClick
 					@click="showShareDialog = true">
@@ -19,14 +37,6 @@
 						<ShareIcon :size="20" />
 					</template>
 					{{ t('Share') }}
-				</NcActionButton>
-				<NcActionButton
-					closeAfterClick
-					@click="handleDetailsButtonClick()">
-					<template #icon>
-						<InfoIcon :size="20" />
-					</template>
-					{{ t('Details') }}
 				</NcActionButton>
 				<NcActionButton
 					v-if="setlist"
@@ -47,18 +57,8 @@
 					</template>
 					{{ t('GEMA Report') }}
 				</NcActionButton>
-				<NcActionButton
-					v-if="setlist && editable"
-					closeAfterClick
-					@click="showCloneDialog = true">
-					<template #icon>
-						<CloneIcon :size="20" />
-					</template>
-					{{ t('Clone') }}
-				</NcActionButton>
 				<template v-if="setlistEntries.length > 0">
 					<NcActionSeparator />
-					<NcActionCaption :name="t('View Mode')" />
 					<NcActionRadio
 						v-model="viewMode"
 						value="full"
@@ -140,7 +140,6 @@ import { loadState } from '@nextcloud/initial-state'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import AddSetlistEntryDialog from './components/AddSetlistEntryDialog.vue'

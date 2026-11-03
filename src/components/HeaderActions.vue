@@ -1,11 +1,10 @@
 <template>
 	<NcActions
-		:menuName="buttonText(t('Actions'))"
 		:ariaLabel="t('Actions')"
 		:size="buttonSize"
 		:primary="true"
 		variant="primary"
-		:forceName="true"
+		:forceName="isDesktop"
 		:inline="actionsInline">
 		<slot />
 	</NcActions>
@@ -20,5 +19,5 @@ import { t } from '@/utils/l10n'
  * Single `NcActions` menu for the header actions of a page. Only `NcAction*`
  * components may be passed as default slot content.
  */
-const { buttonSize, buttonText, actionsInline } = useBreakpoints()
+const { buttonSize, actionsInline, isDesktop } = useBreakpoints()
 </script>

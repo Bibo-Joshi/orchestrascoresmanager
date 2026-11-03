@@ -17,20 +17,19 @@
 		</template>
 
 		<template #headerActions>
-			<div
-				:style="{width: screenSizeCategory === 'mobile' ? '100%' : screenSizeCategory === 'tablet' ? '40ex' : '60ex'}">
-				<NcTextField
+			<HeaderActions>
+				<NcActionInput
 					v-model="searchText"
+					type="string"
+					:label="t('Search')"
 					trailingButtonIcon="close"
-					:placeholder="t('Search Score or Score details')"
-					:showTrailingButton="searchText !== ''"
+					:showTrailingButton="!!searchText"
 					@trailingButtonClick="searchText = undefined">
 					<template #icon>
 						<SearchIcon :size="20" />
 					</template>
-				</NcTextField>
-			</div>
-			<HeaderActions>
+					{{ t('Search Score or Score details') }}
+				</NcActionInput>
 				<NcActionButton
 					v-if="editable"
 					closeAfterClick
@@ -62,14 +61,13 @@
 import { loadState } from '@nextcloud/initial-state'
 import { onMounted, ref } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
+import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import AddScoreDialog from './components/AddScoreDialog.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
 import HeaderActions from '@/components/HeaderActions.vue'
 import Layout from '@/components/Layout.vue'
 import ScoreSidebar from '@/components/ScoreSidebar.vue'
 import ScoresTable from '@/components/ScoresTable.vue'
-import { useBreakpoints } from '@/composables/useBreakpoints'
 import { useCsvExport } from '@/composables/useCsvExport'
 import { AddIcon, DownloadIcon, ScoreIcon, SearchIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
@@ -80,7 +78,6 @@ import { t } from '@/utils/l10n'
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
 const tagsStore = useTagsStore()
-const { screenSizeCategory } = useBreakpoints()
 const searchText = ref<string | undefined>(undefined)
 
 // Load initial state from the server

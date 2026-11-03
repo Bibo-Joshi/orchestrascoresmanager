@@ -38,32 +38,19 @@
 		</template>
 
 		<template #headerActions>
-			<!-- Search in Table -->
-			<div
-				:style="{width: screenSizeCategory === 'mobile' ? '100%' : screenSizeCategory === 'tablet' ? '40ex' : '60ex'}">
-				<NcTextField
+			<HeaderActions>
+				<NcActionInput
 					v-model="searchText"
+					type="string"
+					:label="t('Search')"
 					trailingButtonIcon="close"
-					:placeholder="t('Search Score or Score details')"
-					:showTrailingButton="searchText !== ''"
+					:showTrailingButton="!!searchText"
 					@trailingButtonClick="searchText = undefined">
 					<template #icon>
 						<SearchIcon :size="20" />
 					</template>
-				</NcTextField>
-			</div>
-
-			<!-- Version Selector -->
-			<NcSelect
-				v-if="versions.length > 0"
-				v-model="selectedVersionOption"
-				:options="versionOptions"
-				:placeholder="t('Select version')"
-				:clearable="false"
-				class="version-selector"
-				@input="handleVersionChange" />
-
-			<HeaderActions>
+					{{ t('Search Score or Score details') }}
+				</NcActionInput>
 				<NcActionButton
 					v-if="editable && isSelectedVersionActive && folderCollection"
 					closeAfterClick
@@ -73,17 +60,33 @@
 					</template>
 					{{ t('Add') }}
 				</NcActionButton>
-				<NcActionButton
-					v-if="editable && folderCollection"
-					closeAfterClick
-					:disabled="!isSelectedVersionActive"
-					:aria-label="t('Start new version')"
-					@click="startNewVersion">
-					<template #icon>
-						<HistoryIcon :size="20" />
-					</template>
-					{{ t('New Version') }}
-				</NcActionButton>
+				<template v-if="versions.length > 0 || (editable && folderCollection)">
+					<NcActionSeparator />
+					<NcActionInput
+						v-if="versions.length > 0"
+						v-model="selectedVersionOption"
+						type="multiselect"
+						:label="t('Version')"
+						:options="versionOptions"
+						:clearable="false">
+						<template #icon>
+							<HistoryIcon :size="20" />
+						</template>
+						{{ t('Select version') }}
+					</NcActionInput>
+					<NcActionButton
+						v-if="editable && folderCollection"
+						closeAfterClick
+						:disabled="!isSelectedVersionActive"
+						:aria-label="t('Start new version')"
+						@click="startNewVersion">
+						<template #icon>
+							<HistoryIcon :size="20" />
+						</template>
+						{{ t('New Version') }}
+					</NcActionButton>
+				</template>
+				<NcActionSeparator />
 				<NcActionButton
 					closeAfterClick
 					@click="exportCsv">
@@ -130,9 +133,9 @@ import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActionInput from '@nextcloud/vue/components/NcActionInput'
+import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import NcSelect from '@nextcloud/vue/components/NcSelect'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
 import AddToCollectionDialog from './components/AddToCollectionDialog.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
@@ -143,7 +146,6 @@ import ScoresTable from '@/components/ScoresTable.vue'
 import { useStartNewVersion } from './composables/useStartNewVersion.ts'
 import { useTocExport } from './composables/useTocExport.ts'
 import { apiClients } from '@/api/client'
-import { useBreakpoints } from '@/composables/useBreakpoints'
 import { useCsvExport } from '@/composables/useCsvExport'
 import { formatDateStr } from '@/composables/useDateFormatting'
 import { AddIcon, DownloadIcon, HistoryIcon, ScoreIcon, SearchIcon } from '@/icons/vue-material'
@@ -173,7 +175,6 @@ const router = useRouter()
 const folderCollectionsStore = useFolderCollectionsStore()
 const versionsStore = useFolderCollectionVersionsStore()
 const scoreBooksStore = useScoreBooksStore()
-const { screenSizeCategory } = useBreakpoints()
 
 const loading = ref(false)
 const loadError = ref(false)
@@ -680,9 +681,3 @@ async function deleteScoreBook(scoreBook: ScoreBook | ScoreBookIndexed) {
 	)
 }
 </script>
-
-<style lang="scss" scoped>
-.version-selector {
-	min-width: 200px;
-}
-</style>
