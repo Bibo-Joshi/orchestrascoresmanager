@@ -87,8 +87,8 @@ export interface PdfFormatConfig {
  */
 export const defaultPdfFormatConfig: PdfFormatConfig = {
 	titleFontSize: 16,
-	sectionFontSize: 11,
-	tableFontSize: 8,
+	sectionFontSize: 14,
+	tableFontSize: 12,
 	margin: 8,
 }
 

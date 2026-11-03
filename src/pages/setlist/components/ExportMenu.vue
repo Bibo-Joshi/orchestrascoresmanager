@@ -33,6 +33,23 @@
 		:name="t('Export PDF')"
 		:open="dialogOpen"
 		@update:open="dialogOpen = $event">
+		<div class="pdf-layout-select">
+			<strong>PDF-Layout</strong>
+			<NcCheckboxRadioSwitch
+				v-model="pdfLayout"
+				type="radio"
+				name="pdfLayout"
+				value="standard">
+				Standardlayout (Original)
+			</NcCheckboxRadioSwitch>
+			<NcCheckboxRadioSwitch
+				v-model="pdfLayout"
+				type="radio"
+				name="pdfLayout"
+				value="ntso">
+				NTSO-Bühnenlayout (farbig, kompakt)
+			</NcCheckboxRadioSwitch>
+		</div>
 		<p>{{ t('Select and reorder the columns to include in the PDF export.') }}</p>
 		<draggable
 			:list="dialogColumns"
@@ -93,7 +110,8 @@ import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
-import { exportSetlistToPdf } from '@/utils/pdf-exporter'
+import { exportSetlistToPdf as exportSetlistToPdfNtso } from '@/utils/pdf-exporter'
+import { exportSetlistToPdf as exportSetlistToPdfStandard } from '@/utils/pdf-exporter-standard'
 import { exportSetlistToGemaXlsx } from '@/utils/setlist-xlsx-exporter'
 
 interface Props {
@@ -117,6 +135,7 @@ interface DialogColumn extends PdfColumnConfig {
 	enabled: boolean
 }
 
+const pdfLayout = ref<'standard' | 'ntso'>('ntso')
 const dialogOpen = ref(false)
 const dialogColumns = ref<DialogColumn[]>([])
 const hasUserCustomizedColumns = ref(false)
@@ -183,7 +202,10 @@ async function onPdfExport(): Promise<void> {
 			// Fetch the server's latest score metadata before generating the PDF.
 			const response = await apiClients.default.scoreApiGetScores()
 			const freshScores = new Map(response.data.ocs.data.map((score) => [score.id, score]))
-			exportSetlistToPdf({
+			const exportPdf = pdfLayout.value === 'ntso'
+				? exportSetlistToPdfNtso
+				: exportSetlistToPdfStandard
+			exportPdf({
 				setlist: props.setlist,
 				entries: props.entries,
 				getScoreById: (id) => freshScores.get(id),
@@ -218,6 +240,13 @@ async function onGemaExport(): Promise<void> {
 </script>
 
 <style lang="scss" scoped>
+.pdf-layout-select {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5ex;
+	margin-bottom: 1.5ex;
+}
+
 .column-list {
 	padding: 1ex 0;
 }
