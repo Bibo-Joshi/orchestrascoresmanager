@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace OCA\OrchestraScoresManager\Tests\integration\Db\Scope;
 
+use OCA\OrchestraScoresManager\Db\Score;
 use OCA\OrchestraScoresManager\Db\ScoreBookScoreLinkMapper;
 use OCA\OrchestraScoresManager\Db\ScoreMapper;
 use OCA\OrchestraScoresManager\Db\ScoreTagLinkMapper;
 use OCA\OrchestraScoresManager\Db\TagMapper;
-use OCA\OrchestraScoresManager\Db\Score;
-use OCA\OrchestraScoresManager\Policy\ScorePolicy;
 use OCA\OrchestraScoresManager\Policy\PolicyInterface;
 use OCA\OrchestraScoresManager\Policy\Scope\EntityScopeInterface;
 use OCA\OrchestraScoresManager\Policy\Scope\ScoreScope;
+use OCA\OrchestraScoresManager\Policy\ScorePolicy;
 use OCA\OrchestraScoresManager\Service\PermissionService;
 
 final class ScoreScopeTest extends ScopePolicyTestCase {

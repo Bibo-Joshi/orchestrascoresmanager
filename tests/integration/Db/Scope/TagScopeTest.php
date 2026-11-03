@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace OCA\OrchestraScoresManager\Tests\integration\Db\Scope;
 
-use OCA\OrchestraScoresManager\Db\TagMapper;
 use OCA\OrchestraScoresManager\Db\Tag;
-use OCA\OrchestraScoresManager\Policy\TagPolicy;
+use OCA\OrchestraScoresManager\Db\TagMapper;
 use OCA\OrchestraScoresManager\Policy\PolicyInterface;
 use OCA\OrchestraScoresManager\Policy\Scope\EntityScopeInterface;
 use OCA\OrchestraScoresManager\Policy\Scope\TagScope;
+use OCA\OrchestraScoresManager\Policy\TagPolicy;
 use OCA\OrchestraScoresManager\Service\PermissionService;
 
 final class TagScopeTest extends ScopePolicyTestCase {

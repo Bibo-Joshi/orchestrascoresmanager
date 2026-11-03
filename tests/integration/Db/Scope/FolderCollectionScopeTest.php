@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace OCA\OrchestraScoresManager\Tests\integration\Db\Scope;
 
 use OCA\OrchestraScoresManager\Db\Enum\FolderCollectionType;
-use OCA\OrchestraScoresManager\Db\FolderCollectionMapper;
 use OCA\OrchestraScoresManager\Db\FolderCollection;
+use OCA\OrchestraScoresManager\Db\FolderCollectionMapper;
 use OCA\OrchestraScoresManager\Policy\FolderCollectionPolicy;
 use OCA\OrchestraScoresManager\Policy\PolicyInterface;
 use OCA\OrchestraScoresManager\Policy\Scope\EntityScopeInterface;
