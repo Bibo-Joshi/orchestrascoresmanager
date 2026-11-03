@@ -34,10 +34,10 @@
 		:open="dialogOpen"
 		@update:open="dialogOpen = $event">
 		<div class="pdf-layout-select">
-			<label for="pdf-profile-select"><strong>PDF-Layout</strong></label>
+			<label for="pdf-profile-select"><strong>{{ t('PDF layout') }}</strong></label>
 			<select id="pdf-profile-select" v-model="selectedPdfProfileId">
 				<option value="standard">
-					Standardlayout (Original)
+					{{ t('Standard layout (built-in)') }}
 				</option>
 				<option v-for="profile in availablePdfProfiles" :key="profile.id" :value="profile.id">
 					{{ profile.name }}

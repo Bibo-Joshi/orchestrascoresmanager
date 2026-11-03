@@ -51,7 +51,7 @@ function color(value: unknown, fallback: string): string {
 
 /**
  * Normalize untrusted responses and user input, preserve rule order (priority).
- * @param raw
+ * @param raw Untrusted layout profiles to validate and normalize.
  */
 export function normalizeProfiles(raw: unknown): PdfLayoutProfile[] {
 	const input = Array.isArray(raw) ? raw.slice(0, 12) : []
@@ -110,8 +110,8 @@ export function hexToRgb(hex: string): [number, number, number] {
 
 /**
  * Exact, case-insensitive, tag-name matching. First matching color rule wins.
- * @param tags
- * @param expression
+ * @param tags Tag names assigned to a score.
+ * @param expression A tag expression using AND (&) and OR (|).
  */
 export function matchesTags(tags: string[], expression: string): boolean {
 	const names = new Set(tags.map((tag) => tag.trim().toLocaleLowerCase()))

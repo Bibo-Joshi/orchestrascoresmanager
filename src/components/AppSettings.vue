@@ -32,15 +32,15 @@
 				</div>
 			</NcFormGroup>
 		</NcAppSettingsSection>
-		<NcAppSettingsSection id="pdf-layouts" name="PDF-Layouts">
+		<NcAppSettingsSection id="pdf-layouts" :name="t('PDF layouts')">
 			<div class="pdf-profile-heading">
-				<p>PDF-Vorlagen für den Setlistenexport. Das Standardlayout des Entwicklers bleibt unverändert.</p>
+				<p>{{ t('Manage PDF layouts for setlist exports. The built-in standard layout cannot be modified.') }}</p>
 				<NcButton variant="secondary" @click="addPdfProfile">
-					+ Layout
+					{{ t('Add layout') }}
 				</NcButton>
 			</div>
 			<div class="pdf-standard-profile">
-				🔒 Standardlayout (Original, nicht veränderbar)
+				🔒 {{ t('Standard layout (built-in, read-only)') }}
 			</div>
 			<details v-for="profile in pdfProfiles" :key="profile.id" class="pdf-profile">
 				<summary class="pdf-profile-summary">
@@ -48,93 +48,93 @@
 				</summary>
 				<div class="pdf-profile-content">
 					<div class="pdf-field">
-						<label :for="`profile-name-${profile.id}`">Layoutname</label>
+						<label :for="`profile-name-${profile.id}`">{{ t('Layout name') }}</label>
 						<input :id="`profile-name-${profile.id}`"
 							v-model="profile.name"
 							type="text"
 							maxlength="80">
 					</div>
 					<div class="pdf-numeric-grid">
-						<label>Überschrift (pt)<input v-model.number="profile.titleFontSize"
+						<label>{{ t('Title font size (pt)') }}<input v-model.number="profile.titleFontSize"
 							type="number"
 							min="8"
 							max="36"
 							step="0.5"></label>
-						<label>Abschnitt (pt)<input v-model.number="profile.sectionFontSize"
+						<label>{{ t('Section font size (pt)') }}<input v-model.number="profile.sectionFontSize"
 							type="number"
 							min="7"
 							max="24"
 							step="0.5"></label>
-						<label>Tabellenschrift (pt)<input v-model.number="profile.tableFontSize"
+						<label>{{ t('Table font size (pt)') }}<input v-model.number="profile.tableFontSize"
 							type="number"
 							min="6"
 							max="18"
 							step="0.5"></label>
-						<label>Seitenrand (mm)<input v-model.number="profile.margin"
+						<label>{{ t('Page margin (mm)') }}<input v-model.number="profile.margin"
 							type="number"
 							min="3"
 							max="30"
 							step="0.5"></label>
-						<label>Zellenabstand (mm)<input v-model.number="profile.cellPadding"
+						<label>{{ t('Cell padding (mm)') }}<input v-model.number="profile.cellPadding"
 							type="number"
 							min="0.3"
 							max="8"
 							step="0.5"></label>
-						<label>Pausenabstand (mm)<input v-model.number="profile.breakPadding"
+						<label>{{ t('Break padding (mm)') }}<input v-model.number="profile.breakPadding"
 							type="number"
 							min="1"
 							max="10"
 							step="0.5"></label>
-						<label>Pausenfarbe<input v-model="profile.breakColor" type="color"></label>
+						<label>{{ t('Break row color') }}<input v-model="profile.breakColor" type="color"></label>
 					</div>
-					<h4>Farbregeln nach Schlagworten</h4>
+					<h4>{{ t('Tag-based row colors') }}</h4>
 					<p class="pdf-hint">
-						Die erste passende Regel gewinnt. &amp; bedeutet UND, | bedeutet ODER.
+						{{ t('The first matching rule wins. Use & for AND and | for OR.') }}
 					</p>
 					<div v-for="(rule, index) in profile.rules" :key="rule.id" class="pdf-rule">
 						<input v-model="rule.label"
-							aria-label="Bezeichnung"
-							title="Legendenbezeichnung"
+							:aria-label="t('Rule label')"
+							:title="t('Legend label')"
 							maxlength="60"
-							placeholder="Male">
+							:placeholder="t('e.g. Singer')">
 						<input v-model="rule.expression"
-							aria-label="Schlagwortkombination"
-							title="Schlagwortkombination"
+							:aria-label="t('Tag expression')"
+							:title="t('Tag expression')"
 							maxlength="240"
-							placeholder="Male & Female | Duett">
-						<input v-model="rule.color" aria-label="Farbe" type="color">
+							:placeholder="t('e.g. Tag A & Tag B | Tag C')">
+						<input v-model="rule.color" :aria-label="t('Color')" type="color">
 						<button type="button"
-							aria-label="Regel nach oben"
+							:aria-label="t('Move rule up')"
 							:disabled="index === 0"
 							@click="movePdfRule(profile, index, -1)">
 							↑
 						</button>
 						<button type="button"
-							aria-label="Regel nach unten"
+							:aria-label="t('Move rule down')"
 							:disabled="index === profile.rules.length - 1"
 							@click="movePdfRule(profile, index, 1)">
 							↓
 						</button>
-						<button type="button" aria-label="Regel entfernen" @click="profile.rules.splice(index, 1)">
+						<button type="button" :aria-label="t('Remove rule')" @click="profile.rules.splice(index, 1)">
 							−
 						</button>
 					</div>
 					<div class="pdf-profile-actions">
 						<NcButton variant="secondary" @click="addPdfRule(profile)">
-							+ Farbregel
+							{{ t('Add color rule') }}
 						</NcButton>
 						<NcButton variant="tertiary" @click="duplicatePdfProfile(profile)">
-							Layout duplizieren
+							{{ t('Duplicate layout') }}
 						</NcButton>
 						<NcButton variant="tertiary" @click="removePdfProfile(profile)">
-							− Layout entfernen
+							{{ t('Remove layout') }}
 						</NcButton>
 					</div>
 				</div>
 			</details>
 			<div class="save-button-container">
 				<NcButton variant="primary" :disabled="isSavingPdfProfiles" @click="savePdfProfiles">
-					{{ isSavingPdfProfiles ? 'Speichere …' : 'PDF-Layouts speichern' }}
+					{{ isSavingPdfProfiles ? t('Saving…') : t('Save PDF layouts') }}
 				</NcButton>
 			</div>
 		</NcAppSettingsSection>
@@ -246,23 +246,23 @@ function createPdfId(): string {
 
 function addPdfProfile(): void {
 	if (pdfProfiles.value.length >= 12) {
-		showError('Maximal 12 PDF-Layouts möglich.')
+		showError(t('You can create up to 12 PDF layouts.'))
 		return
 	}
 	const profile = cloneProfile(DEFAULT_PDF_PROFILE)
 	profile.id = createPdfId()
-	profile.name = 'Neues Layout'
+	profile.name = t('New layout')
 	pdfProfiles.value.push(profile)
 }
 
 function duplicatePdfProfile(source: PdfLayoutProfile): void {
 	if (pdfProfiles.value.length >= 12) {
-		showError('Maximal 12 PDF-Layouts möglich.')
+		showError(t('You can create up to 12 PDF layouts.'))
 		return
 	}
 	const duplicate = cloneProfile(source)
 	duplicate.id = createPdfId()
-	duplicate.name = `${source.name} (Kopie)`
+	duplicate.name = `${source.name} (${t('copy')})`
 	duplicate.rules.forEach((rule) => {
 		rule.id = createPdfId()
 	})
@@ -271,7 +271,7 @@ function duplicatePdfProfile(source: PdfLayoutProfile): void {
 }
 
 function removePdfProfile(profile: PdfLayoutProfile): void {
-	if (!window.confirm(`Layout „${profile.name}“ wirklich entfernen?`)) {
+	if (!window.confirm(t('Delete layout "{name}"?', { name: profile.name }))) {
 		return
 	}
 	pdfProfiles.value = pdfProfiles.value.filter((p) => p.id !== profile.id)
@@ -279,10 +279,10 @@ function removePdfProfile(profile: PdfLayoutProfile): void {
 
 function addPdfRule(profile: PdfLayoutProfile): void {
 	if (profile.rules.length >= 30) {
-		showError('Maximal 30 Farbregeln pro Layout möglich.')
+		showError(t('You can create up to 30 color rules per layout.'))
 		return
 	}
-	profile.rules.push({ id: createPdfId(), label: 'Neue Regel', expression: '', color: '#FFF1BC' })
+	profile.rules.push({ id: createPdfId(), label: t('New rule'), expression: '', color: '#FFF1BC' })
 }
 
 function movePdfRule(profile: PdfLayoutProfile, index: number, delta: number): void {
@@ -298,14 +298,14 @@ function movePdfRule(profile: PdfLayoutProfile, index: number, delta: number): v
 
 async function savePdfProfiles(): Promise<void> {
 	if (pdfProfiles.value.some((p) => !p.name.trim() || p.rules.some((r) => !r.label.trim() || !r.expression.trim()))) {
-		showError('Bitte alle Layoutnamen sowie die Bezeichnungen und Ausdrücke der Farbregeln ausfüllen.')
+		showError(t('Please fill in all layout names, rule labels and tag expressions.'))
 		return
 	}
 	isSavingPdfProfiles.value = true
 	try {
 		pdfProfiles.value = await putPdfProfiles(pdfProfiles.value)
 	} catch {
-		showError('Konnte PDF-Layouts nicht speichern.')
+		showError(t('Failed to save PDF layouts.'))
 	} finally {
 		isSavingPdfProfiles.value = false
 	}

@@ -107,8 +107,8 @@ export const defaultPdfFormatConfig: PdfFormatConfig = {
 
 /**
  * Determine a score row's colour from the first matching profile rule.
- * @param score
- * @param config
+ * @param score Score metadata, if available.
+ * @param config The selected PDF layout configuration.
  */
 function scoreRowColor(score: Score | undefined, config: PdfFormatConfig): [number, number, number] | null {
 	const rule = config.rules?.find((candidate) => matchesTags(score?.tags ?? [], candidate.expression))

@@ -1099,3 +1099,114 @@ msgstr ""
 
 msgid "Invalid duration format"
 msgstr ""
+
+msgid "PDF layouts"
+msgstr ""
+
+msgid "Manage PDF layouts for setlist exports. The built-in standard layout cannot be modified."
+msgstr ""
+
+msgid "Add layout"
+msgstr ""
+
+msgid "Standard layout (built-in, read-only)"
+msgstr ""
+
+msgid "Layout name"
+msgstr ""
+
+msgid "Title font size (pt)"
+msgstr ""
+
+msgid "Section font size (pt)"
+msgstr ""
+
+msgid "Table font size (pt)"
+msgstr ""
+
+msgid "Page margin (mm)"
+msgstr ""
+
+msgid "Cell padding (mm)"
+msgstr ""
+
+msgid "Break padding (mm)"
+msgstr ""
+
+msgid "Break row color"
+msgstr ""
+
+msgid "Tag-based row colors"
+msgstr ""
+
+msgid "The first matching rule wins. Use & for AND and | for OR."
+msgstr ""
+
+msgid "Rule label"
+msgstr ""
+
+msgid "Legend label"
+msgstr ""
+
+msgid "Tag expression"
+msgstr ""
+
+msgid "Color"
+msgstr ""
+
+msgid "Move rule up"
+msgstr ""
+
+msgid "Move rule down"
+msgstr ""
+
+msgid "Remove rule"
+msgstr ""
+
+msgid "Add color rule"
+msgstr ""
+
+msgid "Duplicate layout"
+msgstr ""
+
+msgid "Remove layout"
+msgstr ""
+
+msgid "Save PDF layouts"
+msgstr ""
+
+msgid "You can create up to 12 PDF layouts."
+msgstr ""
+
+msgid "New layout"
+msgstr ""
+
+msgid "copy"
+msgstr ""
+
+msgid "Delete layout \"{name}\"?"
+msgstr ""
+
+msgid "You can create up to 30 color rules per layout."
+msgstr ""
+
+msgid "New rule"
+msgstr ""
+
+msgid "Please fill in all layout names, rule labels and tag expressions."
+msgstr ""
+
+msgid "Failed to save PDF layouts."
+msgstr ""
+
+msgid "PDF layout"
+msgstr ""
+
+msgid "Standard layout (built-in)"
+msgstr ""
+
+msgid "e.g. Singer"
+msgstr ""
+
+msgid "e.g. Tag A & Tag B | Tag C"
+msgstr ""

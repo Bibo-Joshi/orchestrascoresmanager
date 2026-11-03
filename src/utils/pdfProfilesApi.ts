@@ -19,7 +19,7 @@ export async function fetchPdfProfiles(): Promise<PdfLayoutProfile[]> {
 
 /**
  * Save all profiles in one transaction. Server owns persistence, not browser localStorage.
- * @param profiles
+ * @param profiles Custom layout profiles to persist.
  */
 export async function putPdfProfiles(profiles: PdfLayoutProfile[]): Promise<PdfLayoutProfile[]> {
 	const normalized = normalizeProfiles(profiles)
