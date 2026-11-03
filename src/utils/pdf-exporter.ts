@@ -1,6 +1,6 @@
 import type { Table as AutoTable, Styles } from 'jspdf-autotable'
 import type { FolderCollection, Score, ScoreBook, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
-import type { NtsoTagColorRule } from '@/utils/ntsoPdfSettings'
+import type { PdfTagColorRule } from '@/utils/pdfLayoutSettings'
 import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
 
 /**
@@ -12,7 +12,7 @@ import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
 import { jsPDF } from 'jspdf'
 import { autoTable } from 'jspdf-autotable'
 import { t } from '@/utils/l10n'
-import { ntsoHexToRgb, ntsoMatchesTags } from '@/utils/ntsoPdfSettings'
+import { hexToRgb, matchesTags } from '@/utils/pdfLayoutSettings'
 import { isBreakEntry, resolveScoreField } from '@/utils/setlistScoreUtils'
 import { formatDurationHHMM, formatDurationHHMMSS } from '@/utils/timeFormatUtils'
 
@@ -92,7 +92,7 @@ export interface PdfFormatConfig {
 	cellPadding?: number
 	breakPadding?: number
 	breakColor?: string
-	rules?: NtsoTagColorRule[]
+	rules?: PdfTagColorRule[]
 }
 
 /**
@@ -111,8 +111,8 @@ export const defaultPdfFormatConfig: PdfFormatConfig = {
  * @param config
  */
 function scoreRowColor(score: Score | undefined, config: PdfFormatConfig): [number, number, number] | null {
-	const rule = config.rules?.find((candidate) => ntsoMatchesTags(score?.tags ?? [], candidate.expression))
-	return rule ? ntsoHexToRgb(rule.color) : null
+	const rule = config.rules?.find((candidate) => matchesTags(score?.tags ?? [], candidate.expression))
+	return rule ? hexToRgb(rule.color) : null
 }
 
 /**
@@ -375,7 +375,7 @@ export function exportSetlistToPdf(
 
 		// One-line legend. Coloured backgrounds are derived from score tags, not setlist comments.
 		const legend: Array<{ label: string, color: [number, number, number] }> = (activeConfig.rules ?? [])
-			.map((rule) => ({ label: rule.label, color: ntsoHexToRgb(rule.color) }))
+			.map((rule) => ({ label: rule.label, color: hexToRgb(rule.color) }))
 		let x = margin
 		doc.setFontSize(8)
 		for (const item of legend) {
@@ -519,7 +519,7 @@ export function exportSetlistToPdf(
 			}
 			if (breakRows.has(cellData.row.index)) {
 				// Dark, high-contrast band spanning the entire table row.
-				cellData.cell.styles.fillColor = ntsoHexToRgb(activeConfig.breakColor ?? '#354354')
+				cellData.cell.styles.fillColor = hexToRgb(activeConfig.breakColor ?? '#354354')
 				cellData.cell.styles.textColor = [255, 255, 255]
 				cellData.cell.styles.fontStyle = 'bold'
 				cellData.cell.styles.minCellHeight = 10

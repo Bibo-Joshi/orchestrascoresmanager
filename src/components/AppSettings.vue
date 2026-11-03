@@ -142,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NtsoPdfProfile } from '@/utils/ntsoPdfSettings'
+import type { PdfLayoutProfile } from '@/utils/pdfLayoutSettings'
 
 import { showError } from '@nextcloud/dialogs'
 import { computed, defineModel, onMounted, ref } from 'vue'
@@ -158,15 +158,15 @@ import { useAppSettingsStore } from '@/stores/appSettingsStore'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
-import { fetchPdfProfiles, putPdfProfiles } from '@/utils/ntsoPdfProfilesApi'
-import { cloneProfile, DEFAULT_NTSO_PROFILE } from '@/utils/ntsoPdfSettings'
+import { cloneProfile, DEFAULT_PDF_PROFILE } from '@/utils/pdfLayoutSettings'
+import { fetchPdfProfiles, putPdfProfiles } from '@/utils/pdfProfilesApi'
 import {
 	formatDurationHHMMSS,
 	parseDurationHHMMSS,
 	restrictToTimeFormat as restrictInputToTimeFormat,
 } from '@/utils/timeFormatUtils'
 const open = defineModel<boolean>({ default: false })
-const pdfProfiles = ref<NtsoPdfProfile[]>([])
+const pdfProfiles = ref<PdfLayoutProfile[]>([])
 const isSavingPdfProfiles = ref(false)
 
 const appSettingsStore = useAppSettingsStore()
@@ -249,13 +249,13 @@ function addPdfProfile(): void {
 		showError('Maximal 12 PDF-Layouts möglich.')
 		return
 	}
-	const profile = cloneProfile(DEFAULT_NTSO_PROFILE)
+	const profile = cloneProfile(DEFAULT_PDF_PROFILE)
 	profile.id = createPdfId()
 	profile.name = 'Neues Layout'
 	pdfProfiles.value.push(profile)
 }
 
-function duplicatePdfProfile(source: NtsoPdfProfile): void {
+function duplicatePdfProfile(source: PdfLayoutProfile): void {
 	if (pdfProfiles.value.length >= 12) {
 		showError('Maximal 12 PDF-Layouts möglich.')
 		return
@@ -270,14 +270,14 @@ function duplicatePdfProfile(source: NtsoPdfProfile): void {
 	pdfProfiles.value.push(duplicate)
 }
 
-function removePdfProfile(profile: NtsoPdfProfile): void {
+function removePdfProfile(profile: PdfLayoutProfile): void {
 	if (!window.confirm(`Layout „${profile.name}“ wirklich entfernen?`)) {
 		return
 	}
 	pdfProfiles.value = pdfProfiles.value.filter((p) => p.id !== profile.id)
 }
 
-function addPdfRule(profile: NtsoPdfProfile): void {
+function addPdfRule(profile: PdfLayoutProfile): void {
 	if (profile.rules.length >= 30) {
 		showError('Maximal 30 Farbregeln pro Layout möglich.')
 		return
@@ -285,7 +285,7 @@ function addPdfRule(profile: NtsoPdfProfile): void {
 	profile.rules.push({ id: createPdfId(), label: 'Neue Regel', expression: '', color: '#FFF1BC' })
 }
 
-function movePdfRule(profile: NtsoPdfProfile, index: number, delta: number): void {
+function movePdfRule(profile: PdfLayoutProfile, index: number, delta: number): void {
 	const next = index + delta
 	if (next < 0 || next >= profile.rules.length) {
 		return

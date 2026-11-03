@@ -1,5 +1,5 @@
-/** PDF stage-layout profiles. `standard` is always provided by upstream and never stored. */
-export interface NtsoTagColorRule {
+/** PDF layout profiles. The built-in `standard` layout is never stored. */
+export interface PdfTagColorRule {
 	id: string
 	label: string
 	/** AND: '&', OR: '|'  (e.g. 'Male & Female | Duett') */
@@ -7,7 +7,7 @@ export interface NtsoTagColorRule {
 	color: string
 }
 
-export interface NtsoPdfSettings {
+export interface PdfLayoutSettings {
 	titleFontSize: number
 	sectionFontSize: number
 	tableFontSize: number
@@ -15,17 +15,17 @@ export interface NtsoPdfSettings {
 	cellPadding: number
 	breakPadding: number
 	breakColor: string
-	rules: NtsoTagColorRule[]
+	rules: PdfTagColorRule[]
 }
 
-export interface NtsoPdfProfile extends NtsoPdfSettings {
+export interface PdfLayoutProfile extends PdfLayoutSettings {
 	id: string
 	name: string
 }
 
-export const DEFAULT_NTSO_PROFILE: NtsoPdfProfile = {
-	id: 'ntso',
-	name: 'NTSO – Bühnenlayout',
+export const DEFAULT_PDF_PROFILE: PdfLayoutProfile = {
+	id: 'stage',
+	name: 'Stage layout',
 	titleFontSize: 16,
 	sectionFontSize: 11,
 	tableFontSize: 8,
@@ -33,15 +33,10 @@ export const DEFAULT_NTSO_PROFILE: NtsoPdfProfile = {
 	cellPadding: 1.5,
 	breakPadding: 3,
 	breakColor: '#354354',
-	rules: [
-		{ id: 'duet', label: 'Duett', expression: 'Male & Female | Duett | Duet', color: '#FFE0B2' },
-		{ id: 'instrumental', label: 'Instrumental', expression: 'Instrumental', color: '#E0F2D9' },
-		{ id: 'female', label: 'Female', expression: 'Female', color: '#FFDCEB' },
-		{ id: 'male', label: 'Male', expression: 'Male', color: '#DCEEFF' },
-	],
+	rules: [],
 }
 
-export function cloneProfile(profile: NtsoPdfProfile): NtsoPdfProfile {
+export function cloneProfile(profile: PdfLayoutProfile): PdfLayoutProfile {
 	return { ...profile, rules: profile.rules.map((rule) => ({ ...rule })) }
 }
 
@@ -58,22 +53,22 @@ function color(value: unknown, fallback: string): string {
  * Normalize untrusted responses and user input, preserve rule order (priority).
  * @param raw
  */
-export function normalizeProfiles(raw: unknown): NtsoPdfProfile[] {
+export function normalizeProfiles(raw: unknown): PdfLayoutProfile[] {
 	const input = Array.isArray(raw) ? raw.slice(0, 12) : []
 	const seen = new Set<string>()
-	const result: NtsoPdfProfile[] = []
+	const result: PdfLayoutProfile[] = []
 	for (const item of input) {
 		if (!item || typeof item !== 'object') {
 			continue
 		}
-		const p = item as Partial<NtsoPdfProfile>
+		const p = item as Partial<PdfLayoutProfile>
 		const id = typeof p.id === 'string' ? p.id.trim().slice(0, 64) : ''
 		const name = typeof p.name === 'string' ? p.name.trim().slice(0, 80) : ''
 		if (!id || !name || id === 'standard' || seen.has(id)) {
 			continue
 		}
 		seen.add(id)
-		const defaults = DEFAULT_NTSO_PROFILE
+		const defaults = DEFAULT_PDF_PROFILE
 		const rules = Array.isArray(p.rules)
 			? p.rules.slice(0, 30).flatMap((rule, i) => {
 					if (!rule || typeof rule !== 'object') {
@@ -108,7 +103,7 @@ export function normalizeProfiles(raw: unknown): NtsoPdfProfile[] {
 	return result
 }
 
-export function ntsoHexToRgb(hex: string): [number, number, number] {
+export function hexToRgb(hex: string): [number, number, number] {
 	const safe = color(hex, '#FFFFFF')
 	return [1, 3, 5].map((i) => Number.parseInt(safe.slice(i, i + 2), 16)) as [number, number, number]
 }
@@ -118,7 +113,7 @@ export function ntsoHexToRgb(hex: string): [number, number, number] {
  * @param tags
  * @param expression
  */
-export function ntsoMatchesTags(tags: string[], expression: string): boolean {
+export function matchesTags(tags: string[], expression: string): boolean {
 	const names = new Set(tags.map((tag) => tag.trim().toLocaleLowerCase()))
 	return expression.split('|').some((group) => {
 		const required = group.split('&').map((tag) => tag.trim().toLocaleLowerCase()).filter(Boolean)

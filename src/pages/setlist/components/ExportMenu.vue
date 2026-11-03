@@ -87,8 +87,8 @@
 
 <script setup lang="ts">
 import type { FolderCollection, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
-import type { NtsoPdfProfile } from '@/utils/ntsoPdfSettings'
 import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
+import type { PdfLayoutProfile } from '@/utils/pdfLayoutSettings'
 
 import { computed, ref } from 'vue'
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
@@ -105,9 +105,9 @@ import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
-import { fetchPdfProfiles } from '@/utils/ntsoPdfProfilesApi'
-import { cloneProfile, DEFAULT_NTSO_PROFILE } from '@/utils/ntsoPdfSettings'
 import { exportSetlistToPdf } from '@/utils/pdf-exporter'
+import { cloneProfile, DEFAULT_PDF_PROFILE } from '@/utils/pdfLayoutSettings'
+import { fetchPdfProfiles } from '@/utils/pdfProfilesApi'
 import { exportSetlistToGemaXlsx } from '@/utils/setlist-xlsx-exporter'
 
 interface Props {
@@ -131,8 +131,8 @@ interface DialogColumn extends PdfColumnConfig {
 	enabled: boolean
 }
 
-const selectedPdfProfileId = ref('ntso')
-const availablePdfProfiles = ref<NtsoPdfProfile[]>([cloneProfile(DEFAULT_NTSO_PROFILE)])
+const selectedPdfProfileId = ref('standard')
+const availablePdfProfiles = ref<PdfLayoutProfile[]>([cloneProfile(DEFAULT_PDF_PROFILE)])
 const dialogOpen = ref(false)
 const dialogColumns = ref<DialogColumn[]>([])
 const hasUserCustomizedColumns = ref(false)
@@ -218,7 +218,7 @@ async function onPdfExport(): Promise<void> {
 				columnConfigs: selectedColumns,
 			}, selectedPdfProfileId.value === 'standard'
 				? undefined
-				: (availablePdfProfiles.value.find((p) => p.id === selectedPdfProfileId.value) ?? DEFAULT_NTSO_PROFILE))
+				: (availablePdfProfiles.value.find((p) => p.id === selectedPdfProfileId.value) ?? undefined))
 		},
 		t('Export failed: '),
 	)
