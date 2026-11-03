@@ -1,5 +1,6 @@
 import type { Styles } from 'jspdf-autotable'
 import type { FolderCollection, Score, ScoreBook, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
+import type { NtsoTagColorRule } from '@/utils/ntsoPdfSettings'
 import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
 
 /**
@@ -11,6 +12,7 @@ import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
 import { jsPDF } from 'jspdf'
 import { autoTable } from 'jspdf-autotable'
 import { t } from '@/utils/l10n'
+import { ntsoHexToRgb, ntsoMatchesTags } from '@/utils/ntsoPdfSettings'
 import { isBreakEntry, resolveScoreField } from '@/utils/setlistScoreUtils'
 import { formatDurationHHMM, formatDurationHHMMSS } from '@/utils/timeFormatUtils'
 
@@ -80,6 +82,10 @@ export interface PdfFormatConfig {
 	tableFontSize: number
 	/** Page margins in mm */
 	margin: number
+	cellPadding?: number
+	breakPadding?: number
+	breakColor?: string
+	rules?: NtsoTagColorRule[]
 }
 
 /**
@@ -112,7 +118,11 @@ const NTSO_ROW_COLORS = {
 	male: [220, 238, 255] as [number, number, number], // light blue
 } as const
 
-function ntsoScoreRowColor(score: Score | undefined): [number, number, number] | null {
+function ntsoScoreRowColor(score: Score | undefined, config: PdfFormatConfig): [number, number, number] | null {
+	if (config.rules) {
+		const rule = config.rules.find((r) => ntsoMatchesTags(score?.tags ?? [], r.expression))
+		return rule ? ntsoHexToRgb(rule.color) : null
+	}
 	const names = new Set((score?.tags ?? []).map((name) => name.trim().toLocaleLowerCase()))
 	const has = (aliases: readonly string[]) => aliases.some((alias) => names.has(alias))
 	const male = has(NTSO_TAG_ALIASES.male)
@@ -363,20 +373,27 @@ export function exportSetlistToPdf(
 	y += detailLines.length * (config.tableFontSize * 0.4 + 1.5) + 3
 
 	// One-line legend. Coloured backgrounds are derived from score tags, not setlist comments.
-	const legend: Array<{ label: string, color: [number, number, number] }> = [
-		{ label: 'Male', color: NTSO_ROW_COLORS.male },
-		{ label: 'Female', color: NTSO_ROW_COLORS.female },
-		{ label: 'Duett', color: NTSO_ROW_COLORS.duet },
-		{ label: 'Instrumental', color: NTSO_ROW_COLORS.instrumental },
-	]
+	const legend: Array<{ label: string, color: [number, number, number] }> = config.rules
+		? config.rules.map((rule) => ({ label: rule.label, color: ntsoHexToRgb(rule.color) }))
+		: [
+				{ label: 'Male', color: NTSO_ROW_COLORS.male },
+				{ label: 'Female', color: NTSO_ROW_COLORS.female },
+				{ label: 'Duett', color: NTSO_ROW_COLORS.duet },
+				{ label: 'Instrumental', color: NTSO_ROW_COLORS.instrumental },
+			]
 	let x = margin
 	doc.setFontSize(8)
 	for (const item of legend) {
+		const itemWidth = doc.getTextWidth(item.label) + 13
+		if (x + itemWidth > pageWidth - margin && x > margin) {
+			x = margin
+			y += 6
+		}
 		doc.setFillColor(...item.color)
 		doc.rect(x, y - 2.5, 3.5, 3.5, 'F')
 		doc.setTextColor(0, 0, 0)
 		doc.text(item.label, x + 5, y + 0.2)
-		x += doc.getTextWidth(item.label) + 13
+		x += itemWidth
 	}
 	y += 6
 	// --- Entries table ---
@@ -410,7 +427,7 @@ export function exportSetlistToPdf(
 			ntsoBreakRows.add(entryRows.length)
 			ntsoRowColors.push(null)
 		} else {
-			ntsoRowColors.push(ntsoScoreRowColor(score))
+			ntsoRowColors.push(ntsoScoreRowColor(score, config))
 		}
 		entryRows.push(activeColumns.map((col) => getEntryCellValue(col.id, entry, startTime, effectiveDuration, effectiveMod, score, getScoreBookById, fcvScoresMap, fcvScoreBookIndicesMap)))
 	}
@@ -422,7 +439,7 @@ export function exportSetlistToPdf(
 		theme: 'plain',
 		margin: { left: margin, right: margin },
 		tableWidth: contentWidth,
-		styles: { fontSize: config.tableFontSize, overflow: 'linebreak', lineWidth: 0 },
+		styles: { fontSize: config.tableFontSize, overflow: 'linebreak', lineWidth: 0, ...(config.cellPadding !== undefined ? { cellPadding: config.cellPadding } : {}) },
 		headStyles: {
 			fontStyle: 'bold',
 			fillColor: false,
@@ -437,11 +454,16 @@ export function exportSetlistToPdf(
 			}
 			if (ntsoBreakRows.has(cellData.row.index)) {
 				// Dark, high-contrast band spanning the entire table row.
-				cellData.cell.styles.fillColor = [53, 67, 84]
+				cellData.cell.styles.fillColor = ntsoHexToRgb(config.breakColor ?? '#354354')
 				cellData.cell.styles.textColor = [255, 255, 255]
 				cellData.cell.styles.fontStyle = 'bold'
 				cellData.cell.styles.minCellHeight = 10
-				cellData.cell.styles.cellPadding = { top: 3, right: 2, bottom: 3, left: 2 }
+				cellData.cell.styles.cellPadding = {
+					top: config.breakPadding ?? 3,
+					right: 2,
+					bottom: config.breakPadding ?? 3,
+					left: 2,
+				}
 				if (activeColumns[cellData.column.index]?.id === 'title') {
 					cellData.cell.text = [t('Break').toLocaleUpperCase()]
 				}

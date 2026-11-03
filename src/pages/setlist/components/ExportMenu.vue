@@ -34,21 +34,15 @@
 		:open="dialogOpen"
 		@update:open="dialogOpen = $event">
 		<div class="pdf-layout-select">
-			<strong>PDF-Layout</strong>
-			<NcCheckboxRadioSwitch
-				v-model="pdfLayout"
-				type="radio"
-				name="pdfLayout"
-				value="standard">
-				Standardlayout (Original)
-			</NcCheckboxRadioSwitch>
-			<NcCheckboxRadioSwitch
-				v-model="pdfLayout"
-				type="radio"
-				name="pdfLayout"
-				value="ntso">
-				NTSO-Bühnenlayout (farbig, kompakt)
-			</NcCheckboxRadioSwitch>
+			<label for="pdf-profile-select"><strong>PDF-Layout</strong></label>
+			<select id="pdf-profile-select" v-model="selectedPdfProfileId">
+				<option value="standard">
+					Standardlayout (Original)
+				</option>
+				<option v-for="profile in availablePdfProfiles" :key="profile.id" :value="profile.id">
+					{{ profile.name }}
+				</option>
+			</select>
 		</div>
 		<p>{{ t('Select and reorder the columns to include in the PDF export.') }}</p>
 		<draggable
@@ -93,6 +87,7 @@
 
 <script setup lang="ts">
 import type { FolderCollection, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
+import type { NtsoPdfProfile } from '@/utils/ntsoPdfSettings'
 import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
 
 import { computed, ref } from 'vue'
@@ -110,6 +105,8 @@ import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
+import { fetchPdfProfiles } from '@/utils/ntsoPdfProfilesApi'
+import { cloneProfile, DEFAULT_NTSO_PROFILE } from '@/utils/ntsoPdfSettings'
 import { exportSetlistToPdf as exportSetlistToPdfNtso } from '@/utils/pdf-exporter'
 import { exportSetlistToPdf as exportSetlistToPdfStandard } from '@/utils/pdf-exporter-standard'
 import { exportSetlistToGemaXlsx } from '@/utils/setlist-xlsx-exporter'
@@ -135,7 +132,8 @@ interface DialogColumn extends PdfColumnConfig {
 	enabled: boolean
 }
 
-const pdfLayout = ref<'standard' | 'ntso'>('ntso')
+const selectedPdfProfileId = ref('ntso')
+const availablePdfProfiles = ref<NtsoPdfProfile[]>([cloneProfile(DEFAULT_NTSO_PROFILE)])
 const dialogOpen = ref(false)
 const dialogColumns = ref<DialogColumn[]>([])
 const hasUserCustomizedColumns = ref(false)
@@ -166,7 +164,15 @@ const DEFAULT_ENABLED_IDS: computed<ReadonlySet<PdfColumnId>> = computed(() => {
  * Open the PDF export configuration dialog, populating it with the current
  * column order from the table.
  */
-function openDialog(): void {
+async function openDialog(): Promise<void> {
+	try {
+		availablePdfProfiles.value = await fetchPdfProfiles()
+		if (selectedPdfProfileId.value !== 'standard' && !availablePdfProfiles.value.some((p) => p.id === selectedPdfProfileId.value)) {
+			selectedPdfProfileId.value = availablePdfProfiles.value[0]?.id ?? 'standard'
+		}
+	} catch {
+		// Fallback to last known layout if the settings endpoint is temporarily unavailable.
+	}
 	const currentColumns = props.getColumns()
 		.filter((col) => col.label.trim() !== '')
 
@@ -202,7 +208,7 @@ async function onPdfExport(): Promise<void> {
 			// Fetch the server's latest score metadata before generating the PDF.
 			const response = await apiClients.default.scoreApiGetScores()
 			const freshScores = new Map(response.data.ocs.data.map((score) => [score.id, score]))
-			const exportPdf = pdfLayout.value === 'ntso'
+			const exportPdf = selectedPdfProfileId.value !== 'standard'
 				? exportSetlistToPdfNtso
 				: exportSetlistToPdfStandard
 			exportPdf({
@@ -214,7 +220,9 @@ async function onPdfExport(): Promise<void> {
 				fcvScoreBookIndicesMap: props.fcvScoreBookIndicesMap,
 				folderCollection: props.folderCollection,
 				columnConfigs: selectedColumns,
-			})
+			}, selectedPdfProfileId.value === 'standard'
+				? undefined
+				: (availablePdfProfiles.value.find((p) => p.id === selectedPdfProfileId.value) ?? DEFAULT_NTSO_PROFILE))
 		},
 		t('Export failed: '),
 	)
