@@ -25,6 +25,7 @@ export { default as PDFIcon } from 'vue-material-design-icons/FilePdfBox.vue'
 export { default as SettingsIcon } from 'vue-material-design-icons/CogOutline.vue'
 export { default as TableViewIcon } from 'vue-material-design-icons/TableHeadersEye.vue'
 export { default as EditIcon } from 'vue-material-design-icons/Pencil.vue'
+export { default as SearchIcon } from 'vue-material-design-icons/Magnify.vue'
 
 // State icons
 export { default as ErrorIcon } from 'vue-material-design-icons/AlertCircle.vue'

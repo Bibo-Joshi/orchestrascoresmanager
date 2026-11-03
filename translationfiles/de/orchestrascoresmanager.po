@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-10-28 21:29+0000\n"
+"POT-Creation-Date: 2026-11-02 20:42+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -518,6 +518,9 @@ msgstr "Fügen Sie Partituren oder Notenbücher zu dieser Ordnersammlung hinzu, 
 
 msgid "You are viewing an inactive version. Scores and score books cannot be added or removed."
 msgstr "Sie betrachten eine inaktive Version. Partituren und Notenbücher können nicht hinzugefügt oder entfernt werden."
+
+msgid "Search Score or Score details"
+msgstr "Partiturtitel und -details durchsuchen"
 
 msgid "Select version"
 msgstr "Version auswählen"

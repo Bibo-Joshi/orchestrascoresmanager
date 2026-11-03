@@ -7,6 +7,7 @@
 			:editable="editable"
 			:modules="gridModules"
 			:context="gridContext"
+			:searchText="searchText"
 			@cellValueChanged="handleCellValueChanged"
 			@cellDoubleClicked="handleCellDoubleClicked" />
 
@@ -33,6 +34,7 @@ import type {
 
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
+import { QuickFilterModule } from 'ag-grid-community'
 import {
 	TooltipModule,
 } from 'ag-grid-community'
@@ -56,7 +58,7 @@ import { parseDurationHHMMSS } from '@/utils/timeFormatUtils'
 
 const props = defineProps<Props>()
 
-const gridModules = [TooltipModule]
+const gridModules = [TooltipModule, QuickFilterModule]
 
 interface Props {
 	editable: boolean
@@ -84,6 +86,10 @@ interface Props {
 	 * Custom delete handler for folder collection mode
 	 */
 	onDeleteScore?: (scoreId: number, scoreBookId: number | null, viaScoreBook: boolean) => Promise<void>
+	/**
+	 * Search to search for using ag-grids quick filter
+	 */
+	searchText?: string | undefined
 }
 
 const scoresStore = useScoresStore()

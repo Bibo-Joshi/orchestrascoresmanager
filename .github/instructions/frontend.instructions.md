@@ -1,3 +1,7 @@
+---
+applyTo: "src/**/*.ts,src/**/*.vue"
+---
+
 # Copilot Instructions for `/src` (Vue3/TypeScript Frontend)
 
 ## Vue3 Composition API
