@@ -1,4 +1,4 @@
-import type { Styles } from 'jspdf-autotable'
+import type { Table as AutoTable, Styles } from 'jspdf-autotable'
 import type { FolderCollection, Score, ScoreBook, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
 import type { NtsoTagColorRule } from '@/utils/ntsoPdfSettings'
 import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
@@ -40,6 +40,13 @@ export interface PdfColumnConfig {
 	id: PdfColumnId
 	/** Translated display label used as the column header */
 	label: string
+}
+
+/**
+ * Extension of jsPDF with the lastAutoTable property added by jspdf-autotable
+ */
+interface JsPDFWithAutoTable extends jsPDF {
+	lastAutoTable: AutoTable | false
 }
 
 /**
@@ -93,53 +100,19 @@ export interface PdfFormatConfig {
  */
 export const defaultPdfFormatConfig: PdfFormatConfig = {
 	titleFontSize: 16,
-	sectionFontSize: 14,
-	tableFontSize: 12,
+	sectionFontSize: 11,
+	tableFontSize: 8,
 	margin: 8,
 }
 
 /**
- * NTSO stage layout: tag-to-colour mapping.
- * The Score API already includes tags as names, so no new backend API is needed.
- * Change the aliases below if your existing tags are named differently.
- * Priority: duet (also male + female) > instrumental > female > male.
+ * Determine a score row's colour from the first matching profile rule.
+ * @param score
+ * @param config
  */
-const NTSO_TAG_ALIASES = {
-	duet: ['duett', 'duet'],
-	instrumental: ['instrumental', 'instrumentalstück', 'instrumentalstueck', 'instr.'],
-	female: ['female', 'weiblich'],
-	male: ['male', 'männlich', 'maennlich'],
-} as const
-
-const NTSO_ROW_COLORS = {
-	duet: [255, 224, 178] as [number, number, number], // pastel orange
-	instrumental: [224, 242, 217] as [number, number, number], // light green
-	female: [255, 220, 235] as [number, number, number], // pink
-	male: [220, 238, 255] as [number, number, number], // light blue
-} as const
-
-function ntsoScoreRowColor(score: Score | undefined, config: PdfFormatConfig): [number, number, number] | null {
-	if (config.rules) {
-		const rule = config.rules.find((r) => ntsoMatchesTags(score?.tags ?? [], r.expression))
-		return rule ? ntsoHexToRgb(rule.color) : null
-	}
-	const names = new Set((score?.tags ?? []).map((name) => name.trim().toLocaleLowerCase()))
-	const has = (aliases: readonly string[]) => aliases.some((alias) => names.has(alias))
-	const male = has(NTSO_TAG_ALIASES.male)
-	const female = has(NTSO_TAG_ALIASES.female)
-	if (has(NTSO_TAG_ALIASES.duet) || (male && female)) {
-		return NTSO_ROW_COLORS.duet
-	}
-	if (has(NTSO_TAG_ALIASES.instrumental)) {
-		return NTSO_ROW_COLORS.instrumental
-	}
-	if (female) {
-		return NTSO_ROW_COLORS.female
-	}
-	if (male) {
-		return NTSO_ROW_COLORS.male
-	}
-	return null
+function scoreRowColor(score: Score | undefined, config: PdfFormatConfig): [number, number, number] | null {
+	const rule = config.rules?.find((candidate) => ntsoMatchesTags(score?.tags ?? [], candidate.expression))
+	return rule ? ntsoHexToRgb(rule.color) : null
 }
 
 /**
@@ -211,6 +184,31 @@ function computeSummary(
 		moderationAndBreakTimeSecs,
 		totalDurationSecs: playTimeSecs + moderationAndBreakTimeSecs,
 	}
+}
+
+/**
+ * Add text to the document and advance the y position
+ *
+ * @param doc - The jsPDF document
+ * @param text - The text to add
+ * @param x - X position
+ * @param y - Current Y position
+ * @param fontSize - Font size
+ * @param bold - Whether text should be bold
+ * @return New Y position after adding text
+ */
+function addText(
+	doc: jsPDF,
+	text: string,
+	x: number,
+	y: number,
+	fontSize: number,
+	bold = false,
+): number {
+	doc.setFontSize(fontSize)
+	doc.setFont('helvetica', bold ? 'bold' : 'normal')
+	doc.text(text, x, y)
+	return y + fontSize * 0.4 + 2
 }
 
 /**
@@ -340,62 +338,128 @@ function getEntryCellValue(
  */
 export function exportSetlistToPdf(
 	data: PdfSetlistData,
-	config: PdfFormatConfig = defaultPdfFormatConfig,
+	config?: PdfFormatConfig,
 ): void {
+	const isCustomLayout = config !== undefined
+	const activeConfig = config ?? defaultPdfFormatConfig
 	const { setlist, entries, getScoreById, getScoreBookById, fcvScoresMap, fcvScoreBookIndicesMap, folderCollection } = data
 
 	const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
 	const pageWidth = doc.internal.pageSize.getWidth()
-	const margin = config.margin
+	const margin = activeConfig.margin
 	const contentWidth = pageWidth - 2 * margin
 
-	// --- Compact NTSO stage header (no large details/summary table) ---
 	let y = margin + 5
-	const draftSuffix = setlist.isDraft ? ` (${t('Draft')})` : ''
-	const headerTitle = `${setlist.title}${draftSuffix}`
-	doc.setFont('helvetica', 'bold')
-	doc.setFontSize(config.titleFontSize)
-	const titleLines = doc.splitTextToSize(headerTitle, contentWidth) as string[]
-	doc.text(titleLines, margin, y)
-	y += titleLines.length * (config.titleFontSize * 0.4 + 1.2) + 1
+	if (isCustomLayout) {
+		// Compact custom-layout header
+		const draftSuffix = setlist.isDraft ? ` (${t('Draft')})` : ''
+		const headerTitle = `${setlist.title}${draftSuffix}`
+		doc.setFont('helvetica', 'bold')
+		doc.setFontSize(activeConfig.titleFontSize)
+		const titleLines = doc.splitTextToSize(headerTitle, contentWidth) as string[]
+		doc.text(titleLines, margin, y)
+		y += titleLines.length * (activeConfig.titleFontSize * 0.4 + 1.2) + 1
 
-	const summary = computeSummary(setlist, entries, getScoreById)
-	const headerDetails: string[] = []
-	if (setlist.startDateTime) {
-		const { date, time } = formatDateTime(setlist.startDateTime)
-		headerDetails.push(`${date} · ${time}`)
-	}
-	headerDetails.push(`${t('Overall Duration')}: ${formatDurationWithUnit(summary.totalDurationSecs)}`)
-	doc.setFont('helvetica', 'normal')
-	doc.setFontSize(config.tableFontSize + 1)
-	const detailLines = doc.splitTextToSize(headerDetails.join('  |  '), contentWidth) as string[]
-	doc.text(detailLines, margin, y)
-	y += detailLines.length * (config.tableFontSize * 0.4 + 1.5) + 3
-
-	// One-line legend. Coloured backgrounds are derived from score tags, not setlist comments.
-	const legend: Array<{ label: string, color: [number, number, number] }> = config.rules
-		? config.rules.map((rule) => ({ label: rule.label, color: ntsoHexToRgb(rule.color) }))
-		: [
-				{ label: 'Male', color: NTSO_ROW_COLORS.male },
-				{ label: 'Female', color: NTSO_ROW_COLORS.female },
-				{ label: 'Duett', color: NTSO_ROW_COLORS.duet },
-				{ label: 'Instrumental', color: NTSO_ROW_COLORS.instrumental },
-			]
-	let x = margin
-	doc.setFontSize(8)
-	for (const item of legend) {
-		const itemWidth = doc.getTextWidth(item.label) + 13
-		if (x + itemWidth > pageWidth - margin && x > margin) {
-			x = margin
-			y += 6
+		const summary = computeSummary(setlist, entries, getScoreById)
+		const headerDetails: string[] = []
+		if (setlist.startDateTime) {
+			const { date, time } = formatDateTime(setlist.startDateTime)
+			headerDetails.push(`${date} · ${time}`)
 		}
-		doc.setFillColor(...item.color)
-		doc.rect(x, y - 2.5, 3.5, 3.5, 'F')
-		doc.setTextColor(0, 0, 0)
-		doc.text(item.label, x + 5, y + 0.2)
-		x += itemWidth
+		headerDetails.push(`${t('Overall Duration')}: ${formatDurationWithUnit(summary.totalDurationSecs)}`)
+		doc.setFont('helvetica', 'normal')
+		doc.setFontSize(activeConfig.tableFontSize + 1)
+		const detailLines = doc.splitTextToSize(headerDetails.join('  |  '), contentWidth) as string[]
+		doc.text(detailLines, margin, y)
+		y += detailLines.length * (activeConfig.tableFontSize * 0.4 + 1.5) + 3
+
+		// One-line legend. Coloured backgrounds are derived from score tags, not setlist comments.
+		const legend: Array<{ label: string, color: [number, number, number] }> = (activeConfig.rules ?? [])
+			.map((rule) => ({ label: rule.label, color: ntsoHexToRgb(rule.color) }))
+		let x = margin
+		doc.setFontSize(8)
+		for (const item of legend) {
+			const itemWidth = doc.getTextWidth(item.label) + 13
+			if (x + itemWidth > pageWidth - margin && x > margin) {
+				x = margin
+				y += 6
+			}
+			doc.setFillColor(...item.color)
+			doc.rect(x, y - 2.5, 3.5, 3.5, 'F')
+			doc.setTextColor(0, 0, 0)
+			doc.text(item.label, x + 5, y + 0.2)
+			x += itemWidth
+		}
+		y += 6
+	} else {
+		// --- Title ---
+		const draftSuffix = setlist.isDraft ? ` (${t('Draft')})` : ''
+		const titleText = `${t('Setlist')}: ${setlist.title}${draftSuffix}`
+		y = addText(doc, titleText, margin, y, activeConfig.titleFontSize, true)
+		y += 2
+
+		// --- Description ---
+		if (setlist.description) {
+			doc.setFontSize(activeConfig.sectionFontSize)
+			doc.setFont('helvetica', 'normal')
+			const lines = doc.splitTextToSize(setlist.description, contentWidth) as string[]
+			doc.text(lines, margin, y)
+			y += lines.length * (activeConfig.sectionFontSize * 0.4 + 1) + 3
+		}
+
+		// --- Folder collection ---
+		if (folderCollection) {
+			y = addText(
+				doc,
+				`${t('Folder Collection')}: ${folderCollection.title}`,
+				margin,
+				y,
+				activeConfig.sectionFontSize,
+			)
+			y += 1
+		}
+
+		// --- Info (summary) table — vertical two-column layout ---
+		const summary = computeSummary(setlist, entries, getScoreById)
+
+		y = addText(doc, t('Info'), margin, y, activeConfig.sectionFontSize, true)
+
+		const infoRows: string[][] = []
+
+		if (setlist.startDateTime) {
+			const { date, time, startOfDaySecs } = formatDateTime(setlist.startDateTime)
+			// endTimeSecs may exceed 86400 (24h) for events that run past midnight; displayed as elapsed HH:MM
+			const endTimeSecs = startOfDaySecs + summary.totalDurationSecs
+			infoRows.push([t('Date'), date])
+			infoRows.push([t('Start Time'), time])
+			infoRows.push([t('End Time'), formatDurationHHMM(endTimeSecs)])
+		}
+
+		infoRows.push([t('Playtime'), formatDurationWithUnit(summary.playTimeSecs)])
+		infoRows.push([t('Moderation & Breaks'), formatDurationWithUnit(summary.moderationAndBreakTimeSecs)])
+		infoRows.push([t('Overall Duration'), formatDurationWithUnit(summary.totalDurationSecs)])
+
+		autoTable(doc, {
+			startY: y,
+			showHead: 'never',
+			theme: 'plain',
+			body: infoRows,
+			margin: { left: margin, right: margin },
+			tableWidth: 'wrap',
+			styles: { fontSize: activeConfig.tableFontSize, cellWidth: 'wrap' },
+			columnStyles: {
+				0: { fontStyle: 'bold', cellPadding: { left: 0, vertical: 1, right: 2 }, valign: 'middle' },
+			},
+		})
+
+		const infoTable = (doc as JsPDFWithAutoTable).lastAutoTable
+		if (infoTable !== false && infoTable.finalY) {
+			y = infoTable.finalY + 4
+		} else {
+			y = y + 20
+		}
 	}
-	y += 6
+
 	// --- Entries table ---
 	const hasFolderCollectionVersion = setlist.folderCollectionVersionId !== null
 	const isIndexedCollection = folderCollection?.collectionType === 'indexed'
@@ -413,8 +477,8 @@ export function exportSetlistToPdf(
 	}
 
 	const entryRows: string[][] = []
-	const ntsoRowColors: Array<[number, number, number] | null> = []
-	const ntsoBreakRows = new Set<number>()
+	const rowColors: Array<[number, number, number] | null> = []
+	const breakRows = new Set<number>()
 
 	for (const entry of entries) {
 		const effectiveMod = entry.moderationDuration ?? setlist.defaultModerationDuration ?? 0
@@ -424,10 +488,10 @@ export function exportSetlistToPdf(
 		cumulativeTime += effectiveMod + effectiveDuration
 
 		if (isBreakEntry(entry)) {
-			ntsoBreakRows.add(entryRows.length)
-			ntsoRowColors.push(null)
+			breakRows.add(entryRows.length)
+			rowColors.push(null)
 		} else {
-			ntsoRowColors.push(ntsoScoreRowColor(score, config))
+			rowColors.push(scoreRowColor(score, activeConfig))
 		}
 		entryRows.push(activeColumns.map((col) => getEntryCellValue(col.id, entry, startTime, effectiveDuration, effectiveMod, score, getScoreBookById, fcvScoresMap, fcvScoreBookIndicesMap)))
 	}
@@ -439,7 +503,7 @@ export function exportSetlistToPdf(
 		theme: 'plain',
 		margin: { left: margin, right: margin },
 		tableWidth: contentWidth,
-		styles: { fontSize: config.tableFontSize, overflow: 'linebreak', lineWidth: 0, ...(config.cellPadding !== undefined ? { cellPadding: config.cellPadding } : {}) },
+		styles: { fontSize: activeConfig.tableFontSize, overflow: 'linebreak', lineWidth: 0, ...(activeConfig.cellPadding !== undefined ? { cellPadding: activeConfig.cellPadding } : {}) },
 		headStyles: {
 			fontStyle: 'bold',
 			fillColor: false,
@@ -447,21 +511,22 @@ export function exportSetlistToPdf(
 			lineColor: [0, 0, 0],
 			lineWidth: { bottom: 0.8, top: 0, left: 0, right: 0 },
 		},
-		columnStyles: buildEntryColumnStyles(doc, config, entryHeaders),
+		alternateRowStyles: isCustomLayout ? undefined : { fillColor: [245, 245, 245] },
+		columnStyles: buildEntryColumnStyles(doc, activeConfig, entryHeaders),
 		didParseCell: (cellData) => {
-			if (cellData.section !== 'body') {
+			if (!isCustomLayout || cellData.section !== 'body') {
 				return
 			}
-			if (ntsoBreakRows.has(cellData.row.index)) {
+			if (breakRows.has(cellData.row.index)) {
 				// Dark, high-contrast band spanning the entire table row.
-				cellData.cell.styles.fillColor = ntsoHexToRgb(config.breakColor ?? '#354354')
+				cellData.cell.styles.fillColor = ntsoHexToRgb(activeConfig.breakColor ?? '#354354')
 				cellData.cell.styles.textColor = [255, 255, 255]
 				cellData.cell.styles.fontStyle = 'bold'
 				cellData.cell.styles.minCellHeight = 10
 				cellData.cell.styles.cellPadding = {
-					top: config.breakPadding ?? 3,
+					top: activeConfig.breakPadding ?? 3,
 					right: 2,
-					bottom: config.breakPadding ?? 3,
+					bottom: activeConfig.breakPadding ?? 3,
 					left: 2,
 				}
 				if (activeColumns[cellData.column.index]?.id === 'title') {
@@ -469,7 +534,7 @@ export function exportSetlistToPdf(
 				}
 				return
 			}
-			const background = ntsoRowColors[cellData.row.index]
+			const background = rowColors[cellData.row.index]
 			if (background) {
 				cellData.cell.styles.fillColor = background
 			}

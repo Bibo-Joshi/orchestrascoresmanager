@@ -107,8 +107,7 @@ import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
 import { fetchPdfProfiles } from '@/utils/ntsoPdfProfilesApi'
 import { cloneProfile, DEFAULT_NTSO_PROFILE } from '@/utils/ntsoPdfSettings'
-import { exportSetlistToPdf as exportSetlistToPdfNtso } from '@/utils/pdf-exporter'
-import { exportSetlistToPdf as exportSetlistToPdfStandard } from '@/utils/pdf-exporter-standard'
+import { exportSetlistToPdf } from '@/utils/pdf-exporter'
 import { exportSetlistToGemaXlsx } from '@/utils/setlist-xlsx-exporter'
 
 interface Props {
@@ -208,10 +207,7 @@ async function onPdfExport(): Promise<void> {
 			// Fetch the server's latest score metadata before generating the PDF.
 			const response = await apiClients.default.scoreApiGetScores()
 			const freshScores = new Map(response.data.ocs.data.map((score) => [score.id, score]))
-			const exportPdf = selectedPdfProfileId.value !== 'standard'
-				? exportSetlistToPdfNtso
-				: exportSetlistToPdfStandard
-			exportPdf({
+			exportSetlistToPdf({
 				setlist: props.setlist,
 				entries: props.entries,
 				getScoreById: (id) => freshScores.get(id),
