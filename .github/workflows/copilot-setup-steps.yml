@@ -1,6 +1,15 @@
 name: Setup Copilot Environment
 
 on:
+  # Automatically run the setup steps when they are changed to allow for easy validation, and
+  # allow manual testing through the repository's "Actions" tab
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
   workflow_call:
     inputs:
       php-version:
@@ -8,6 +17,11 @@ on:
         required: false
         type: string
         default: '8.4'
+      nextcloud-server-version:
+        description: 'Nextcloud server version when backend instance is enabled'
+        required: false
+        type: string
+        default: 'stable35'
       node-version:
         description: 'Node.js version to setup'
         required: false
@@ -28,22 +42,117 @@ on:
         required: false
         type: boolean
         default: true
+      setup-nextcloud:
+        description: 'Whether to setup a full Nextcloud instance for backend work'
+        required: false
+        type: boolean
+        default: false
+      nextcloud-database:
+        description: 'Database backend used when setup-nextcloud is true'
+        required: false
+        type: string
+        default: 'sqlite'
+      install-translation-tools:
+        description: 'Whether to install gettext and translationtool.phar'
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   copilot-setup-steps:
     runs-on: ubuntu-latest
+
+    # Set the permissions to the lowest permissions possible needed for your steps.
+    # Copilot will be given its own token for its operations.
+    permissions:
+      # If you want to clone the repository as part of your setup steps, for example to install dependencies, you'll need the `contents: read` permission.
+      # If you don't clone the repository in your setup steps, Copilot will do this for you automatically after the steps complete.
+      contents: read
+
+    services:
+      mysql:
+        image: ghcr.io/nextcloud/continuous-integration-mysql-8.4:latest
+        ports:
+          - 4444:3306/tcp
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+        options: --health-cmd="mysqladmin ping" --health-interval 5s --health-timeout 2s --health-retries 10
+      mariadb:
+        image: ghcr.io/nextcloud/continuous-integration-mariadb-11.4:latest
+        ports:
+          - 4445:3306/tcp
+        env:
+          MARIADB_ROOT_PASSWORD: rootpassword
+        options: --health-cmd="mariadb-admin ping" --health-interval 5s --health-timeout 2s --health-retries 5
+      postgres:
+        image: ghcr.io/nextcloud/continuous-integration-postgres-16:latest
+        ports:
+          - 4446:5432/tcp
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: rootpassword
+          POSTGRES_DB: nextcloud
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 2s --health-retries 5
+
     steps:
+      - name: Set app env
+        run: echo "APP_NAME=orchestrascoresmanager" >> $GITHUB_ENV
+
+      - name: Checkout server
+        if: inputs.setup-nextcloud
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          submodules: true
+          repository: nextcloud/server
+          ref: ${{ inputs.nextcloud-server-version }}
+
+      - name: Checkout app
+        if: inputs.setup-nextcloud
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          path: apps/${{ env.APP_NAME }}
+
+      - name: Checkout app (standalone)
+        if: ${{ !inputs.setup-nextcloud }}
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Resolve app path
+        id: app-path
+        run: |
+          if [ "${{ inputs.setup-nextcloud }}" = "true" ]; then
+            echo "dir=apps/${{ env.APP_NAME }}" >> $GITHUB_OUTPUT
+          else
+            echo "dir=." >> $GITHUB_OUTPUT
+          fi
+
       # PHP Setup
       - name: Set up PHP ${{ inputs.php-version }}
         if: inputs.install-php
         uses: shivammathur/setup-php@cf4cade2721270509d5b1c766ab3549210a39a2a # v2.33.0
         with:
           php-version: ${{ inputs.php-version }}
-          extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite
-          coverage: none
+          extensions: bz2, ctype, curl, dom, fileinfo, gd, iconv, intl, json, libxml, mbstring, openssl, pcntl, posix, session, simplexml, xmlreader, xmlwriter, zip, zlib, sqlite, pdo_sqlite, mysql, pdo_mysql, pgsql, pdo_pgsql
+          coverage: pcov
           ini-file: development
+          ini-values: >
+              disable_functions=,
+              pcov.enabled=1,
+              pcov.directory=${{ github.workspace }}/${{ steps.app-path.outputs.dir }},
+              pcov.exclude=~(vendor|vendor-bin|tests)~
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Enable ONLY_FULL_GROUP_BY for MySQL
+        if: inputs.setup-nextcloud && inputs.nextcloud-database == 'mysql'
+        run: |
+          echo "SET GLOBAL sql_mode=(SELECT CONCAT(@@sql_mode,',ONLY_FULL_GROUP_BY'));" | mysql -h 127.0.0.1 -P 4444 -u root -prootpassword
+          echo 'SELECT @@sql_mode;' | mysql -h 127.0.0.1 -P 4444 -u root -prootpassword
+
+      - name: Enable ONLY_FULL_GROUP_BY for MariaDB
+        if: inputs.setup-nextcloud && inputs.nextcloud-database == 'mariadb'
+        run: |
+          echo "SET GLOBAL sql_mode=(SELECT CONCAT(@@sql_mode,',ONLY_FULL_GROUP_BY'));" | mysql -h 127.0.0.1 -P 4445 -u root -prootpassword
+          echo 'SELECT @@sql_mode;' | mysql -h 127.0.0.1 -P 4445 -u root -prootpassword
 
       - name: Get composer cache directory
         if: inputs.install-php
@@ -61,30 +170,74 @@ jobs:
 
       - name: Install PHP dependencies
         if: inputs.install-php
-        run: composer install --no-interaction --prefer-dist
+        working-directory: ${{ steps.app-path.outputs.dir }}
+        run: |
+          composer remove nextcloud/ocp --dev --no-scripts --no-update
+          composer install --no-interaction --prefer-dist
+
+      - name: Install translation dependencies
+        if: inputs.install-translation-tools && inputs.install-php
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext
+
+      - name: Download translationtool.phar
+        if: inputs.install-translation-tools && inputs.install-php
+        working-directory: ${{ steps.app-path.outputs.dir }}
+        run: |
+          curl -L -o translationtool.phar https://github.com/nextcloud/docker-ci/raw/master/translations/translationtool/translationtool.phar
+          chmod +x translationtool.phar
+
+      - name: Set up Nextcloud instance
+        if: inputs.setup-nextcloud
+        run: |
+          mkdir data
+          if [ "${{ inputs.nextcloud-database }}" = "sqlite" ]; then
+            ./occ maintenance:install --verbose --database=sqlite --database-name=nextcloud --database-host=127.0.0.1 --admin-user admin --admin-pass admin
+          elif [ "${{ inputs.nextcloud-database }}" = "mysql" ]; then
+            ./occ maintenance:install --verbose --database=mysql --database-name=nextcloud --database-host=127.0.0.1 --database-port=4444 --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
+          elif [ "${{ inputs.nextcloud-database }}" = "mariadb" ]; then
+            ./occ maintenance:install --verbose --database=mysql --database-name=nextcloud --database-host=127.0.0.1 --database-port=4445 --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
+          elif [ "${{ inputs.nextcloud-database }}" = "pgsql" ]; then
+            ./occ maintenance:install --verbose --database=pgsql --database-name=nextcloud --database-host=127.0.0.1 --database-port=4446 --database-user=root --database-pass=rootpassword --admin-user admin --admin-pass admin
+          else
+            echo "Unsupported nextcloud-database value: ${{ inputs.nextcloud-database }}"
+            exit 1
+          fi
+          ./occ app:enable --force ${{ env.APP_NAME }}
 
       # Node.js Setup
-      - name: Read package.json node and npm engines version
-        if: inputs.install-node && inputs.node-version == ''
-        uses: skjnldsv/read-package-engines-version-actions@06d6baf7d8f41934ab630e97d9e6c0bc9c9ac5e4 # v3
-        id: node-versions
-        with:
-          fallbackNode: '^22'
-          fallbackNpm: '^10'
-
-      - name: Set up Node.js
-        if: inputs.install-node
+      - name: Set up Node.js ${{ inputs.node-version }}
+        if: inputs.install-node && inputs.node-version != ''
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: ${{ inputs.node-version || steps.node-versions.outputs.nodeVersion }}
+          node-version: ${{ inputs.node-version }}
           cache: 'npm'
+          cache-dependency-path: ${{ steps.app-path.outputs.dir }}/package-lock.json
+
+      - name: Set up Node.js from app package.json engines
+        if: inputs.install-node && inputs.node-version == ''
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: ${{ steps.app-path.outputs.dir }}/package.json
+          cache: 'npm'
+          cache-dependency-path: ${{ steps.app-path.outputs.dir }}/package-lock.json
+
+      - name: Read npm version from app package.json
+        if: inputs.install-node && inputs.npm-version == ''
+        id: package-npm
+        working-directory: ${{ steps.app-path.outputs.dir }}
+        run: |
+          npm_version=$(node -p "require('./package.json').engines?.npm || ''")
+          echo "npm_version=$npm_version" >> $GITHUB_OUTPUT
 
       - name: Set up npm
-        if: inputs.install-node && (inputs.npm-version != '' || steps.node-versions.outputs.npmVersion != '')
-        run: npm i -g 'npm@${{ inputs.npm-version || steps.node-versions.outputs.npmVersion }}'
+        if: inputs.install-node && (inputs.npm-version != '' || steps.package-npm.outputs.npm_version != '')
+        run: npm i -g 'npm@${{ inputs.npm-version != '' && inputs.npm-version || steps.package-npm.outputs.npm_version }}'
 
       - name: Install Node.js dependencies
         if: inputs.install-node
+        working-directory: ${{ steps.app-path.outputs.dir }}
         env:
           CYPRESS_INSTALL_BINARY: 0
           PUPPETEER_SKIP_DOWNLOAD: true
