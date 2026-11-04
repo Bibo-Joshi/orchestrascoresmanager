@@ -1,7 +1,24 @@
 <template>
 	<Layout :title="setlist?.title">
 		<template #headerActions>
-			<HeaderActions>
+			<HeaderActions :inline="actionsInline">
+				<NcActionButton
+					closeAfterClick
+					@click="handleDetailsButtonClick()">
+					<template #icon>
+						<InfoIcon :size="20" />
+					</template>
+					{{ t('Details') }}
+				</NcActionButton>
+				<NcActionButton
+					v-if="setlist"
+					closeAfterClick
+					@click="showShareDialog = true">
+					<template #icon>
+						<ShareIcon :size="20" />
+					</template>
+					{{ t('Share') }}
+				</NcActionButton>
 				<NcActionButton
 					v-if="setlist && editable"
 					closeAfterClick
@@ -12,14 +29,6 @@
 					{{ t('Add Entry') }}
 				</NcActionButton>
 				<NcActionButton
-					closeAfterClick
-					@click="handleDetailsButtonClick()">
-					<template #icon>
-						<InfoIcon :size="20" />
-					</template>
-					{{ t('Details') }}
-				</NcActionButton>
-				<NcActionButton
 					v-if="setlist && editable"
 					closeAfterClick
 					@click="showCloneDialog = true">
@@ -28,16 +37,7 @@
 					</template>
 					{{ t('Clone') }}
 				</NcActionButton>
-				<NcActionSeparator v-if="showShareSeparator" />
-				<NcActionButton
-					v-if="setlist"
-					closeAfterClick
-					@click="showShareDialog = true">
-					<template #icon>
-						<ShareIcon :size="20" />
-					</template>
-					{{ t('Share') }}
-				</NcActionButton>
+				<NcActionSeparator v-if="showExportSeparator" />
 				<NcActionButton
 					v-if="setlist"
 					closeAfterClick
@@ -172,7 +172,7 @@ const setlistEntriesStore = useSetlistEntriesStore()
 const scoreSidebarStore = useScoreSidebarStore()
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
-const { isDesktop, actionsInline } = useBreakpoints()
+const { isDesktop } = useBreakpoints()
 
 const loading = ref(false)
 const loadError = ref(false)
@@ -223,20 +223,21 @@ const setlistEntries = computed(() => {
  * (taken from the buttons in order) are not part of the menu, so a separator is only
  * shown if the menu has entries on both of its sides.
  */
+const actionsInline = computed(() => editable.value ? 3 : 2)
 const headerGroupSizes = computed(() => {
 	const hasSetlist = !!setlist.value
-	const manage = hasSetlist && editable.value ? 3 : 1
-	const share = hasSetlist ? (editable.value ? 3 : 2) : 0
+	const manage = hasSetlist && editable.value ? 4 : 2
+	const exportSetlist = hasSetlist ? (editable.value ? 2 : 1) : 0
 	const viewMode = setlistEntries.value.length > 0 ? 1 : 0
-	return { manage, share, viewMode }
+	return { manage, exportSetlist, viewMode }
 })
-const showShareSeparator = computed(() => {
-	const { manage, share } = headerGroupSizes.value
-	return manage - actionsInline.value > 0 && share - Math.max(0, actionsInline.value - manage) > 0
+const showExportSeparator = computed(() => {
+	const { manage, exportSetlist } = headerGroupSizes.value
+	return manage - actionsInline.value > 0 && exportSetlist - Math.max(0, actionsInline.value - manage) > 0
 })
 const showViewModeSeparator = computed(() => {
-	const { manage, share } = headerGroupSizes.value
-	return manage + share - actionsInline.value > 0
+	const { manage, exportSetlist } = headerGroupSizes.value
+	return manage + exportSetlist - actionsInline.value > 0
 })
 
 const { gemaExporting, exportGema } = useGemaExport(() => setlist.value, () => setlistEntries.value)
