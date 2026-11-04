@@ -17,19 +17,8 @@
 		</template>
 
 		<template #headerActions>
+			<HeaderSearch v-model="searchText" />
 			<HeaderActions>
-				<NcActionInput
-					v-model="searchText"
-					type="string"
-					:label="t('Search')"
-					trailingButtonIcon="close"
-					:showTrailingButton="!!searchText"
-					@trailingButtonClick="searchText = undefined">
-					<template #icon>
-						<SearchIcon :size="20" />
-					</template>
-					{{ t('Search Score or Score details') }}
-				</NcActionInput>
 				<NcActionButton
 					v-if="editable"
 					closeAfterClick
@@ -61,15 +50,15 @@
 import { loadState } from '@nextcloud/initial-state'
 import { onMounted, ref } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
-import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import AddScoreDialog from './components/AddScoreDialog.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
 import HeaderActions from '@/components/HeaderActions.vue'
+import HeaderSearch from '@/components/HeaderSearch.vue'
 import Layout from '@/components/Layout.vue'
 import ScoreSidebar from '@/components/ScoreSidebar.vue'
 import ScoresTable from '@/components/ScoresTable.vue'
 import { useCsvExport } from '@/composables/useCsvExport'
-import { AddIcon, DownloadIcon, ScoreIcon, SearchIcon } from '@/icons/vue-material'
+import { AddIcon, DownloadIcon, ScoreIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useTagsStore } from '@/stores/tagsStore'

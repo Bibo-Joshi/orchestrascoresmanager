@@ -38,19 +38,8 @@
 		</template>
 
 		<template #headerActions>
-			<HeaderActions>
-				<NcActionInput
-					v-model="searchText"
-					type="string"
-					:label="t('Search')"
-					trailingButtonIcon="close"
-					:showTrailingButton="!!searchText"
-					@trailingButtonClick="searchText = undefined">
-					<template #icon>
-						<SearchIcon :size="20" />
-					</template>
-					{{ t('Search Score or Score details') }}
-				</NcActionInput>
+			<HeaderSearch v-model="searchText" />
+			<HeaderActions :inline="editable ? 2 : 0">
 				<NcActionButton
 					v-if="editable && isSelectedVersionActive && folderCollection"
 					closeAfterClick
@@ -140,6 +129,7 @@ import AddToCollectionDialog from './components/AddToCollectionDialog.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
 import HeaderActions from '@/components/HeaderActions.vue'
+import HeaderSearch from '@/components/HeaderSearch.vue'
 import Layout from '@/components/Layout.vue'
 import ScoreSidebar from '@/components/ScoreSidebar.vue'
 import ScoresTable from '@/components/ScoresTable.vue'
@@ -148,7 +138,7 @@ import { useTocExport } from './composables/useTocExport.ts'
 import { apiClients } from '@/api/client'
 import { useCsvExport } from '@/composables/useCsvExport'
 import { formatDateStr } from '@/composables/useDateFormatting'
-import { AddIcon, DownloadIcon, HistoryIcon, ScoreIcon, SearchIcon } from '@/icons/vue-material'
+import { AddIcon, DownloadIcon, HistoryIcon, ScoreIcon } from '@/icons/vue-material'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { useFolderCollectionVersionsStore } from '@/stores/folderCollectionVersionsStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'

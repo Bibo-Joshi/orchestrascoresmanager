@@ -28,7 +28,7 @@
 					</template>
 					{{ t('Clone') }}
 				</NcActionButton>
-				<NcActionSeparator />
+				<NcActionSeparator v-if="showShareSeparator" />
 				<NcActionButton
 					v-if="setlist"
 					closeAfterClick
@@ -58,7 +58,8 @@
 					{{ t('GEMA Report') }}
 				</NcActionButton>
 				<template v-if="setlistEntries.length > 0">
-					<NcActionSeparator />
+					<NcActionSeparator v-if="showViewModeSeparator" />
+					<NcActionCaption :name="t('View Mode')" />
 					<NcActionRadio
 						v-model="viewMode"
 						value="full"
@@ -140,6 +141,7 @@ import { loadState } from '@nextcloud/initial-state'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import AddSetlistEntryDialog from './components/AddSetlistEntryDialog.vue'
@@ -170,7 +172,7 @@ const setlistEntriesStore = useSetlistEntriesStore()
 const scoreSidebarStore = useScoreSidebarStore()
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
-const { isDesktop } = useBreakpoints()
+const { isDesktop, actionsInline } = useBreakpoints()
 
 const loading = ref(false)
 const loadError = ref(false)
@@ -214,6 +216,27 @@ const setlistEntries = computed(() => {
 		return []
 	}
 	return setlistEntriesStore.getEntriesBySetlistId(id)
+})
+
+/**
+ * Whether separators between the groups of header actions are needed. Inline actions
+ * (taken from the buttons in order) are not part of the menu, so a separator is only
+ * shown if the menu has entries on both of its sides.
+ */
+const headerGroupSizes = computed(() => {
+	const hasSetlist = !!setlist.value
+	const manage = hasSetlist && editable.value ? 3 : 1
+	const share = hasSetlist ? (editable.value ? 3 : 2) : 0
+	const viewMode = setlistEntries.value.length > 0 ? 1 : 0
+	return { manage, share, viewMode }
+})
+const showShareSeparator = computed(() => {
+	const { manage, share } = headerGroupSizes.value
+	return manage - actionsInline.value > 0 && share - Math.max(0, actionsInline.value - manage) > 0
+})
+const showViewModeSeparator = computed(() => {
+	const { manage, share } = headerGroupSizes.value
+	return manage + share - actionsInline.value > 0
 })
 
 const { gemaExporting, exportGema } = useGemaExport(() => setlist.value, () => setlistEntries.value)
