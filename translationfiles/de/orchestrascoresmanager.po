@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-11-02 20:42+0000\n"
+"POT-Creation-Date: 2026-11-04 21:06+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -360,11 +360,14 @@ msgstr "Ordnersammlungen konnten nicht geladen werden. Bitte laden Sie die Seite
 msgid "Not in any folder collection"
 msgstr "In keiner Ordnersammlung"
 
-msgid "Export failed: "
-msgstr "Export fehlgeschlagen: "
+msgid "Actions"
+msgstr ""
 
-msgid "Export CSV"
-msgstr "CSV exportieren"
+msgid "Search Score or Score details"
+msgstr "Partiturtitel und -details durchsuchen"
+
+msgid "Search"
+msgstr ""
 
 msgid "Main app navigation"
 msgstr "Haupt App-Navigation"
@@ -519,11 +522,26 @@ msgstr "Fügen Sie Partituren oder Notenbücher zu dieser Ordnersammlung hinzu, 
 msgid "You are viewing an inactive version. Scores and score books cannot be added or removed."
 msgstr "Sie betrachten eine inaktive Version. Partituren und Notenbücher können nicht hinzugefügt oder entfernt werden."
 
-msgid "Search Score or Score details"
-msgstr "Partiturtitel und -details durchsuchen"
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Version"
+msgstr ""
 
 msgid "Select version"
 msgstr "Version auswählen"
+
+msgid "Start new version"
+msgstr "Neue Version starten"
+
+msgid "New Version"
+msgstr "Neue Version"
+
+msgid "Export CSV"
+msgstr "CSV exportieren"
+
+msgid "Export ToC & Index"
+msgstr "Inhaltsverzeichnis & Index exportieren"
 
 msgid "Score"
 msgstr "Partitur"
@@ -536,9 +554,6 @@ msgstr "Notenbuch zur Sammlung hinzugefügt"
 
 msgid "Failed to add to collection: "
 msgstr "Hinzufügen zur Sammlung fehlgeschlagen: "
-
-msgid "Add"
-msgstr "Hinzufügen"
 
 msgid "Add to collection"
 msgstr "Zur Sammlung hinzufügen"
@@ -554,24 +569,6 @@ msgstr "Auswählen, was hinzugefügt werden soll"
 
 msgid "Select a score"
 msgstr "Partitur auswählen"
-
-msgid "Export ToC & Index"
-msgstr "Inhaltsverzeichnis & Index exportieren"
-
-msgid "Could not determine current version information"
-msgstr "Aktuelle Versionsinformationen konnten nicht ermittelt werden"
-
-msgid "New version started successfully"
-msgstr "Neue Version erfolgreich gestartet"
-
-msgid "Failed to start new version: "
-msgstr "Neue Version konnte nicht gestartet werden"
-
-msgid "Start new version"
-msgstr "Neue Version starten"
-
-msgid "New Version"
-msgstr "Neue Version"
 
 msgid "This will create a new version starting on the selected date. The current active version will be marked as ended one day before. All scores and score books will be copied to the new version."
 msgstr "Dies erstellt eine neue Version ab dem ausgewählten Datum. Die aktuelle aktive Version wird als einen Tag vorher beendet markiert. Alle Partituren und Notenbücher werden in die neue Version kopiert."
@@ -818,6 +815,27 @@ msgid_plural "This score is part of %n setlists"
 msgstr[0] "Diese Partitur ist Teil von %n Setlist"
 msgstr[1] "Diese Partitur ist Teil von %n Setlisten"
 
+msgid "Share"
+msgstr "Teilen"
+
+msgid "Add Entry"
+msgstr "Eintrag hinzufügen"
+
+msgid "PDF Export"
+msgstr "PDF-Export"
+
+msgid "GEMA Report"
+msgstr "GEMA-Bericht"
+
+msgid "View Mode"
+msgstr "Ansicht"
+
+msgid "Full View"
+msgstr "Erweiterte Ansicht"
+
+msgid "Compact View"
+msgstr "Kompakte Ansicht"
+
 msgid "Failed to load setlist"
 msgstr "Setlist konnte nicht geladen werden"
 
@@ -829,9 +847,6 @@ msgstr "Verfügbare Partituren konnten nicht geladen werden"
 
 msgid "Failed to add entry"
 msgstr "Eintrag konnte nicht hinzugefügt werden"
-
-msgid "Add Entry"
-msgstr "Eintrag hinzufügen"
 
 msgid "Add Setlist Entry"
 msgstr "Setlist-Eintrag hinzufügen"
@@ -848,20 +863,17 @@ msgstr "Partitur auswählen"
 msgid "Break Duration (HH:MM:SS)"
 msgstr "Pausendauer (HH:MM:SS)"
 
-msgid "Export"
-msgstr "Exportieren"
-
-msgid "PDF Export"
-msgstr "PDF-Export"
-
-msgid "GEMA Report"
-msgstr "GEMA-Bericht"
+msgid "Export failed: "
+msgstr "Export fehlgeschlagen: "
 
 msgid "Export PDF"
 msgstr "PDF exportieren"
 
 msgid "Select and reorder the columns to include in the PDF export."
 msgstr "Spalten für den PDF-Export auswählen und sortieren."
+
+msgid "Export"
+msgstr "Exportieren"
 
 msgid "Delete Setlist Entry"
 msgstr "Setlist-Eintrag löschen"
@@ -889,9 +901,6 @@ msgstr "Kommentar"
 
 msgid "Sharing failed: "
 msgstr "Teilen fehlgeschlagen: "
-
-msgid "Share"
-msgstr "Teilen"
 
 msgid "Share setlist"
 msgstr "Setlist teilen"
@@ -937,15 +946,6 @@ msgstr ""
 
 msgid "Saved"
 msgstr "Gespeichert"
-
-msgid "View Mode"
-msgstr "Ansicht"
-
-msgid "Full View"
-msgstr "Erweiterte Ansicht"
-
-msgid "Compact View"
-msgstr "Kompakte Ansicht"
 
 msgid "Drafts"
 msgstr "Entwürfe"
@@ -1045,6 +1045,15 @@ msgstr "Weitere Setlisten konnten nicht geladen werden"
 
 msgid "Setlist"
 msgstr "Setlist"
+
+msgid "Could not determine current version information"
+msgstr "Aktuelle Versionsinformationen konnten nicht ermittelt werden"
+
+msgid "New version started successfully"
+msgstr "Neue Version erfolgreich gestartet"
+
+msgid "Failed to start new version: "
+msgstr "Neue Version konnte nicht gestartet werden"
 
 msgid "Image could not be generated"
 msgstr "Bild konnte nicht erzeugt werden"

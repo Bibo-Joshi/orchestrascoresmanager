@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-11-02 20:42+0000\n"
+"POT-Creation-Date: 2026-11-04 21:06+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -359,10 +359,13 @@ msgstr ""
 msgid "Not in any folder collection"
 msgstr ""
 
-msgid "Export failed: "
+msgid "Actions"
 msgstr ""
 
-msgid "Export CSV"
+msgid "Search Score or Score details"
+msgstr ""
+
+msgid "Search"
 msgstr ""
 
 msgid "Main app navigation"
@@ -526,10 +529,25 @@ msgid ""
 "or removed."
 msgstr ""
 
-msgid "Search Score or Score details"
+msgid "Add"
+msgstr ""
+
+msgid "Version"
 msgstr ""
 
 msgid "Select version"
+msgstr ""
+
+msgid "Start new version"
+msgstr ""
+
+msgid "New Version"
+msgstr ""
+
+msgid "Export CSV"
+msgstr ""
+
+msgid "Export ToC & Index"
 msgstr ""
 
 msgid "Score"
@@ -542,9 +560,6 @@ msgid "Score book added to collection"
 msgstr ""
 
 msgid "Failed to add to collection: "
-msgstr ""
-
-msgid "Add"
 msgstr ""
 
 msgid "Add to collection"
@@ -560,24 +575,6 @@ msgid "Select what to add"
 msgstr ""
 
 msgid "Select a score"
-msgstr ""
-
-msgid "Export ToC & Index"
-msgstr ""
-
-msgid "Could not determine current version information"
-msgstr ""
-
-msgid "New version started successfully"
-msgstr ""
-
-msgid "Failed to start new version: "
-msgstr ""
-
-msgid "Start new version"
-msgstr ""
-
-msgid "New Version"
 msgstr ""
 
 msgid ""
@@ -833,6 +830,27 @@ msgid_plural "This score is part of %n setlists"
 msgstr[0] ""
 msgstr[1] ""
 
+msgid "Share"
+msgstr ""
+
+msgid "Add Entry"
+msgstr ""
+
+msgid "PDF Export"
+msgstr ""
+
+msgid "GEMA Report"
+msgstr ""
+
+msgid "View Mode"
+msgstr ""
+
+msgid "Full View"
+msgstr ""
+
+msgid "Compact View"
+msgstr ""
+
 msgid "Failed to load setlist"
 msgstr ""
 
@@ -843,9 +861,6 @@ msgid "Failed to load available scores"
 msgstr ""
 
 msgid "Failed to add entry"
-msgstr ""
-
-msgid "Add Entry"
 msgstr ""
 
 msgid "Add Setlist Entry"
@@ -863,19 +878,16 @@ msgstr ""
 msgid "Break Duration (HH:MM:SS)"
 msgstr ""
 
-msgid "Export"
-msgstr ""
-
-msgid "PDF Export"
-msgstr ""
-
-msgid "GEMA Report"
+msgid "Export failed: "
 msgstr ""
 
 msgid "Export PDF"
 msgstr ""
 
 msgid "Select and reorder the columns to include in the PDF export."
+msgstr ""
+
+msgid "Export"
 msgstr ""
 
 msgid "Delete Setlist Entry"
@@ -903,9 +915,6 @@ msgid "Comment"
 msgstr ""
 
 msgid "Sharing failed: "
-msgstr ""
-
-msgid "Share"
 msgstr ""
 
 msgid "Share setlist"
@@ -951,15 +960,6 @@ msgid "Saving…"
 msgstr ""
 
 msgid "Saved"
-msgstr ""
-
-msgid "View Mode"
-msgstr ""
-
-msgid "Full View"
-msgstr ""
-
-msgid "Compact View"
 msgstr ""
 
 msgid "Drafts"
@@ -1059,6 +1059,15 @@ msgid "Failed to load more setlists"
 msgstr ""
 
 msgid "Setlist"
+msgstr ""
+
+msgid "Could not determine current version information"
+msgstr ""
+
+msgid "New version started successfully"
+msgstr ""
+
+msgid "Failed to start new version: "
 msgstr ""
 
 msgid "Image could not be generated"
