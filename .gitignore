@@ -22,6 +22,3 @@ translationtool.phar
 /import_script/.env
 
 /build/
-
-# Local patch backups
-*.bak

@@ -1,10 +1,11 @@
 /**
  * Dependency-free unit tests for the PDF layout profile helpers.
  * Run from the OSM repository root:
- *   node --experimental-strip-types --test tests/frontend/pdfLayoutSettings.test.mjs
+ *   npm run test:frontend
  *
- * Node 24 supports TypeScript type stripping; on Node 22 the flag is required.
+ * Uses esbuild to bundle the TypeScript dependencies before running with Node.js.
  */
+
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
 
