@@ -1,14 +1,4 @@
 <template>
-	<NcButton v-if="editable"
-		:size="buttonSize"
-		variant="primary"
-		:text="buttonText(t('Add'))"
-		@click="showCreateDialog = true">
-		<template #icon>
-			<AddIcon />
-		</template>
-	</NcButton>
-
 	<AddOrEditDialog
 		v-model:isOpen="showCreateDialog"
 		:name="t('Create score book')"
@@ -22,25 +12,17 @@
 <script setup lang="ts">
 import { showError, showSuccess } from '@nextcloud/dialogs'
 import { computed, ref } from 'vue'
-import NcButton from '@nextcloud/vue/components/NcButton'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import AddOrEditDialog from '@/components/AddOrEditDialog.vue'
-import { useBreakpoints } from '@/composables/useBreakpoints'
-import { AddIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
 
-interface Props {
-	editable: boolean
-}
-
-defineProps<Props>()
+/** Whether the dialog is open */
+const showCreateDialog = defineModel<boolean>('open', { default: false })
 
 const scoreBooksStore = useScoreBooksStore()
-const { buttonSize, buttonText } = useBreakpoints()
 
-const showCreateDialog = ref(false)
 const inputNewScoreBookTitle = ref('')
 
 const isFormValid = computed(() => inputNewScoreBookTitle.value.trim().length > 0)

@@ -1,14 +1,4 @@
 <template>
-	<NcButton v-if="editable"
-		:size="buttonSize"
-		variant="primary"
-		:text="buttonText(t('Add'))"
-		@click="openDialog">
-		<template #icon>
-			<AddIcon />
-		</template>
-	</NcButton>
-
 	<AddOrEditDialog
 		v-model:isOpen="showDialog"
 		:name="t('Add to collection')"
@@ -70,13 +60,11 @@ import type { EntityOption } from '@/composables/useEntitySelect'
 
 import { showSuccess } from '@nextcloud/dialogs'
 import { computed, onMounted, ref, watch } from 'vue'
-import NcButton from '@nextcloud/vue/components/NcButton'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import AddOrEditDialog from '@/components/AddOrEditDialog.vue'
 import FocusTrap from '@/components/FocusTrap.vue'
 import { apiClients } from '@/api/client'
-import { useBreakpoints } from '@/composables/useBreakpoints'
 import {
 	createScoreBookOptions,
 	createScoreBookSelectable,
@@ -86,20 +74,21 @@ import {
 	filterScores,
 } from '@/composables/useEntitySelect'
 import { useIndexValidation } from '@/composables/useIndexValidation'
-import { AddIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
 
 interface Props {
-	editable: boolean
 	folderCollectionId: number
 	isIndexed: boolean
 	existingScoreIds: Set<number>
 	existingScoreBookIds: Set<number>
 	occupiedIndices: Set<number>
 }
+
+/** Whether the dialog is open */
+const showDialog = defineModel<boolean>('open', { default: false })
 
 const props = defineProps<Props>()
 
@@ -115,9 +104,7 @@ interface TypeOption {
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
-const { buttonSize, buttonText } = useBreakpoints()
 
-const showDialog = ref(false)
 const loadingData = ref(false)
 const loadDataError = ref(false)
 
@@ -197,14 +184,13 @@ onMounted(() => {
 	scoreBooksStore.initialize()
 })
 
-/**
- * Open dialog and load data
- */
-function openDialog() {
-	resetForm()
-	showDialog.value = true
-	ensureDataLoaded()
-}
+// Reset the form and load data whenever the dialog is opened
+watch(showDialog, (isOpen) => {
+	if (isOpen) {
+		resetForm()
+		ensureDataLoaded()
+	}
+})
 
 /**
  * Reset form

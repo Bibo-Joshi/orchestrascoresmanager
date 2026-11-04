@@ -17,21 +17,27 @@
 		</template>
 
 		<template #headerActions>
-			<div
-				:style="{width: screenSizeCategory === 'mobile' ? '100%' : screenSizeCategory === 'tablet' ? '40ex' : '60ex'}">
-				<NcTextField
-					v-model="searchText"
-					trailingButtonIcon="close"
-					:placeholder="t('Search Score or Score details')"
-					:showTrailingButton="searchText !== ''"
-					@trailingButtonClick="searchText = undefined">
+			<HeaderSearch v-model="searchText" />
+			<HeaderActions>
+				<NcActionButton
+					v-if="editable"
+					closeAfterClick
+					@click="showAddDialog = true">
 					<template #icon>
-						<SearchIcon :size="20" />
+						<AddIcon :size="20" />
 					</template>
-				</NcTextField>
-			</div>
-			<AddScoreButton :editable="editable" />
-			<ExportCsvButton :tableRef="scoresTableRef?.tableRef ?? null" />
+					{{ t('Add') }}
+				</NcActionButton>
+				<NcActionButton
+					closeAfterClick
+					@click="exportCsv">
+					<template #icon>
+						<DownloadIcon :size="20" />
+					</template>
+					{{ t('Export CSV') }}
+				</NcActionButton>
+			</HeaderActions>
+			<AddScoreDialog v-model:open="showAddDialog" />
 		</template>
 
 		<template #sidebar>
@@ -43,15 +49,16 @@
 <script setup lang="ts">
 import { loadState } from '@nextcloud/initial-state'
 import { onMounted, ref } from 'vue'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
-import AddScoreButton from './components/AddScoreButton.vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import AddScoreDialog from './components/AddScoreDialog.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
-import ExportCsvButton from '@/components/ExportCsvButton.vue'
+import HeaderActions from '@/components/HeaderActions.vue'
+import HeaderSearch from '@/components/HeaderSearch.vue'
 import Layout from '@/components/Layout.vue'
 import ScoreSidebar from '@/components/ScoreSidebar.vue'
 import ScoresTable from '@/components/ScoresTable.vue'
-import { useBreakpoints } from '@/composables/useBreakpoints'
-import { ScoreIcon, SearchIcon } from '@/icons/vue-material'
+import { useCsvExport } from '@/composables/useCsvExport'
+import { AddIcon, DownloadIcon, ScoreIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useTagsStore } from '@/stores/tagsStore'
@@ -60,7 +67,6 @@ import { t } from '@/utils/l10n'
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
 const tagsStore = useTagsStore()
-const { screenSizeCategory } = useBreakpoints()
 const searchText = ref<string | undefined>(undefined)
 
 // Load initial state from the server
@@ -68,6 +74,9 @@ const editable = ref<boolean>(!!loadState('orchestrascoresmanager', 'editable'))
 
 // Ref to access ScoresTable and its tableRef
 const scoresTableRef = ref<{ tableRef: { exportAsCsv?: (fileName?: string) => boolean } | null } | null>(null)
+
+const showAddDialog = ref(false)
+const { exportCsv } = useCsvExport(() => scoresTableRef.value?.tableRef ?? null)
 
 // Initialize stores on mount
 onMounted(async () => {
