@@ -85,13 +85,10 @@ final class SetlistServiceTest extends TestCase {
 	): void {
 		$this->setlistMapper->expects($this->once())
 			->method($mapperMethod)
-			->with($isDraft, $isPublished)
+			->with(PolicyInterface::ACTION_READ, $isDraft, $isPublished)
 			->willReturn($setlists);
 
-		$this->setlistPolicy->expects($this->exactly(count($setlists)))
-			->method('allows')
-			->with(PolicyInterface::ACTION_READ, $this->anything())
-			->willReturn(true);
+		$this->setlistPolicy->expects($this->never())->method('allows');
 
 		$result = $this->service->getSetlists($filter, $isDraft, $isPublished);
 
@@ -109,13 +106,13 @@ final class SetlistServiceTest extends TestCase {
 		$setlist2->setTitle('Test Setlist 2');
 
 		return [
-			'all filter' => ['all', 'findAll', [$setlist1, $setlist2], null, null],
-			'future filter' => ['future', 'findFuture', [$setlist1], null, null],
-			'past filter' => ['past', 'findPast', [$setlist2], null, null],
-			'all with isDraft=true' => ['all', 'findAll', [$setlist1], true, null],
-			'all with isPublished=true' => ['all', 'findAll', [$setlist2], null, true],
-			'future with isDraft=false' => ['future', 'findFuture', [$setlist1], false, null],
-			'past with both filters' => ['past', 'findPast', [$setlist2], false, true],
+			'all filter' => ['all', 'findAllScoped', [$setlist1, $setlist2], null, null],
+			'future filter' => ['future', 'findFutureScoped', [$setlist1], null, null],
+			'past filter' => ['past', 'findPastScoped', [$setlist2], null, null],
+			'all with isDraft=true' => ['all', 'findAllScoped', [$setlist1], true, null],
+			'all with isPublished=true' => ['all', 'findAllScoped', [$setlist2], null, true],
+			'future with isDraft=false' => ['future', 'findFutureScoped', [$setlist1], false, null],
+			'past with both filters' => ['past', 'findPastScoped', [$setlist2], false, true],
 		];
 	}
 
@@ -751,14 +748,13 @@ final class SetlistServiceTest extends TestCase {
 	}
 
 	public function testGetSetlistsForScoreDefaults(): void {
-		$this->setlistPolicy->method('allows')->willReturn(true);
 		$this->setlistMapper->expects($this->once())
-			->method('findByScoreId')
-			->with(7, false, 'date', 'DESC', 51, 0)
+			->method('findByScoreIdScoped')
+			->with(PolicyInterface::ACTION_READ, 7, 'date', 'DESC', 51, 0)
 			->willReturn([$this->makeSetlist(1)]);
 		$this->setlistMapper->expects($this->once())
-			->method('countByScoreId')
-			->with(7, false)
+			->method('countByScoreIdScoped')
+			->with(PolicyInterface::ACTION_READ, 7)
 			->willReturn(1);
 
 		$result = $this->service->getSetlistsForScore(7);
@@ -769,15 +765,15 @@ final class SetlistServiceTest extends TestCase {
 		$this->assertSame(1, $result['pagination']['total']);
 	}
 
-	public function testGetSetlistsForScoreRestrictsToPublishedWhenUnpublishedNotReadable(): void {
-		$this->setlistPolicy->method('allows')->willReturn(false);
+	public function testGetSetlistsForScoreUsesScopedQueriesWithRequestedParams(): void {
+		$this->setlistPolicy->expects($this->never())->method('allows');
 		$this->setlistMapper->expects($this->once())
-			->method('findByScoreId')
-			->with(7, true, 'name', 'ASC', 11, 0)
+			->method('findByScoreIdScoped')
+			->with(PolicyInterface::ACTION_READ, 7, 'name', 'ASC', 11, 0)
 			->willReturn([]);
 		$this->setlistMapper->expects($this->once())
-			->method('countByScoreId')
-			->with(7, true)
+			->method('countByScoreIdScoped')
+			->with(PolicyInterface::ACTION_READ, 7)
 			->willReturn(0);
 
 		$result = $this->service->getSetlistsForScore(7, 10, null, 'name', 'asc');
@@ -787,10 +783,9 @@ final class SetlistServiceTest extends TestCase {
 	}
 
 	public function testGetSetlistsForScoreReturnsNextCursorAndCursorRoundTrip(): void {
-		$this->setlistPolicy->method('allows')->willReturn(true);
-		$this->setlistMapper->method('countByScoreId')->willReturn(3);
+		$this->setlistMapper->method('countByScoreIdScoped')->willReturn(3);
 		$calls = [];
-		$this->setlistMapper->method('findByScoreId')
+		$this->setlistMapper->method('findByScoreIdScoped')
 			->willReturnCallback(function (...$args) use (&$calls) {
 				$calls[] = $args;
 				return count($calls) === 1
@@ -806,13 +801,12 @@ final class SetlistServiceTest extends TestCase {
 		$second = $this->service->getSetlistsForScore(7, null, $cursor);
 		$this->assertCount(1, $second['setlists']);
 		$this->assertNull($second['pagination']['nextCursor']);
-		$this->assertSame([7, false, 'creation', 'ASC', 3, 2], $calls[1]);
+		$this->assertSame([PolicyInterface::ACTION_READ, 7, 'creation', 'ASC', 3, 2], $calls[1]);
 	}
 
 	public function testGetSetlistsForScoreAcceptsMatchingExplicitParamsWithCursor(): void {
-		$this->setlistPolicy->method('allows')->willReturn(true);
-		$this->setlistMapper->method('countByScoreId')->willReturn(5);
-		$this->setlistMapper->method('findByScoreId')->willReturn([
+		$this->setlistMapper->method('countByScoreIdScoped')->willReturn(5);
+		$this->setlistMapper->method('findByScoreIdScoped')->willReturn([
 			$this->makeSetlist(1), $this->makeSetlist(2), $this->makeSetlist(3),
 		]);
 		$cursor = $this->service->getSetlistsForScore(7, 2, null, 'name', 'DESC')['pagination']['nextCursor'];
@@ -822,9 +816,8 @@ final class SetlistServiceTest extends TestCase {
 	}
 
 	public function testGetSetlistsForScoreRejectsMismatchingParamsWithCursor(): void {
-		$this->setlistPolicy->method('allows')->willReturn(true);
-		$this->setlistMapper->method('countByScoreId')->willReturn(5);
-		$this->setlistMapper->method('findByScoreId')->willReturn([
+		$this->setlistMapper->method('countByScoreIdScoped')->willReturn(5);
+		$this->setlistMapper->method('findByScoreIdScoped')->willReturn([
 			$this->makeSetlist(1), $this->makeSetlist(2), $this->makeSetlist(3),
 		]);
 		$cursor = $this->service->getSetlistsForScore(7, 2, null, 'name', 'DESC')['pagination']['nextCursor'];
@@ -835,7 +828,7 @@ final class SetlistServiceTest extends TestCase {
 
 	#[DataProvider('invalidParamsProvider')]
 	public function testGetSetlistsForScoreRejectsInvalidParams(?int $limit, ?string $cursor, ?string $sortBy, ?string $sortOrder): void {
-		$this->setlistMapper->expects($this->never())->method('findByScoreId');
+		$this->setlistMapper->expects($this->never())->method('findByScoreIdScoped');
 
 		$this->expectException(\InvalidArgumentException::class);
 		$this->service->getSetlistsForScore(7, $limit, $cursor, $sortBy, $sortOrder);

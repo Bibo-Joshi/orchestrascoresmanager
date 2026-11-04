@@ -34,6 +34,15 @@ applyTo: "lib/**/*.php"
 - Return boolean from `allows(string $action, ?object $subject)`
 - Keep logic simple and testable
 
+**Scopes** (`Policy/Scope/*Scope.php`, e.g., `SetlistScope.php`)
+- Implement `EntityScopeInterface::apply(string $action, IQueryBuilder $qb, string $alias = ''): void`
+- Query counterpart of a Policy: constrain a query to the rows the Policy would allow for the action
+- Use the `PolicyInterface::ACTION_*` constants, bind booleans with `PARAM_BOOL`
+- Denied and unknown actions add `1 = 0` (default deny); allowed actions without restriction are a no-op
+- Keep each Scope in sync with its Policy; the integration tests in `tests/integration/Db/Scope` check both jointly
+- Scopes are applied **only in user-facing list reads**, via explicitly named `*Scoped(string $action, …)` mapper methods (e.g., `SetlistMapper::findAllScoped`). Unscoped mapper methods stay the default for internal and write-path logic, and point lookups (`find`) stay unscoped and are protected by `authorizePolicy($action, $entity)` to keep "forbidden" distinct from "not found"
+- Scopes for entities whose mappers do not need them yet exist for uniformity but are not wired into mappers until a rule requires it
+
 **Controllers** (`Controller/*Controller.php`)
 - Handle HTTP requests/responses
 - Thin layer: validate input, call Services, return responses

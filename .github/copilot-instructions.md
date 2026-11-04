@@ -36,6 +36,7 @@ MVC architecture with NextCloud framework:
 - `Db/` - Database entities and mappers
 - `Service/` - Business logic layer
 - `Policy/` - Authorization logic
+- `Policy/Scope/` - Query scopes mirroring Policies, applied only in user-facing list reads via `*Scoped` mapper methods
 - `Migration/` - Database schema changes
 
 ### `/src` - Vue3 Frontend
