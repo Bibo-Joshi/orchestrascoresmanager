@@ -33,6 +33,17 @@
 		:name="t('Export PDF')"
 		:open="dialogOpen"
 		@update:open="dialogOpen = $event">
+		<div class="pdf-layout-select">
+			<label for="pdf-profile-select"><strong>{{ t('PDF layout') }}</strong></label>
+			<select id="pdf-profile-select" v-model="selectedPdfProfileId">
+				<option value="standard">
+					{{ t('Standard layout (built-in)') }}
+				</option>
+				<option v-for="profile in availablePdfProfiles" :key="profile.id" :value="profile.id">
+					{{ profile.name }}
+				</option>
+			</select>
+		</div>
 		<p>{{ t('Select and reorder the columns to include in the PDF export.') }}</p>
 		<draggable
 			:list="dialogColumns"
@@ -77,6 +88,7 @@
 <script setup lang="ts">
 import type { FolderCollection, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
 import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
+import type { PdfLayoutProfile } from '@/utils/pdfLayoutSettings'
 
 import { computed, ref } from 'vue'
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
@@ -86,6 +98,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
+import { apiClients } from '@/api/client'
 import { useBreakpoints } from '@/composables/useBreakpoints'
 import { CancelIcon, DownloadIcon, DragVerticalIcon, ExcelIcon, LoadingIcon, PDFIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
@@ -93,6 +106,8 @@ import { useScoresStore } from '@/stores/scoresStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
 import { exportSetlistToPdf } from '@/utils/pdf-exporter'
+import { cloneProfile, DEFAULT_PDF_PROFILE } from '@/utils/pdfLayoutSettings'
+import { fetchPdfProfiles } from '@/utils/pdfProfilesApi'
 import { exportSetlistToGemaXlsx } from '@/utils/setlist-xlsx-exporter'
 
 interface Props {
@@ -116,6 +131,8 @@ interface DialogColumn extends PdfColumnConfig {
 	enabled: boolean
 }
 
+const selectedPdfProfileId = ref('standard')
+const availablePdfProfiles = ref<PdfLayoutProfile[]>([cloneProfile(DEFAULT_PDF_PROFILE)])
 const dialogOpen = ref(false)
 const dialogColumns = ref<DialogColumn[]>([])
 const hasUserCustomizedColumns = ref(false)
@@ -146,7 +163,15 @@ const DEFAULT_ENABLED_IDS: computed<ReadonlySet<PdfColumnId>> = computed(() => {
  * Open the PDF export configuration dialog, populating it with the current
  * column order from the table.
  */
-function openDialog(): void {
+async function openDialog(): Promise<void> {
+	try {
+		availablePdfProfiles.value = await fetchPdfProfiles()
+		if (selectedPdfProfileId.value !== 'standard' && !availablePdfProfiles.value.some((p) => p.id === selectedPdfProfileId.value)) {
+			selectedPdfProfileId.value = availablePdfProfiles.value[0]?.id ?? 'standard'
+		}
+	} catch {
+		// Fallback to last known layout if the settings endpoint is temporarily unavailable.
+	}
 	const currentColumns = props.getColumns()
 		.filter((col) => col.label.trim() !== '')
 
@@ -178,16 +203,22 @@ async function onPdfExport(): Promise<void> {
 
 	await tryShowError(
 		async () => {
+			// The Pinia store can still contain old tags after editing scores.
+			// Fetch the server's latest score metadata before generating the PDF.
+			const response = await apiClients.default.scoreApiGetScores()
+			const freshScores = new Map(response.data.ocs.data.map((score) => [score.id, score]))
 			exportSetlistToPdf({
 				setlist: props.setlist,
 				entries: props.entries,
-				getScoreById: (id) => scoresStore.getScoreById(id),
+				getScoreById: (id) => freshScores.get(id),
 				getScoreBookById: (id) => scoreBooksStore.getScoreBookById(id),
 				fcvScoresMap: props.fcvScoresMap,
 				fcvScoreBookIndicesMap: props.fcvScoreBookIndicesMap,
 				folderCollection: props.folderCollection,
 				columnConfigs: selectedColumns,
-			})
+			}, selectedPdfProfileId.value === 'standard'
+				? undefined
+				: (availablePdfProfiles.value.find((p) => p.id === selectedPdfProfileId.value) ?? undefined))
 		},
 		t('Export failed: '),
 	)
@@ -213,6 +244,13 @@ async function onGemaExport(): Promise<void> {
 </script>
 
 <style lang="scss" scoped>
+.pdf-layout-select {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5ex;
+	margin-bottom: 1.5ex;
+}
+
 .column-list {
 	padding: 1ex 0;
 }

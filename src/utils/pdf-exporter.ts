@@ -1,5 +1,6 @@
 import type { Table as AutoTable, Styles } from 'jspdf-autotable'
 import type { FolderCollection, Score, ScoreBook, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
+import type { PdfTagColorRule } from '@/utils/pdfLayoutSettings'
 import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
 
 /**
@@ -11,6 +12,7 @@ import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
 import { jsPDF } from 'jspdf'
 import { autoTable } from 'jspdf-autotable'
 import { t } from '@/utils/l10n'
+import { hexToRgb, matchesTags } from '@/utils/pdfLayoutSettings'
 import { isBreakEntry, resolveScoreField } from '@/utils/setlistScoreUtils'
 import { formatDurationHHMM, formatDurationHHMMSS } from '@/utils/timeFormatUtils'
 
@@ -87,6 +89,10 @@ export interface PdfFormatConfig {
 	tableFontSize: number
 	/** Page margins in mm */
 	margin: number
+	cellPadding?: number
+	breakPadding?: number
+	breakColor?: string
+	rules?: PdfTagColorRule[]
 }
 
 /**
@@ -97,6 +103,16 @@ export const defaultPdfFormatConfig: PdfFormatConfig = {
 	sectionFontSize: 11,
 	tableFontSize: 8,
 	margin: 8,
+}
+
+/**
+ * Determine a score row's colour from the first matching profile rule.
+ * @param score Score metadata, if available.
+ * @param config The selected PDF layout configuration.
+ */
+function scoreRowColor(score: Score | undefined, config: PdfFormatConfig): [number, number, number] | null {
+	const rule = config.rules?.find((candidate) => matchesTags(score?.tags ?? [], candidate.expression))
+	return rule ? hexToRgb(rule.color) : null
 }
 
 /**
@@ -322,82 +338,126 @@ function getEntryCellValue(
  */
 export function exportSetlistToPdf(
 	data: PdfSetlistData,
-	config: PdfFormatConfig = defaultPdfFormatConfig,
+	config?: PdfFormatConfig,
 ): void {
+	const isCustomLayout = config !== undefined
+	const activeConfig = config ?? defaultPdfFormatConfig
 	const { setlist, entries, getScoreById, getScoreBookById, fcvScoresMap, fcvScoreBookIndicesMap, folderCollection } = data
 
 	const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
 	const pageWidth = doc.internal.pageSize.getWidth()
-	const margin = config.margin
+	const margin = activeConfig.margin
 	const contentWidth = pageWidth - 2 * margin
 
 	let y = margin + 5
+	if (isCustomLayout) {
+		// Compact custom-layout header
+		const draftSuffix = setlist.isDraft ? ` (${t('Draft')})` : ''
+		const headerTitle = `${setlist.title}${draftSuffix}`
+		doc.setFont('helvetica', 'bold')
+		doc.setFontSize(activeConfig.titleFontSize)
+		const titleLines = doc.splitTextToSize(headerTitle, contentWidth) as string[]
+		doc.text(titleLines, margin, y)
+		y += titleLines.length * (activeConfig.titleFontSize * 0.4 + 1.2) + 1
 
-	// --- Title ---
-	const draftSuffix = setlist.isDraft ? ` (${t('Draft')})` : ''
-	const titleText = `${t('Setlist')}: ${setlist.title}${draftSuffix}`
-	y = addText(doc, titleText, margin, y, config.titleFontSize, true)
-	y += 2
-
-	// --- Description ---
-	if (setlist.description) {
-		doc.setFontSize(config.sectionFontSize)
+		const summary = computeSummary(setlist, entries, getScoreById)
+		const headerDetails: string[] = []
+		if (setlist.startDateTime) {
+			const { date, time } = formatDateTime(setlist.startDateTime)
+			headerDetails.push(`${date} · ${time}`)
+		}
+		headerDetails.push(`${t('Overall Duration')}: ${formatDurationWithUnit(summary.totalDurationSecs)}`)
 		doc.setFont('helvetica', 'normal')
-		const lines = doc.splitTextToSize(setlist.description, contentWidth) as string[]
-		doc.text(lines, margin, y)
-		y += lines.length * (config.sectionFontSize * 0.4 + 1) + 3
-	}
+		doc.setFontSize(activeConfig.tableFontSize + 1)
+		const detailLines = doc.splitTextToSize(headerDetails.join('  |  '), contentWidth) as string[]
+		doc.text(detailLines, margin, y)
+		y += detailLines.length * (activeConfig.tableFontSize * 0.4 + 1.5) + 3
 
-	// --- Folder collection ---
-	if (folderCollection) {
-		y = addText(
-			doc,
-			`${t('Folder Collection')}: ${folderCollection.title}`,
-			margin,
-			y,
-			config.sectionFontSize,
-		)
-		y += 1
-	}
-
-	// --- Info (summary) table — vertical two-column layout ---
-	const summary = computeSummary(setlist, entries, getScoreById)
-
-	y = addText(doc, t('Info'), margin, y, config.sectionFontSize, true)
-
-	const infoRows: string[][] = []
-
-	if (setlist.startDateTime) {
-		const { date, time, startOfDaySecs } = formatDateTime(setlist.startDateTime)
-		// endTimeSecs may exceed 86400 (24h) for events that run past midnight; displayed as elapsed HH:MM
-		const endTimeSecs = startOfDaySecs + summary.totalDurationSecs
-		infoRows.push([t('Date'), date])
-		infoRows.push([t('Start Time'), time])
-		infoRows.push([t('End Time'), formatDurationHHMM(endTimeSecs)])
-	}
-
-	infoRows.push([t('Playtime'), formatDurationWithUnit(summary.playTimeSecs)])
-	infoRows.push([t('Moderation & Breaks'), formatDurationWithUnit(summary.moderationAndBreakTimeSecs)])
-	infoRows.push([t('Overall Duration'), formatDurationWithUnit(summary.totalDurationSecs)])
-
-	autoTable(doc, {
-		startY: y,
-		showHead: 'never',
-		theme: 'plain',
-		body: infoRows,
-		margin: { left: margin, right: margin },
-		tableWidth: 'wrap',
-		styles: { fontSize: config.tableFontSize, cellWidth: 'wrap' },
-		columnStyles: {
-			0: { fontStyle: 'bold', cellPadding: { left: 0, vertical: 1, right: 2 }, valign: 'middle' },
-		},
-	})
-
-	const infoTable = (doc as JsPDFWithAutoTable).lastAutoTable
-	if (infoTable !== false && infoTable.finalY) {
-		y = infoTable.finalY + 4
+		// One-line legend. Coloured backgrounds are derived from score tags, not setlist comments.
+		const legend: Array<{ label: string, color: [number, number, number] }> = (activeConfig.rules ?? [])
+			.map((rule) => ({ label: rule.label, color: hexToRgb(rule.color) }))
+		let x = margin
+		doc.setFontSize(8)
+		for (const item of legend) {
+			const itemWidth = doc.getTextWidth(item.label) + 13
+			if (x + itemWidth > pageWidth - margin && x > margin) {
+				x = margin
+				y += 6
+			}
+			doc.setFillColor(...item.color)
+			doc.rect(x, y - 2.5, 3.5, 3.5, 'F')
+			doc.setTextColor(0, 0, 0)
+			doc.text(item.label, x + 5, y + 0.2)
+			x += itemWidth
+		}
+		y += 6
 	} else {
-		y = y + 20
+		// --- Title ---
+		const draftSuffix = setlist.isDraft ? ` (${t('Draft')})` : ''
+		const titleText = `${t('Setlist')}: ${setlist.title}${draftSuffix}`
+		y = addText(doc, titleText, margin, y, activeConfig.titleFontSize, true)
+		y += 2
+
+		// --- Description ---
+		if (setlist.description) {
+			doc.setFontSize(activeConfig.sectionFontSize)
+			doc.setFont('helvetica', 'normal')
+			const lines = doc.splitTextToSize(setlist.description, contentWidth) as string[]
+			doc.text(lines, margin, y)
+			y += lines.length * (activeConfig.sectionFontSize * 0.4 + 1) + 3
+		}
+
+		// --- Folder collection ---
+		if (folderCollection) {
+			y = addText(
+				doc,
+				`${t('Folder Collection')}: ${folderCollection.title}`,
+				margin,
+				y,
+				activeConfig.sectionFontSize,
+			)
+			y += 1
+		}
+
+		// --- Info (summary) table — vertical two-column layout ---
+		const summary = computeSummary(setlist, entries, getScoreById)
+
+		y = addText(doc, t('Info'), margin, y, activeConfig.sectionFontSize, true)
+
+		const infoRows: string[][] = []
+
+		if (setlist.startDateTime) {
+			const { date, time, startOfDaySecs } = formatDateTime(setlist.startDateTime)
+			// endTimeSecs may exceed 86400 (24h) for events that run past midnight; displayed as elapsed HH:MM
+			const endTimeSecs = startOfDaySecs + summary.totalDurationSecs
+			infoRows.push([t('Date'), date])
+			infoRows.push([t('Start Time'), time])
+			infoRows.push([t('End Time'), formatDurationHHMM(endTimeSecs)])
+		}
+
+		infoRows.push([t('Playtime'), formatDurationWithUnit(summary.playTimeSecs)])
+		infoRows.push([t('Moderation & Breaks'), formatDurationWithUnit(summary.moderationAndBreakTimeSecs)])
+		infoRows.push([t('Overall Duration'), formatDurationWithUnit(summary.totalDurationSecs)])
+
+		autoTable(doc, {
+			startY: y,
+			showHead: 'never',
+			theme: 'plain',
+			body: infoRows,
+			margin: { left: margin, right: margin },
+			tableWidth: 'wrap',
+			styles: { fontSize: activeConfig.tableFontSize, cellWidth: 'wrap' },
+			columnStyles: {
+				0: { fontStyle: 'bold', cellPadding: { left: 0, vertical: 1, right: 2 }, valign: 'middle' },
+			},
+		})
+
+		const infoTable = (doc as JsPDFWithAutoTable).lastAutoTable
+		if (infoTable !== false && infoTable.finalY) {
+			y = infoTable.finalY + 4
+		} else {
+			y = y + 20
+		}
 	}
 
 	// --- Entries table ---
@@ -417,6 +477,8 @@ export function exportSetlistToPdf(
 	}
 
 	const entryRows: string[][] = []
+	const rowColors: Array<[number, number, number] | null> = []
+	const breakRows = new Set<number>()
 
 	for (const entry of entries) {
 		const effectiveMod = entry.moderationDuration ?? setlist.defaultModerationDuration ?? 0
@@ -425,6 +487,12 @@ export function exportSetlistToPdf(
 		const startTime = cumulativeTime
 		cumulativeTime += effectiveMod + effectiveDuration
 
+		if (isBreakEntry(entry)) {
+			breakRows.add(entryRows.length)
+			rowColors.push(null)
+		} else {
+			rowColors.push(scoreRowColor(score, activeConfig))
+		}
 		entryRows.push(activeColumns.map((col) => getEntryCellValue(col.id, entry, startTime, effectiveDuration, effectiveMod, score, getScoreBookById, fcvScoresMap, fcvScoreBookIndicesMap)))
 	}
 
@@ -435,7 +503,7 @@ export function exportSetlistToPdf(
 		theme: 'plain',
 		margin: { left: margin, right: margin },
 		tableWidth: contentWidth,
-		styles: { fontSize: config.tableFontSize, overflow: 'linebreak', lineWidth: 0 },
+		styles: { fontSize: activeConfig.tableFontSize, overflow: 'linebreak', lineWidth: 0, ...(activeConfig.cellPadding !== undefined ? { cellPadding: activeConfig.cellPadding } : {}) },
 		headStyles: {
 			fontStyle: 'bold',
 			fillColor: false,
@@ -443,8 +511,34 @@ export function exportSetlistToPdf(
 			lineColor: [0, 0, 0],
 			lineWidth: { bottom: 0.8, top: 0, left: 0, right: 0 },
 		},
-		alternateRowStyles: { fillColor: [245, 245, 245] },
-		columnStyles: buildEntryColumnStyles(doc, config, entryHeaders),
+		alternateRowStyles: isCustomLayout ? undefined : { fillColor: [245, 245, 245] },
+		columnStyles: buildEntryColumnStyles(doc, activeConfig, entryHeaders),
+		didParseCell: (cellData) => {
+			if (!isCustomLayout || cellData.section !== 'body') {
+				return
+			}
+			if (breakRows.has(cellData.row.index)) {
+				// Dark, high-contrast band spanning the entire table row.
+				cellData.cell.styles.fillColor = hexToRgb(activeConfig.breakColor ?? '#354354')
+				cellData.cell.styles.textColor = [255, 255, 255]
+				cellData.cell.styles.fontStyle = 'bold'
+				cellData.cell.styles.minCellHeight = 10
+				cellData.cell.styles.cellPadding = {
+					top: activeConfig.breakPadding ?? 3,
+					right: 2,
+					bottom: activeConfig.breakPadding ?? 3,
+					left: 2,
+				}
+				if (activeColumns[cellData.column.index]?.id === 'title') {
+					cellData.cell.text = [t('Break').toLocaleUpperCase()]
+				}
+				return
+			}
+			const background = rowColors[cellData.row.index]
+			if (background) {
+				cellData.cell.styles.fillColor = background
+			}
+		},
 	})
 
 	// Download the PDF

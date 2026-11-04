@@ -12,6 +12,7 @@ use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSForbiddenException;
+use OCP\AppFramework\OCS\OCSBadRequestException;
 use OCP\AppFramework\OCSController;
 use OCP\IRequest;
 use OCP\IUserSession;
@@ -86,4 +87,30 @@ class UserSettingsController extends OCSController {
 		$settings = $this->callService(fn () => $this->userSettingsService->getSetlistSettings($userId));
 		return new DataResponse($settings);
 	}
+	/** Get this user's PDF stage layout profiles. */
+	#[NoAdminRequired]
+	#[ApiRoute(verb: 'GET', url: '/settings/user/pdf-layouts')]
+	public function getPdfLayouts(): DataResponse {
+		$userId = $this->userSession->getUser()?->getUID();
+		if ($userId === null) {
+			throw new OCSForbiddenException('Not authenticated');
+		}
+		return new DataResponse(['profiles' => $this->userSettingsService->getPdfLayouts($userId)]);
+	}
+
+	/** Persist profiles in Nextcloud's per-user configuration. */
+	#[NoAdminRequired]
+	#[ApiRoute(verb: 'PUT', url: '/settings/user/pdf-layouts')]
+	public function putPdfLayouts(array $profiles = []): DataResponse {
+		$userId = $this->userSession->getUser()?->getUID();
+		if ($userId === null) {
+			throw new OCSForbiddenException('Not authenticated');
+		}
+		try {
+			return new DataResponse(['profiles' => $this->userSettingsService->putPdfLayouts($userId, $profiles)]);
+		} catch (\InvalidArgumentException $e) {
+			throw new OCSBadRequestException($e->getMessage());
+		}
+	}
+
 }

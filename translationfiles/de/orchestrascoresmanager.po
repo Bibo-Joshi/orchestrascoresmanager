@@ -1218,3 +1218,114 @@ msgstr "Ungültiges Spieldauerformat"
 
 #~ msgid "Score Book Version History"
 #~ msgstr "Notenbuch-Versionshistorie"
+
+msgid "PDF layouts"
+msgstr "PDF-Layouts"
+
+msgid "Manage PDF layouts for setlist exports. The built-in standard layout cannot be modified."
+msgstr "PDF-Vorlagen für den Setlistenexport verwalten. Das integrierte Standardlayout kann nicht verändert werden."
+
+msgid "Add layout"
+msgstr "Layout hinzufügen"
+
+msgid "Standard layout (built-in, read-only)"
+msgstr "Standardlayout (integriert, nicht veränderbar)"
+
+msgid "Layout name"
+msgstr "Layoutname"
+
+msgid "Title font size (pt)"
+msgstr "Überschrift (pt)"
+
+msgid "Section font size (pt)"
+msgstr "Abschnitt (pt)"
+
+msgid "Table font size (pt)"
+msgstr "Tabellenschrift (pt)"
+
+msgid "Page margin (mm)"
+msgstr "Seitenrand (mm)"
+
+msgid "Cell padding (mm)"
+msgstr "Zellenabstand (mm)"
+
+msgid "Break padding (mm)"
+msgstr "Pausenabstand (mm)"
+
+msgid "Break row color"
+msgstr "Pausenfarbe"
+
+msgid "Tag-based row colors"
+msgstr "Farbregeln nach Schlagworten"
+
+msgid "The first matching rule wins. Use & for AND and | for OR."
+msgstr "Die erste passende Regel gewinnt. & bedeutet UND, | bedeutet ODER."
+
+msgid "Rule label"
+msgstr "Regelbezeichnung"
+
+msgid "Legend label"
+msgstr "Legendenbezeichnung"
+
+msgid "Tag expression"
+msgstr "Schlagwortkombination"
+
+msgid "Color"
+msgstr "Farbe"
+
+msgid "Move rule up"
+msgstr "Regel nach oben"
+
+msgid "Move rule down"
+msgstr "Regel nach unten"
+
+msgid "Remove rule"
+msgstr "Regel entfernen"
+
+msgid "Add color rule"
+msgstr "Farbregel hinzufügen"
+
+msgid "Duplicate layout"
+msgstr "Layout duplizieren"
+
+msgid "Remove layout"
+msgstr "Layout entfernen"
+
+msgid "Save PDF layouts"
+msgstr "PDF-Layouts speichern"
+
+msgid "You can create up to 12 PDF layouts."
+msgstr "Maximal 12 PDF-Layouts möglich."
+
+msgid "New layout"
+msgstr "Neues Layout"
+
+msgid "copy"
+msgstr "Kopie"
+
+msgid "Delete layout \"{name}\"?"
+msgstr "Layout „{name}“ wirklich entfernen?"
+
+msgid "You can create up to 30 color rules per layout."
+msgstr "Maximal 30 Farbregeln pro Layout möglich."
+
+msgid "New rule"
+msgstr "Neue Regel"
+
+msgid "Please fill in all layout names, rule labels and tag expressions."
+msgstr "Bitte alle Layoutnamen sowie die Bezeichnungen und Ausdrücke der Farbregeln ausfüllen."
+
+msgid "Failed to save PDF layouts."
+msgstr "Konnte PDF-Layouts nicht speichern."
+
+msgid "PDF layout"
+msgstr "PDF-Layout"
+
+msgid "Standard layout (built-in)"
+msgstr "Standardlayout (Original)"
+
+msgid "e.g. Singer"
+msgstr "z. B. Sänger"
+
+msgid "e.g. Tag A & Tag B | Tag C"
+msgstr "z. B. Male & Female | Duett"

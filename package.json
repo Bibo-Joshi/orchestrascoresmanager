@@ -16,7 +16,8 @@
     "watch": "vite --mode development build --watch",
     "lint": "eslint src",
     "stylelint": "stylelint src/**/*.vue src/**/*.scss src/**/*.css",
-    "generate:api": "node scripts/generate-api.mjs"
+    "generate:api": "node scripts/generate-api.mjs",
+    "test:frontend": "esbuild tests/frontend/pdfLayoutSettings.test.mjs --bundle --platform=node --format=esm --target=node22 --outfile=node_modules/.cache/osm-pdf-layout-tests.mjs && node node_modules/.cache/osm-pdf-layout-tests.mjs"
   },
   "type": "module",
   "browserslist": [
