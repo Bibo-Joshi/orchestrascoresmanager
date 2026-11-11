@@ -8,7 +8,7 @@ import { generateUrl } from '@nextcloud/router'
 import { Workbook } from 'exceljs'
 import { isBreakEntry } from '@/utils/setlistScoreUtils'
 
-const TEMPLATE_URL = generateUrl('/apps/orchestrascoresmanager/gema-template')
+const TEMPLATE_URL = generateUrl('/apps/orchestrascoresmanager/assets/gema-template')
 const DATA_START_ROW = 21
 
 interface PersonNameParts {
