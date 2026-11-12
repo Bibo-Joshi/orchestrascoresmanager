@@ -16,6 +16,8 @@ use OCP\IRequest;
 
 /**
  * Serves application assets through Nextcloud routing.
+ *
+ * @psalm-suppress UnusedClass - Controller discovered by Nextcloud framework
  */
 class AssetsController extends Controller {
 	private const CACHE_SECONDS = 3600;
@@ -27,11 +29,15 @@ class AssetsController extends Controller {
 		parent::__construct($appName, $request);
 	}
 
+	protected function getGemaTemplatePath(): string {
+		return __DIR__ . '/../../public/gema-template.xlsx';
+	}
+
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
 	#[FrontpageRoute(verb: 'GET', url: '/assets/gema-template')]
 	public function getGemaTemplate(): Response {
-		$path = __DIR__ . '/../../public/gema-template.xlsx';
+		$path = $this->getGemaTemplatePath();
 
 		if (!is_file($path) || !is_readable($path)) {
 			return new NotFoundResponse();

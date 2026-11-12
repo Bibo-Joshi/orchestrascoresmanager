@@ -10360,6 +10360,10 @@
         {
             "name": "folder_collection_version_api",
             "description": "Controller for folder collection version operations. Provides endpoints to access and modify folder collection versions independently of their parent folder collection."
+        },
+        {
+            "name": "assets",
+            "description": "Serves application assets through Nextcloud routing."
         }
     ]
 }

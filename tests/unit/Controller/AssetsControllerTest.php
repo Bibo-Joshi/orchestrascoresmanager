@@ -7,6 +7,7 @@ namespace OCA\OrchestraScoresManager\Tests\unit\Controller;
 use OCA\OrchestraScoresManager\Controller\AssetsController;
 use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\IOutput;
+use OCP\AppFramework\Http\NotFoundResponse;
 use OCP\AppFramework\Http\StreamResponse;
 use OCP\IRequest;
 use PHPUnit\Framework\TestCase;
@@ -79,5 +80,18 @@ final class AssetsControllerTest extends TestCase {
 		);
 
 		$this->assertArrayHasKey('Expires', $headers);
+	}
+
+	public function testGemaTemplateNotFound(): void {
+		$controller = new class('orchestrascoresmanager', $this->createMock(IRequest::class), ) extends AssetsController {
+			protected function getGemaTemplatePath(): string {
+				return '/nonexistent/osm-gema-template.xlsx';
+			}
+		};
+
+		$response = $controller->getGemaTemplate();
+
+		$this->assertInstanceOf(NotFoundResponse::class, $response);
+		$this->assertSame(Http::STATUS_NOT_FOUND, $response->getStatus());
 	}
 }
