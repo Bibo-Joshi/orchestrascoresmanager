@@ -9,6 +9,7 @@ use OCP\AppFramework\Http;
 use OCP\AppFramework\Http\Attribute\FrontpageRoute;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
+use OCP\AppFramework\Http\Attribute\OpenAPI;
 use OCP\AppFramework\Http\NotFoundResponse;
 use OCP\AppFramework\Http\Response;
 use OCP\AppFramework\Http\StreamResponse;
@@ -35,6 +36,7 @@ class AssetsController extends Controller {
 
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
+	#[OpenAPI(OpenAPI::SCOPE_IGNORE)]
 	#[FrontpageRoute(verb: 'GET', url: '/assets/gema-template')]
 	public function getGemaTemplate(): Response {
 		$path = $this->getGemaTemplatePath();

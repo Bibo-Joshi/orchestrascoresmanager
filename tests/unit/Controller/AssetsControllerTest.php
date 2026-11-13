@@ -56,9 +56,12 @@ final class AssetsControllerTest extends TestCase {
 		$output->expects($this->once())
 			->method('setReadfile')
 			->willReturnCallback(
-				function ($path) use (&$streamedContent): bool {
-					$streamedContent = file_get_contents($path);
-					return $streamedContent !== false;
+				function (string $path) use (&$streamedContent): bool {
+					ob_start();
+					$result = readfile($path);
+					$streamedContent = ob_get_clean();
+
+					return $result !== false;
 				}
 			);
 
