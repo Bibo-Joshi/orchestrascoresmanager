@@ -20,6 +20,7 @@ use OCP\IRequest;
  *
  * @psalm-suppress UnusedClass - Controller discovered by Nextcloud framework
  */
+#[OpenAPI(OpenAPI::SCOPE_IGNORE)]
 class AssetsController extends Controller {
 	private const CACHE_SECONDS = 3600;
 
@@ -36,7 +37,6 @@ class AssetsController extends Controller {
 
 	#[NoAdminRequired]
 	#[NoCSRFRequired]
-	#[OpenAPI(OpenAPI::SCOPE_IGNORE)]
 	#[FrontpageRoute(verb: 'GET', url: '/assets/gema-template')]
 	public function getGemaTemplate(): Response {
 		$path = $this->getGemaTemplatePath();
