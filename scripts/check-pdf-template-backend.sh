@@ -17,8 +17,14 @@ printf '\n== PHP lint ==\n'
 composer lint
 printf '\n== PHP-CS-Fixer dry run ==\n'
 composer cs:check
-printf '\n== PHPUnit (full backend suite) ==\n'
-composer test:unit
+printf '\n== PHPUnit ==\n'
+if [[ -f ../../tests/bootstrap.php ]]; then
+  printf 'Nextcloud checkout detected: running unit and integration suites.\n'
+  composer test:unit
+else
+  printf 'Standalone checkout detected: running unit tests only.\n'
+  vendor-bin/phpunit/vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml --testsuite 'Unit Tests' --colors=always --fail-on-warning --fail-on-risky
+fi
 printf '\n== Psalm ==\n'
 composer psalm
 printf '\nAll local PHP checks completed. Real DB migrations are not executed by this script.\n'
