@@ -302,7 +302,8 @@
 					<template #icon>
 						<NcLoadingIcon
 							v-if="saving"
-							:size="20" /><ConfirmIcon
+							:size="20" />
+						<ConfirmIcon
 							v-else
 							:size="20" />
 					</template>
@@ -313,9 +314,7 @@
 	</div>
 </template>
 
-<script
-	setup
-	lang="ts">
+<script setup lang="ts">
 import type { PdfRuleDraft } from '@/utils/pdfTemplateRules'
 import type { PdfTemplate, PdfTemplateInput } from '@/utils/pdfTemplatesApi'
 
@@ -504,9 +503,7 @@ async function removeTemplate(item: PdfTemplate): Promise<void> {
 }
 </script>
 
-<style
-	scoped
-	lang="scss">
+<style scoped lang="scss">
 .pdf-templates { display: flex; flex-direction: column; gap: 12px; }
 .template-list { padding: 0; margin: 0; list-style: none; }
 .template-item { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--color-border); }
