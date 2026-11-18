@@ -45,7 +45,7 @@ final class SetlistTemplateMigrationTest extends TestCase {
 		}
 		$this->assertTrue($setlistTable->hasColumn('default_template_id'));
 		$this->assertFalse($setlistTable->getColumn('default_template_id')->getNotnull());
-		$foreignKeys = $setlistTable->getForeignKeys();
+		$foreignKeys = array_values($setlistTable->getForeignKeys());
 		$this->assertCount(1, $foreignKeys);
 		$this->assertSame(['default_template_id'], $foreignKeys[0]->getLocalColumns());
 		$this->assertSame(['id'], $foreignKeys[0]->getForeignColumns());
