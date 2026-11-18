@@ -76,11 +76,13 @@ class SetlistTemplateMapper {
 
 	/** @return array<string, mixed> */
 	private function serializeRow(array $row): array {
-		/** @psalm-suppress MixedAssignment - JSON is validated before its properties are read. */
-		$config = json_decode((string)$row['config_json'], true, 512, JSON_THROW_ON_ERROR);
-		if (!is_array($config) || (array_is_list($config) && $config !== [])) {
+		/** @var mixed $decoded */
+		$decoded = json_decode((string)$row['config_json'], true, 512, JSON_THROW_ON_ERROR);
+		if (!is_array($decoded) || (array_is_list($decoded) && $decoded !== [])) {
 			throw new \UnexpectedValueException('Stored PDF template configuration must be a JSON object');
 		}
+		/** @var array<string, mixed> $config */
+		$config = $decoded;
 
 		return [
 			'id' => (string)$row['id'],
