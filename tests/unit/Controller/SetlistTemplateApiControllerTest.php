@@ -54,6 +54,28 @@ final class SetlistTemplateApiControllerTest extends TestCase {
 		$this->assertSame([], $this->controller->deleteTemplate('stage')->getData());
 	}
 
+	public function testEmptyFontSizesSerializeAsJsonObjectInList(): void {
+		$this->service->method('getTemplates')->willReturn([
+			['id' => 'empty', 'fontSizes' => [], 'rules' => []],
+			['id' => 'configured', 'fontSizes' => ['title' => 18], 'rules' => []],
+		]);
+
+		$data = $this->controller->getTemplates()->getData();
+		$this->assertSame('{}', json_encode($data[0]['fontSizes'], JSON_THROW_ON_ERROR));
+		$this->assertSame('[]', json_encode($data[0]['rules'], JSON_THROW_ON_ERROR));
+		$this->assertSame('{"title":18}', json_encode($data[1]['fontSizes'], JSON_THROW_ON_ERROR));
+	}
+
+	public function testEmptyFontSizesSerializeAsJsonObjectAfterCreateAndPatch(): void {
+		$this->service->method('createTemplate')->willReturn(['id' => 'empty', 'fontSizes' => []]);
+		$this->service->method('patchTemplate')->willReturn(['id' => 'empty', 'fontSizes' => []]);
+
+		$created = $this->controller->postTemplate(['name' => 'Empty'])->getData();
+		$updated = $this->controller->patchTemplate('empty', ['name' => 'Updated'])->getData();
+		$this->assertSame('{}', json_encode($created['fontSizes'], JSON_THROW_ON_ERROR));
+		$this->assertSame('{}', json_encode($updated['fontSizes'], JSON_THROW_ON_ERROR));
+	}
+
 	public function testForbidsUnauthorizedPost(): void {
 		$this->service->method('createTemplate')->willThrowException(new PermissionDeniedException('Denied'));
 		$this->expectException(OCSForbiddenException::class);
