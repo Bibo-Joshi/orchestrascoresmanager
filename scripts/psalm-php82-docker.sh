@@ -10,13 +10,25 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 1
 fi
 
+# Prefer non-root Docker; fall back to sudo for the Docker commands only.
+# Keep the script under the invoking user so the bind mount retains user ownership.
+docker_cmd=(docker)
+if ! docker info --format '{{.ServerVersion}}' >/dev/null 2>&1; then
+  if ! command -v sudo >/dev/null 2>&1; then
+    echo 'Docker access denied and sudo is unavailable.' >&2
+    exit 1
+  fi
+  echo 'Docker daemon inaccessible as current user; using sudo docker.' >&2
+  docker_cmd=(sudo docker)
+fi
+
 if [[ ! -f "$repo_root/vendor/bin/psalm" ]]; then
   echo 'Psalm dependencies are missing; run composer install on the host first.' >&2
   exit 1
 fi
 
-docker build --tag "$image" "$repo_root/docker/php82-psalm"
-docker run --rm --init \
+"${docker_cmd[@]}" build --tag "$image" "$repo_root/docker/php82-psalm"
+"${docker_cmd[@]}" run --rm --init \
   --user "$(id -u):$(id -g)" \
   --mount "type=bind,source=$repo_root,target=/work" \
   --workdir /work \
