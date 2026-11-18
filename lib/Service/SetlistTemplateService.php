@@ -50,6 +50,10 @@ class SetlistTemplateService {
 			throw new \InvalidArgumentException('Template ID cannot be modified');
 		}
 		unset($previous['createdBy'], $previous['createdAt'], $previous['updatedAt']);
+		// PATCH can update one font size without discarding the other values.
+		if (isset($changes['fontSizes']) && is_array($changes['fontSizes'])) {
+			$changes['fontSizes'] = array_replace($previous['fontSizes'], $changes['fontSizes']);
+		}
 		$validated = $this->validator->validate(array_replace($previous, $changes));
 		return $this->mapper->update(
 			$id, $validated['name'], $validated['description'], $validated['config']
