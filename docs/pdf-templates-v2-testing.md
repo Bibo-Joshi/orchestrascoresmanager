@@ -55,14 +55,26 @@ also uses this runner automatically on PHP 8.5 when Docker is available.
 The migration must be tried with both an **existing** OSM database (upgrade)
 and a **fresh** OSM database. Back up the disposable database first.
 
-Point the Nextcloud development app directory at this branch. Then run,
-inside the development container (replace `nextcloud-dev` with the actual name):
+Point the Nextcloud development app directory at this branch. In Nextcloud 34,
+`migrations:status`, `migrations:execute`, and `migrations:migrate` are developer-only
+commands and are only registered while system `debug` is enabled. On the **isolated
+test container only**, temporarily enable debug mode (replace `nextcloud-dev` with
+your test container's name), then execute just this migration:
 
 ```bash
+docker exec -u www-data nextcloud-dev php occ config:system:get debug
+docker exec -u www-data nextcloud-dev php occ config:system:set debug --type=boolean --value=true
 docker exec -u www-data nextcloud-dev php occ migrations:status orchestrascoresmanager
-docker exec -u www-data nextcloud-dev php occ migrations:migrate orchestrascoresmanager
+docker exec -u www-data nextcloud-dev php occ migrations:execute orchestrascoresmanager 001003003Date20261118000000
 docker exec -u www-data nextcloud-dev php occ migrations:status orchestrascoresmanager
+docker exec -u www-data nextcloud-dev php occ config:system:set debug --type=boolean --value=false
 ```
+
+Before enabling debug, **save the original value** and restore that value at the
+end; if `debug` was previously absent, remove it again with `config:system:delete
+debug` rather than assuming it was explicitly `false`. The example above uses
+`false` as the usual default. Verify that the disposable volume backup exists
+before running the migration. Never enable debug on the productive Nextcloud.
 
 The migration class is `Version001003003Date20261118000000`, creates
 `osm_setlist_templates`, and adds a nullable `default_template_id` FK to
