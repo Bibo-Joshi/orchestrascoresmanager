@@ -26,5 +26,13 @@ else
   vendor-bin/phpunit/vendor/phpunit/phpunit/phpunit -c tests/phpunit.xml --testsuite 'Unit Tests' --colors=always --fail-on-warning --fail-on-risky
 fi
 printf '\n== Psalm ==\n'
-composer psalm
+# Psalm 5.26.1 crashes on PHP 8.5 runtime deprecations.
+if command -v php8.2 >/dev/null 2>&1; then
+  php8.2 vendor/bin/psalm --threads=1 --no-cache
+elif php -r 'exit(PHP_VERSION_ID >= 80500 ? 0 : 1);'; then
+  printf 'Psalm 5.26.1 is incompatible with PHP 8.5 runtime deprecations. Install PHP 8.2 CLI with required extensions.\n' >&2
+  exit 2
+else
+  composer psalm
+fi
 printf '\nAll local PHP checks completed. Real DB migrations are not executed by this script.\n'
