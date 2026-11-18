@@ -37,7 +37,7 @@
 				</label>
 				<label>
 					{{ t('Description (optional)') }}
-					<textarea v-model="form.description" maxlength="2000" rows="2" />
+					<textarea v-model="form.description" maxlength="2000" rows="2"></textarea>
 				</label>
 				<fieldset>
 					<legend>{{ t('Font sizes (pt)') }}</legend>
@@ -348,6 +348,6 @@ async function removeTemplate(item: PdfTemplate): Promise<void> {
 .rule-condition { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
 .rule-formatting { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .rule-formatting > label:last-child { flex: 1 1 160px; }
-.checkbox-field { flex-direction: row !important; align-items: center; }
+.template-form label.checkbox-field { flex-direction: row; align-items: center; }
 .hint { color: var(--color-text-maxcontrast); font-size: 0.9em; }
 </style>
