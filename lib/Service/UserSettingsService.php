@@ -102,10 +102,18 @@ class UserSettingsService {
 		if ($json === '__unconfigured__') {
 			return null;
 		}
-		$data = json_decode($json, true);
-		return is_array($data) && array_is_list($data) ? $data : [];
+		return $this->normalizePdfLayouts(json_decode($json, true));
 	}
 
+	/**
+	 * Decode only list-shaped legacy profiles; invalid or object-shaped JSON
+	 * is treated like an empty list.
+	 *
+	 * @return list<mixed>
+	 */
+	private function normalizePdfLayouts(mixed $decoded): array {
+		return is_array($decoded) && array_is_list($decoded) ? $decoded : [];
+	}
 	/** Limit storage size and validate the shape before persisting user input. */
 	public function putPdfLayouts(string $userId, array $profiles): array {
 		if (!array_is_list($profiles) || count($profiles) > 12) {
