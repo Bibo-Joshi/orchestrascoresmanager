@@ -24,7 +24,10 @@ function breakCondition(): PdfTemplateCondition {
 	return { fact: 'setlistentry', path: '$.breakDuration', operator: 'greaterThan', value: 0 }
 }
 
-/** Conditions use the JSON Rules Engine AST (all/any/not). */
+/**
+ * Conditions use the JSON Rules Engine AST (all/any/not).
+ * @param draft Editor rule definition.
+ */
 export function buildPdfRuleCondition(draft: PdfRuleDraft): PdfTemplateCondition {
 	if (draft.kind === 'unsupported') {
 		return draft.originalExpression ?? {}
@@ -80,6 +83,7 @@ function readPair(value: unknown, kind: 'all' | 'any'): [string, string] | null 
 /**
  * Decode the conditions supported by the visual editor. Other library ASTs
  * remain intact and are displayed read-only, never silently overwritten.
+ * @param rule Saved shared template rule.
  */
 export function editPdfRule(rule: PdfTemplateRule): PdfRuleDraft {
 	const base: PdfRuleDraft = {
