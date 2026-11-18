@@ -30,8 +30,12 @@ printf '\n== Psalm ==\n'
 if command -v php8.2 >/dev/null 2>&1; then
   php8.2 vendor/bin/psalm --threads=1 --no-cache
 elif php -r 'exit(PHP_VERSION_ID >= 80500 ? 0 : 1);'; then
-  printf 'Psalm 5.26.1 is incompatible with PHP 8.5 runtime deprecations. Install PHP 8.2 CLI with required extensions.\n' >&2
-  exit 2
+  if command -v docker >/dev/null 2>&1; then
+    bash scripts/psalm-php82-docker.sh
+  else
+    printf 'Psalm 5.26.1 is incompatible with PHP 8.5. Use PHP 8.2 or install Docker.\n' >&2
+    exit 2
+  fi
 else
   composer psalm
 fi
