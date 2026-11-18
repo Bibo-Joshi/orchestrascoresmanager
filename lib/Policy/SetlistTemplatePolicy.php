@@ -8,7 +8,10 @@ use OCA\OrchestraScoresManager\Service\PermissionService;
 
 /** Shared templates may be read by all OSM users and changed by editors. */
 class SetlistTemplatePolicy implements PolicyInterface {
-	public function __construct(private readonly PermissionService $permissionService) {
+	/** @psalm-suppress PossiblyUnusedMethod - Nextcloud DI constructs policies */
+	public function __construct(
+		private readonly PermissionService $permissionService,
+	) {
 	}
 
 	public function allows(string $action, ?object $subject = null): bool {
