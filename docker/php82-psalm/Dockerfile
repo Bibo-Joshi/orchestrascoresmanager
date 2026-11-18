@@ -1,10 +1,10 @@
-FROM php:8.2-cli-bookworm
+FROM debian:bookworm-slim
 
-# Psalm 5.x requires extensions not included in the minimal CLI image.
-# Keep the image isolated from the host PHP installation.
+# Use Debian's prebuilt PHP 8.2 extensions instead of compiling the PHP source.
+# This avoids DOM/XMLReader build-order and header problems in the CLI image.
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libonig-dev libxml2-dev \
-    && docker-php-ext-install -j"$(nproc)" mbstring dom simplexml xml xmlreader xmlwriter \
+    && apt-get install -y --no-install-recommends \
+        php8.2-cli php8.2-mbstring php8.2-xml \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /work
