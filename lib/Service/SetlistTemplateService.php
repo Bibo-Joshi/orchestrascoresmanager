@@ -13,6 +13,7 @@ use OCP\IUserSession;
  * Shared template operations and authorization, independent of the PDF renderer.
  */
 class SetlistTemplateService {
+	/** @psalm-suppress PossiblyUnusedMethod - Service instantiated by Nextcloud DI */
 	public function __construct(
 		private readonly SetlistTemplateMapper $mapper,
 		private readonly SetlistTemplateValidator $validator,
@@ -52,6 +53,9 @@ class SetlistTemplateService {
 		unset($previous['createdBy'], $previous['createdAt'], $previous['updatedAt']);
 		// PATCH can update one font size without discarding the other values.
 		if (isset($changes['fontSizes']) && is_array($changes['fontSizes'])) {
+			if (!isset($previous['fontSizes']) || !is_array($previous['fontSizes'])) {
+				throw new \UnexpectedValueException('Stored template fontSizes are invalid');
+			}
 			$changes['fontSizes'] = array_replace($previous['fontSizes'], $changes['fontSizes']);
 		}
 		$validated = $this->validator->validate(array_replace($previous, $changes));
