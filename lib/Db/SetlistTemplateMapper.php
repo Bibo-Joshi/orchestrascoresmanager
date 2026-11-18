@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OCA\OrchestraScoresManager\Db;
 
-use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\IDBConnection;
 
 /**
@@ -15,7 +14,10 @@ use OCP\IDBConnection;
 class SetlistTemplateMapper {
 	private const TABLE = 'osm_setlist_templates';
 
-	public function __construct(private readonly IDBConnection $db) {
+	/** @psalm-suppress PossiblyUnusedMethod - Constructor instantiated by Nextcloud DI */
+	public function __construct(
+		private readonly IDBConnection $db,
+	) {
 	}
 
 	/** @return list<array<string, mixed>> */
@@ -74,12 +76,20 @@ class SetlistTemplateMapper {
 
 	/** @return array<string, mixed> */
 	private function serializeRow(array $row): array {
+		/** @psalm-suppress MixedAssignment - JSON is validated before its properties are read. */
 		$config = json_decode((string)$row['config_json'], true, 512, JSON_THROW_ON_ERROR);
+		if (!is_array($config) || (array_is_list($config) && $config !== [])) {
+			throw new \UnexpectedValueException('Stored PDF template configuration must be a JSON object');
+		}
+
 		return [
 			'id' => (string)$row['id'],
 			'name' => (string)$row['name'],
-			'description' => $row['description'],
-			...$config,
+			'description' => $row['description'] === null ? null : (string)$row['description'],
+			'fontSizes' => $config['fontSizes'] ?? [],
+			'margin' => $config['margin'] ?? null,
+			'cellPadding' => $config['cellPadding'] ?? null,
+			'rules' => $config['rules'] ?? [],
 			'createdBy' => (string)$row['created_by'],
 			'createdAt' => (string)$row['created_at'],
 			'updatedAt' => (string)$row['updated_at'],
