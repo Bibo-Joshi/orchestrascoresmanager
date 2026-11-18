@@ -34,6 +34,22 @@ test-only dependency changes should be committed once verified.
 For maximum compatibility, use the project's supported PHP version (8.2);
 running PHP-CS-Fixer with PHP 8.5 may trigger warnings.
 
+## Psalm on hosts with PHP 8.5
+
+Psalm 5.26.1 may crash with PHP 8.5 runtime deprecations. Rather than
+changing the system PHP version, run the included isolated Docker runner:
+
+```bash
+bash scripts/psalm-php82-docker.sh
+```
+
+It builds `docker/php82-psalm/Dockerfile` from `php:8.2-cli-bookworm`, with
+the required `mbstring` and XML extensions, and binds the current checkout
+as `/work` under the invoking user's UID/GID. It does **not** modify the host
+PHP installation or perform any database migrations. Docker caches the built
+image for subsequent runs. The main `scripts/check-pdf-template-backend.sh`
+also uses this runner automatically on PHP 8.5 when Docker is available.
+
 ## Schema migration smoke test — **disposable Nextcloud only**
 
 The migration must be tried with both an **existing** OSM database (upgrade)
