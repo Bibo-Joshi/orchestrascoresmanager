@@ -86,6 +86,18 @@ final class SetlistTemplateServiceTest extends TestCase {
 		$this->assertSame(12, $this->service->patchTemplate('stage', ['margin' => 12])['margin']);
 	}
 
+	public function testPatchOneFontSizePreservesOtherFontSettings(): void {
+		$this->mapper->method('find')->willReturn(['id' => 'stage', ...self::validInput()]);
+		$this->mapper->expects($this->once())->method('update')->with(
+			'stage',
+			'Stage layout',
+			null,
+			$this->callback(fn (array $config): bool => $config['fontSizes'] === ['title' => 16, 'scoreRow' => 10])
+		)->willReturn(['id' => 'stage']);
+
+		$this->service->patchTemplate('stage', ['fontSizes' => ['scoreRow' => 10]]);
+	}
+
 	public function testRejectsChangingTemplateId(): void {
 		$this->mapper->method('find')->willReturn(['id' => 'stage', ...self::validInput()]);
 		$this->mapper->expects($this->never())->method('update');
