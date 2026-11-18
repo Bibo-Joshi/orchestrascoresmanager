@@ -15,8 +15,22 @@ cd ~/Projekte/osm-pdf-templates-v2
 bash scripts/check-pdf-template-backend.sh
 ```
 
-This runs `composer lint`, `composer cs:check`, `composer test:unit`, and
-`composer psalm`. The script will install Composer dependencies if missing.
+The script runs `composer lint` and `composer cs:check`, then only the
+**Unit Tests** suite in a standalone checkout. Integration tests require an
+initialized Nextcloud server and are only run in a Nextcloud checkout.
+
+In a standalone checkout, the new query-builder and schema tests need Doctrine DBAL.
+Install it into PHPUnit's isolated development dependency group:
+
+```bash
+cd vendor-bin/phpunit
+composer require --dev 'doctrine/dbal:^4.0'
+cd ../..
+bash scripts/check-pdf-template-backend.sh
+```
+
+This changes `vendor-bin/phpunit/composer.json` and its lock file; these
+test-only dependency changes should be committed once verified.
 For maximum compatibility, use the project's supported PHP version (8.2);
 running PHP-CS-Fixer with PHP 8.5 may trigger warnings.
 
