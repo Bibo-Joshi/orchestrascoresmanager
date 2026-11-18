@@ -81,7 +81,6 @@ class SetlistApiController extends OCSController {
 	 * @param string|null $startDateTime The start date and time (ISO 8601 format)
 	 * @param int|null $duration The duration in seconds
 	 * @param int|null $defaultModerationDuration The default moderation duration in seconds
-	 * @param string|null $defaultTemplateId Optional shared PDF template ID
 	 * @param int|null $folderCollectionVersionId The ID of the folder collection version
 	 * @param string|null $defaultTemplateId Optional shared PDF template ID
 	 * @param bool $isDraft Whether the setlist is a draft
@@ -137,6 +136,7 @@ class SetlistApiController extends OCSController {
 	 * @param int|null $duration The duration in seconds
 	 * @param int|null $defaultModerationDuration The default moderation duration in seconds
 	 * @param int|null $folderCollectionVersionId The ID of the folder collection version
+	 * @param string|null $defaultTemplateId Optional shared PDF template ID
 	 * @param bool|null $isDraft Whether the setlist is a draft
 	 * @param bool|null $isPublished Whether the setlist is published
 	 *
