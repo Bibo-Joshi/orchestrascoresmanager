@@ -37,4 +37,27 @@ final class SetlistTemplateMapperTest extends TestCase {
 		$this->assertSame(16, $templates[0]['fontSizes']['title']);
 		$this->assertSame('editor', $templates[0]['createdBy']);
 	}
+	public function testRejectsMalformedStoredConfiguration(): void {
+		$db = $this->createMock(IDBConnection::class);
+		$qb = $this->createMock(IQueryBuilder::class);
+		$result = $this->createMock(IResult::class);
+		$db->method('getQueryBuilder')->willReturn($qb);
+		$qb->method('select')->willReturnSelf();
+		$qb->method('from')->willReturnSelf();
+		$qb->method('orderBy')->willReturnSelf();
+		$qb->method('addOrderBy')->willReturnSelf();
+		$qb->method('executeQuery')->willReturn($result);
+		$result->method('fetchAll')->willReturn([[
+			'id' => 'bad',
+			'name' => 'Corrupt template',
+			'description' => null,
+			'config_json' => 'null',
+			'created_by' => 'editor',
+			'created_at' => '2026-11-18 12:00:00',
+			'updated_at' => '2026-11-18 12:00:00',
+		]]);
+
+		$this->expectException(\UnexpectedValueException::class);
+		(new SetlistTemplateMapper($db))->findAll();
+	}
 }
