@@ -32,7 +32,7 @@ class SetlistTemplateApiController extends OCSController {
 
 	/**
 	 * @return DataResponse<Http::STATUS_OK, list<OrchestraScoresManagerSetlistTemplate>, array{}>
-	 * 200: Shared PDF templates
+	 *                                                                                             200: Shared PDF templates
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/setlist-templates')]
@@ -43,7 +43,7 @@ class SetlistTemplateApiController extends OCSController {
 	/**
 	 * @param array $template Template fields excluding generated ID and timestamps
 	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerSetlistTemplate, array{}>
-	 * 201: Created template
+	 *                                                                                            201: Created template
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/setlist-templates')]
@@ -55,7 +55,7 @@ class SetlistTemplateApiController extends OCSController {
 	 * @param string $id Stable template ID
 	 * @param array $template Partial template fields
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerSetlistTemplate, array{}>
-	 * 200: Updated template
+	 *                                                                                       200: Updated template
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'PATCH', url: '/setlist-templates/{id}')]
@@ -66,7 +66,7 @@ class SetlistTemplateApiController extends OCSController {
 	/**
 	 * @param string $id Stable template ID
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}>
-	 * 200: Deleted template
+	 *                                                         200: Deleted template
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'DELETE', url: '/setlist-templates/{id}')]

@@ -88,7 +88,7 @@ final class PdfLayoutProfilesServiceTest extends TestCase {
 				self::assertSame(self::CONFIG_KEY, $key);
 				self::assertSame('[]', $json);
 				self::assertTrue($flag);
-                                return true;
+				return true;
 			});
 
 		$service = $this->service($config);
