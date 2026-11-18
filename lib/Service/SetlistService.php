@@ -387,6 +387,7 @@ class SetlistService {
 		}
 		$clone->setDefaultModerationDuration($source->getDefaultModerationDuration());
 		$clone->setFolderCollectionVersionId($source->getFolderCollectionVersionId());
+		$clone->setDefaultTemplateId($source->getDefaultTemplateId());
 		$clone->setIsDraft(true);
 		$clone->setIsPublished(false);
 
