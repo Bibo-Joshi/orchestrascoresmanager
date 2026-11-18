@@ -13,7 +13,7 @@ This branch is based on `contrib/pdf-layout-profiles-pr` and follows the require
 - [x] Initial unit tests for validation, policy, CRUD controller/service and DB mapping
 - [x] Remove old frontend-only tests as requested
 - [x] Run PHP-CS-Fixer, Psalm (PHP 8.2), and PHPUnit locally (515 tests, 2259 assertions)
-- [ ] Generate and review OpenAPI specification and generated client
+- [x] Generate and review OpenAPI specifications and TypeScript client, including the setlist GET, POST, PATCH and clone contracts
 - [x] Verify real SQLite migration, FK ON DELETE SET NULL, and template CRUD/setlist association via OCS API on disposable Nextcloud 34
 - [ ] Verify automatic app upgrade and migration on a fresh Nextcloud installation (manual migration already succeeded on an existing disposable instance)
 - [ ] Decide one-time migration of previously saved per-user profiles into shared templates
@@ -26,37 +26,33 @@ This branch is based on `contrib/pdf-layout-profiles-pr` and follows the require
 - [x] Structured AND/OR/XOR tag rule builder and break-row rule with explicit priority; unknown AST preserved read-only
 - [x] MDI arrow icons added to `src/icons`; existing delete icon reused
 - [x] Add typed shared template API client for GET/POST/PATCH/DELETE
-- [ ] Remove old per-user profile storage and endpoint usage after the export path is switched
-- [ ] Remove legacy *Layout* terminology after shared export replaces the legacy UI
+- [x] Replace the legacy profile UI and export integration with shared templates
 
 ## Stage 3: export
 
-- [ ] Use a well-maintained TypeScript JSON rule engine; evaluate against `setlist` and `setlistentry`, including resolved score tags
-- [ ] Make rule evaluation deterministic using stored explicit order
-- [ ] Use first matching rule to apply optional backgroundColor and cellPadding, including break rows
-- [ ] Refactor monolithic `pdf-exporter.ts` into `src/utils/pdfexport/`: data preparation, table rendering, full PDF rendering
-- [ ] Built-in standard template remains a front-end-only default and is never stored
-- [ ] Export selector displayed only with non-default templates available
-- [ ] Default template dropdown in setlist details sidebar, editors only
-- [ ] Readers can export with all shared templates; preserve column selection
+- [x] Evaluate JSON Rules Engine conditions against `setlist` and `setlistentry` using freshly loaded score tags
+- [x] Apply the first matching rule by ascending `order`, including for break rows. An omitted override uses the template default.
+- [x] Separate data preparation, rule evaluation, table rendering and document generation under `src/utils/pdfexport/`
+- [x] Keep the built-in template in the frontend. Show the export dropdown when shared templates exist.
+- [x] Let editors set a default in the setlist sidebar and let readers override that choice for a single export
+- [x] Fall back to the built-in template when the setlist has no default or the selected shared template has been deleted
+- [x] Preserve the existing PDF column selection and ordering controls
 
-## Safety notes
+Use `setlistentry.tags` for the row's current score tags and `setlist.tags` for
+the union of current tags across the setlist. Break rows expose
+`setlistentry.breakDuration` in seconds and have an empty tag list.
+The visual editor's XOR uses nested `any`, `all` and `not` groups. Rule paths
+can address properties and array indices, for example `$.tags` or `$.tags[0]`.
+Stored rules with invalid expressions can cause the affected export to fail.
+The built-in template remains available in the export dialog.
 
-This is **not** a production-ready branch. Stage 1 intentionally retains the
-legacy per-user profile UI/API until stages 2 and 3 replace them.
-The schema migration and CRUD/FK behavior have been tested on an isolated Nextcloud 34 + SQLite instance. Automatic versioned app upgrades, MySQL/PostgreSQL, and the shared-template PDF export are still untested.
-Do not deploy on `cloud.ntso.de` before local validation and backup.
+## Verification and follow-up
 
-## Frontend transition status (2026-11-18)
+- Browser checks on the disposable Nextcloud instance covered editor and reader exports, default selection in the sidebar, fresh score tags, nested AND/OR/XOR, rule priorities, break duration, row colors and padding, and interactive column selection and ordering.
+- A standard-export comparison against the base commit produced identical PDF content apart from generated metadata for a setlist with a score, a break and a custom column order.
+- Frontend lint, Stylelint and the production build passed in the development workspace. The default `vue-tsc` command is blocked by the existing `vue/ref-macros` entry. With that entry bypassed via `--types vite/client`, the remaining diagnostics also occur on the base branch.
+- PHPUnit passed with 671 tests and 2,650 assertions when bootstrapped with the disposable Nextcloud 34 instance. Psalm and PHP-CS-Fixer checks of the changed PHP files passed.
+- The legacy `/settings/user/pdf-layouts` endpoints and their per-user data remain available for a future migration decision. The application UI uses shared templates, and the legacy endpoints are excluded from OpenAPI generation.
+- Automatic app upgrades and migration behavior on MySQL and PostgreSQL still need verification. Use the separate development and test instance for validation.
 
-The new `PdfTemplatesEditor.vue` is intentionally a **stage-2 management UI**.
-It is only mounted for editors in app settings and operates on the new shared OCS
-endpoints. Conditions are stored as JSON Rules Engine-style ASTs, but selecting a
-shared template for PDF export and evaluating its rules are **not implemented yet**.
-The old per-user layout editor and export selector remain temporarily so existing
-PDF export functionality is not lost. Do not advertise this branch as complete
-or ready for production until stage 3 replaces that path.
-
-No frontend-specific tests have been added, per the maintainer's request in #156.
-Run `npm run lint` and `npm run build` before testing the editor in the disposable
-Nextcloud instance; CSS/TypeScript checks have not yet been run on these commits.
+No frontend test files were added, per the maintainer's request in #156.

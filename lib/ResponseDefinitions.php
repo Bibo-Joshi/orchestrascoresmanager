@@ -132,7 +132,7 @@ namespace OCA\OrchestraScoresManager;
  *     fontSizes: array{title?:float,subtitle?:float,colorLegend?:float,columnTitle?:float,scoreRow?:float,breakRow?:float},
  *     margin: float,
  *     cellPadding: float,
- *     rules: list<array>,
+ *     rules: list<array{id:string,order:int,label?:string|null,expression:array<string,mixed>,backgroundColor?:string|null,cellPadding?:float|null}>,
  *     createdBy: string,
  *     createdAt: string,
  *     updatedAt: string

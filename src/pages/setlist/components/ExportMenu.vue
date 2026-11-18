@@ -10,11 +10,12 @@
 		</template>
 		<NcActionButton
 			:closeAfterClick="true"
+			:disabled="loadingTemplates || pdfExporting"
 			@click="openDialog">
 			<template #icon>
 				<PDFIcon :size="20" />
 			</template>
-			{{ editable ? t('PDF Export') : buttonText(t('PDF Export')) }}
+			{{ t('PDF Export') }}
 		</NcActionButton>
 		<NcActionButton
 			v-if="editable"
@@ -33,14 +34,14 @@
 		:name="t('Export PDF')"
 		:open="dialogOpen"
 		@update:open="dialogOpen = $event">
-		<div class="pdf-layout-select">
-			<label for="pdf-profile-select"><strong>{{ t('PDF layout') }}</strong></label>
-			<select id="pdf-profile-select" v-model="selectedPdfProfileId">
-				<option value="standard">
-					{{ t('Standard layout (built-in)') }}
+		<div v-if="availablePdfTemplates.length" class="pdf-template-select">
+			<label for="pdf-template-select"><strong>{{ t('PDF template') }}</strong></label>
+			<select id="pdf-template-select" v-model="selectedPdfTemplateId">
+				<option :value="null">
+					{{ t('Standard template (built-in)') }}
 				</option>
-				<option v-for="profile in availablePdfProfiles" :key="profile.id" :value="profile.id">
-					{{ profile.name }}
+				<option v-for="template in availablePdfTemplates" :key="template.id" :value="template.id">
+					{{ template.name }}
 				</option>
 			</select>
 		</div>
@@ -88,7 +89,7 @@
 <script setup lang="ts">
 import type { FolderCollection, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
 import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
-import type { PdfLayoutProfile } from '@/utils/pdfLayoutSettings'
+import type { PdfTemplate } from '@/utils/pdfTemplatesApi'
 
 import { computed, ref } from 'vue'
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
@@ -106,8 +107,7 @@ import { useScoresStore } from '@/stores/scoresStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
 import { exportSetlistToPdf } from '@/utils/pdf-exporter'
-import { cloneProfile, DEFAULT_PDF_PROFILE } from '@/utils/pdfLayoutSettings'
-import { fetchPdfProfiles } from '@/utils/pdfProfilesApi'
+import { fetchPdfTemplates } from '@/utils/pdfTemplatesApi'
 import { exportSetlistToGemaXlsx } from '@/utils/setlist-xlsx-exporter'
 
 interface Props {
@@ -131,8 +131,10 @@ interface DialogColumn extends PdfColumnConfig {
 	enabled: boolean
 }
 
-const selectedPdfProfileId = ref('standard')
-const availablePdfProfiles = ref<PdfLayoutProfile[]>([cloneProfile(DEFAULT_PDF_PROFILE)])
+const selectedPdfTemplateId = ref<string | null>(null)
+const availablePdfTemplates = ref<PdfTemplate[]>([])
+const loadingTemplates = ref(false)
+const pdfExporting = ref(false)
 const dialogOpen = ref(false)
 const dialogColumns = ref<DialogColumn[]>([])
 const hasUserCustomizedColumns = ref(false)
@@ -146,8 +148,8 @@ const hasAnyComment = computed<boolean>(() => {
 })
 
 /** Column IDs that are enabled by default in the export dialog */
-const DEFAULT_ENABLED_IDS: computed<ReadonlySet<PdfColumnId>> = computed(() => {
-	const enabledIds = new Set([
+const DEFAULT_ENABLED_IDS = computed<ReadonlySet<PdfColumnId>>(() => {
+	const enabledIds = new Set<PdfColumnId>([
 		'startTime',
 		'duration',
 		'fcvIndex',
@@ -164,14 +166,18 @@ const DEFAULT_ENABLED_IDS: computed<ReadonlySet<PdfColumnId>> = computed(() => {
  * column order from the table.
  */
 async function openDialog(): Promise<void> {
-	try {
-		availablePdfProfiles.value = await fetchPdfProfiles()
-		if (selectedPdfProfileId.value !== 'standard' && !availablePdfProfiles.value.some((p) => p.id === selectedPdfProfileId.value)) {
-			selectedPdfProfileId.value = availablePdfProfiles.value[0]?.id ?? 'standard'
-		}
-	} catch {
-		// Fallback to last known layout if the settings endpoint is temporarily unavailable.
+	loadingTemplates.value = true
+	const setlistId = props.setlist.id
+	availablePdfTemplates.value = []
+	await tryShowError(async () => {
+		availablePdfTemplates.value = await fetchPdfTemplates()
+	}, t('Failed to load PDF templates'))
+	loadingTemplates.value = false
+	if (setlistId !== props.setlist.id) {
+		return
 	}
+	selectedPdfTemplateId.value = availablePdfTemplates.value.find(({ id }) => id === props.setlist.defaultTemplateId)?.id ?? null
+
 	const currentColumns = props.getColumns()
 		.filter((col) => col.label.trim() !== '')
 
@@ -197,31 +203,34 @@ function markColumnsCustomized(): void {
  */
 async function onPdfExport(): Promise<void> {
 	dialogOpen.value = false
+	pdfExporting.value = true
+	const templateId = selectedPdfTemplateId.value
+	const { setlist, entries, fcvScoresMap, fcvScoreBookIndicesMap, folderCollection } = props
 	const selectedColumns = dialogColumns.value
 		.filter((col) => col.enabled)
 		.map(({ id, label }) => ({ id, label }))
 
 	await tryShowError(
 		async () => {
-			// The Pinia store can still contain old tags after editing scores.
-			// Fetch the server's latest score metadata before generating the PDF.
-			const response = await apiClients.default.scoreApiGetScores()
+			const [response, templates] = await Promise.all([
+				apiClients.default.scoreApiGetScores(),
+				templateId === null ? [] : fetchPdfTemplates(),
+			])
 			const freshScores = new Map(response.data.ocs.data.map((score) => [score.id, score]))
-			exportSetlistToPdf({
-				setlist: props.setlist,
-				entries: props.entries,
+			await exportSetlistToPdf({
+				setlist,
+				entries,
 				getScoreById: (id) => freshScores.get(id),
 				getScoreBookById: (id) => scoreBooksStore.getScoreBookById(id),
-				fcvScoresMap: props.fcvScoresMap,
-				fcvScoreBookIndicesMap: props.fcvScoreBookIndicesMap,
-				folderCollection: props.folderCollection,
+				fcvScoresMap,
+				fcvScoreBookIndicesMap,
+				folderCollection,
 				columnConfigs: selectedColumns,
-			}, selectedPdfProfileId.value === 'standard'
-				? undefined
-				: (availablePdfProfiles.value.find((p) => p.id === selectedPdfProfileId.value) ?? undefined))
+			}, templates.find(({ id }) => id === templateId))
 		},
 		t('Export failed: '),
 	)
+	pdfExporting.value = false
 }
 
 /**
@@ -244,7 +253,7 @@ async function onGemaExport(): Promise<void> {
 </script>
 
 <style lang="scss" scoped>
-.pdf-layout-select {
+.pdf-template-select {
 	display: flex;
 	flex-direction: column;
 	gap: 0.5ex;

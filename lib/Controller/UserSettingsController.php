@@ -89,6 +89,7 @@ class UserSettingsController extends OCSController {
 	}
 	/** Get this user's PDF stage layout profiles. */
 	#[NoAdminRequired]
+	#[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
 	#[ApiRoute(verb: 'GET', url: '/settings/user/pdf-layouts')]
 	public function getPdfLayouts(): DataResponse {
 		$userId = $this->userSession->getUser()?->getUID();
@@ -100,6 +101,7 @@ class UserSettingsController extends OCSController {
 
 	/** Persist profiles in Nextcloud's per-user configuration. */
 	#[NoAdminRequired]
+	#[OpenAPI(scope: OpenAPI::SCOPE_IGNORE)]
 	#[ApiRoute(verb: 'PUT', url: '/settings/user/pdf-layouts')]
 	public function putPdfLayouts(array $profiles = []): DataResponse {
 		$userId = $this->userSession->getUser()?->getUID();

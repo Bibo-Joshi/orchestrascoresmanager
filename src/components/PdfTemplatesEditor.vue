@@ -325,6 +325,7 @@ import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import { AddIcon, ArrowDownIcon, ArrowUpIcon, ConfirmIcon, DeleteIcon, EditIcon } from '@/icons/vue-material'
 import { t } from '@/utils/l10n'
+import { DEFAULT_PDF_TEMPLATE_FONTS } from '@/utils/pdfexport/defaults'
 import { editPdfRule, newPdfRule, serializePdfRules } from '@/utils/pdfTemplateRules'
 import { createPdfTemplate, deletePdfTemplate, fetchPdfTemplates, updatePdfTemplate } from '@/utils/pdfTemplatesApi'
 
@@ -338,21 +339,12 @@ interface EditorForm {
 	rules: PdfRuleDraft[]
 }
 
-const DEFAULT_FONTS: Required<PdfTemplateInput['fontSizes']> = {
-	title: 16,
-	subtitle: 11,
-	colorLegend: 8,
-	columnTitle: 9,
-	scoreRow: 8,
-	breakRow: 8,
-}
-
 function emptyForm(): EditorForm {
 	return {
 		id: null,
 		name: '',
 		description: '',
-		fontSizes: { ...DEFAULT_FONTS },
+		fontSizes: { ...DEFAULT_PDF_TEMPLATE_FONTS },
 		margin: 8,
 		cellPadding: 1.5,
 		rules: [],
@@ -388,7 +380,7 @@ function editTemplate(template: PdfTemplate): void {
 		id: template.id,
 		name: template.name,
 		description: template.description ?? '',
-		fontSizes: { ...DEFAULT_FONTS, ...template.fontSizes },
+		fontSizes: { ...DEFAULT_PDF_TEMPLATE_FONTS, ...template.fontSizes },
 		margin: template.margin,
 		cellPadding: template.cellPadding,
 		rules: [...template.rules].sort((a, b) => a.order - b.order).map(editPdfRule),

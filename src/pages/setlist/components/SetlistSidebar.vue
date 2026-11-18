@@ -38,10 +38,11 @@
 
 				<NcTextArea
 					id="description"
-					v-model="formData.description"
+					:modelValue="formData.description ?? ''"
 					:disabled="!editable"
 					:label="t('Description')"
-					:placeholder="t('Enter description')" />
+					:placeholder="t('Enter description')"
+					@update:modelValue="formData.description = $event" />
 
 				<NcSelect
 					v-model="selectedFolderCollectionVersion"
@@ -68,6 +69,19 @@
 					:placeholder="t('e.g., 90 or 1:30')"
 					@input="restrictToTimeFormat"
 					@paste="restrictToTimeFormat" />
+
+				<label v-if="editable" class="pdf-template-select">
+					{{ t('Default PDF template') }}
+					<select
+						:value="selectedTemplateId"
+						:disabled="!templatesLoaded || isSaving"
+						@change="selectTemplate">
+						<option value="">{{ t('Standard template (built-in)') }}</option>
+						<option v-for="template in pdfTemplates" :key="template.id" :value="template.id">
+							{{ template.name }}
+						</option>
+					</select>
+				</label>
 
 				<div class="status-switches">
 					<NcCheckboxRadioSwitch
@@ -97,10 +111,11 @@
 
 <script setup lang="ts">
 import type { Setlist } from '@/api/generated/openapi/data-contracts'
+import type { PdfTemplate } from '@/utils/pdfTemplatesApi'
 
 import { showError } from '@nextcloud/dialogs'
 import debounce from 'lodash.debounce'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -120,6 +135,7 @@ import { useSetlistSidebarStore } from '@/stores/setlistSidebarStore'
 import { useSetlistsStore } from '@/stores/setlistsStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
+import { fetchPdfTemplates } from '@/utils/pdfTemplatesApi'
 import { formatDurationHHMM, formatDurationHHMMSS, parseDurationHHMM, parseDurationHHMMSS, restrictToTimeFormat as restrictInputToTimeFormat } from '@/utils/timeFormatUtils'
 
 interface Props {
@@ -138,6 +154,13 @@ const nameEditable = ref(false)
 const isSaving = ref(false)
 const isSavingError = ref(false)
 const skipNextSave = ref(false)
+const pdfTemplates = ref<PdfTemplate[]>([])
+const templatesLoaded = ref(false)
+const templateChange = ref<{ id: string | null }>()
+const selectedTemplateId = computed(() => {
+	const id = templateChange.value ? templateChange.value.id : props.setlist?.defaultTemplateId
+	return pdfTemplates.value.find((template) => template.id === id)?.id ?? ''
+})
 
 interface FormData {
 	title: string
@@ -199,49 +222,80 @@ async function getFolderCollectionVersionOptions(selectedID: number | null = nul
  * Initialize form data from setlist
  */
 async function initializeFormData() {
-	if (!props.setlist) {
+	const setlist = props.setlist
+	if (!setlist) {
+		return
+	}
+
+	const options = await getFolderCollectionVersionOptions(setlist.folderCollectionVersionId)
+	if (props.setlist?.id !== setlist.id) {
 		return
 	}
 
 	skipNextSave.value = true
 
 	formData.value = {
-		title: props.setlist.title,
-		startDateTime: props.setlist.startDateTime ? new Date(props.setlist.startDateTime) : null,
-		description: props.setlist.description,
-		defaultModerationTimeStr: props.setlist.defaultModerationDuration !== null
-			? formatDurationHHMMSS(props.setlist.defaultModerationDuration)
+		title: setlist.title,
+		startDateTime: setlist.startDateTime ? new Date(setlist.startDateTime) : null,
+		description: setlist.description,
+		defaultModerationTimeStr: setlist.defaultModerationDuration !== null
+			? formatDurationHHMMSS(setlist.defaultModerationDuration)
 			: '',
-		durationStr: props.setlist.duration !== null
-			? formatDurationHHMM(props.setlist.duration)
+		durationStr: setlist.duration !== null
+			? formatDurationHHMM(setlist.duration)
 			: '',
-		isDraft: props.setlist.isDraft,
-		isPublished: props.setlist.isPublished,
+		isDraft: setlist.isDraft,
+		isPublished: setlist.isPublished,
 	}
 
-	// Set selected folder collection
-	folderCollectionVersionOptions.value = await getFolderCollectionVersionOptions(props.setlist?.folderCollectionVersionId)
-	if (props.setlist.folderCollectionVersionId) {
-		const option = folderCollectionVersionOptions.value.find((opt) => opt.value === props.setlist.folderCollectionVersionId)
-		selectedFolderCollectionVersion.value = option || null
-	} else {
-		selectedFolderCollectionVersion.value = null
-	}
+	folderCollectionVersionOptions.value = options
+	selectedFolderCollectionVersion.value = options.find(({ value }) => value === setlist.folderCollectionVersionId) ?? null
 }
 
-/**
- * Watch for setlist changes and reinitialize form
- */
+const debouncedSave = debounce(handleSave, 800)
+onUnmounted(() => debouncedSave.cancel())
+
 watch(() => props.setlist?.id, async (newId, oldId) => {
 	if (newId !== oldId) {
+		debouncedSave.cancel()
+		templateChange.value = undefined
 		await initializeFormData()
 	}
 }, { immediate: true })
 
+watch(
+	() => setlistSidebarStore.isOpen && props.editable ? props.setlist?.id : undefined,
+	async (id, _oldId, onCleanup) => {
+		templatesLoaded.value = false
+		pdfTemplates.value = []
+		if (id === undefined) {
+			return
+		}
+		let current = true
+		onCleanup(() => {
+			current = false
+		})
+		await tryShowError(async () => {
+			const templates = await fetchPdfTemplates()
+			if (current) {
+				pdfTemplates.value = templates
+				templatesLoaded.value = true
+			}
+		}, t('Failed to load PDF templates'))
+	},
+	{ immediate: true },
+)
+
 /**
- * Create debounced save function to avoid multiple rapid requests
+ * Schedule the selected default as part of the sidebar's normal autosave.
+ * @param event Template selection event.
  */
-const debouncedSave = debounce(handleSave, 800)
+function selectTemplate(event: Event): void {
+	const id = (event.target as HTMLSelectElement).value || null
+	templateChange.value = { id }
+	debouncedSave()
+}
+
 /**
  * Watch all form fields and auto-save with debounce
  */
@@ -280,7 +334,13 @@ function restrictToTimeFormat(event: Event) {
  * Validate and save the setlist
  */
 async function handleSave() {
-	if (!props.setlist || !props.editable) {
+	const setlist = props.setlist
+	if (!setlist || !props.editable) {
+		return
+	}
+
+	if (isSaving.value) {
+		debouncedSave()
 		return
 	}
 
@@ -307,10 +367,11 @@ async function handleSave() {
 	}
 
 	isSaving.value = true
+	const pendingTemplate = templateChange.value
 
 	await tryShowError(
 		async () => {
-			await setlistsStore.updateSetlist(props.setlist.id, {
+			await setlistsStore.updateSetlist(setlist.id, {
 				title: formData.value.title.trim(),
 				startDateTime: formData.value.startDateTime?.toISOString() ?? null,
 				description: formData.value.description,
@@ -319,13 +380,20 @@ async function handleSave() {
 				folderCollectionVersionId: selectedFolderCollectionVersion.value?.value ?? null,
 				isDraft: formData.value.isDraft,
 				isPublished: formData.value.isPublished,
+				...(pendingTemplate ? { defaultTemplateId: pendingTemplate.id } : {}),
 			})
+			if (templateChange.value === pendingTemplate) {
+				templateChange.value = undefined
+			}
 			isSavingError.value = false
 		},
 		t('Failed to update setlist: '),
 		() => {
 			isSaving.value = false
 			isSavingError.value = true
+			if (templateChange.value === pendingTemplate) {
+				templateChange.value = undefined
+			}
 		},
 	)
 
@@ -334,6 +402,12 @@ async function handleSave() {
 </script>
 
 <style lang="scss" scoped>
+.pdf-template-select {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
 .status-switches {
 	display: flex;
 	flex-direction: column;
