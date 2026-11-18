@@ -119,7 +119,7 @@
 							<input v-if="rule.backgroundColor !== null" v-model="rule.backgroundColor" type="color" :aria-label="t('Background color')">
 							<label>
 								{{ t('Cell padding override (mm, optional)') }}
-								<input v-model.number="rule.cellPadding" type="number" min="0" max="20" step="0.5" :placeholder="t('Default')">
+								<input :value="rule.cellPadding ?? ''" type="number" min="0" max="20" step="0.5" :placeholder="t('Default')" @input="setRulePadding(rule, $event)">
 							</label>
 						</div>
 					</div>
@@ -249,6 +249,11 @@ function toggleRuleColor(rule: PdfRuleDraft): void {
 	rule.backgroundColor = rule.backgroundColor === null ? '#FFE2B8' : null
 }
 
+function setRulePadding(rule: PdfRuleDraft, event: Event): void {
+	const input = event.target as HTMLInputElement
+	rule.cellPadding = input.value.trim() === '' ? null : Number(input.value)
+}
+
 function numberInRange(value: unknown, min: number, max: number): boolean {
 	return typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max
 }
@@ -269,7 +274,7 @@ function makePayload(): PdfTemplateInput | null {
 			showError(t('Each tag rule must have the required tag names.'))
 			return null
 		}
-		if (rule.cellPadding !== null && rule.cellPadding !== '' && !numberInRange(rule.cellPadding, 0, 20)) {
+		if (rule.cellPadding !== null && !numberInRange(rule.cellPadding, 0, 20)) {
 			showError(t('Invalid rule cell padding.'))
 			return null
 		}
