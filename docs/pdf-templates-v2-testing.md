@@ -43,8 +43,8 @@ changing the system PHP version, run the included isolated Docker runner:
 bash scripts/psalm-php82-docker.sh
 ```
 
-It builds `docker/php82-psalm/Dockerfile` from `php:8.2-cli-bookworm`, with
-the required `mbstring` and XML extensions, and binds the current checkout
+It builds `docker/php82-psalm/Dockerfile` from `debian:bookworm-slim` with
+Debian's prebuilt PHP 8.2 CLI, `mbstring` and XML extensions, then binds the checkout
 as `/work` under the invoking user's UID/GID. It does **not** modify the host
 PHP installation or perform any database migrations. Docker caches the built
 image for subsequent runs. The main `scripts/check-pdf-template-backend.sh`
