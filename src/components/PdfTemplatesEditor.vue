@@ -1,97 +1,233 @@
 <template>
 	<div class="pdf-templates">
-		<p>{{ t('Shared templates for PDF setlist exports. The built-in standard template is always available.') }}</p>
-		<p v-if="loading">{{ t('Loading templates…') }}</p>
-		<p v-else-if="templates.length === 0" class="hint">{{ t('No shared templates have been created yet.') }}</p>
-		<ul v-else class="template-list">
-			<li v-for="item in templates" :key="item.id" class="template-item">
+		<p>
+			{{ t('Shared templates for PDF setlist exports. The built-in standard template is always available.') }}
+		</p>
+		<p v-if="loading">
+			{{ t('Loading templates…') }}
+		</p>
+		<p
+			v-else-if="templates.length === 0"
+			class="hint">
+			{{ t('No shared templates have been created yet.') }}
+		</p>
+		<ul
+			v-else
+			class="template-list">
+			<li
+				v-for="item in templates"
+				:key="item.id"
+				class="template-item">
 				<div class="template-info">
 					<strong>{{ item.name }}</strong>
-					<p v-if="item.description">{{ item.description }}</p>
+					<p v-if="item.description">
+						{{ item.description }}
+					</p>
 				</div>
 				<div class="template-actions">
-					<NcButton variant="tertiary" :disabled="saving" @click="editTemplate(item)">
-						<template #icon><EditIcon :size="20" /></template>
+					<NcButton
+						variant="tertiary"
+						:disabled="saving"
+						@click="editTemplate(item)">
+						<template #icon>
+							<EditIcon :size="20" />
+						</template>
 						{{ t('Edit') }}
 					</NcButton>
-					<NcButton variant="tertiary" :disabled="saving" @click="removeTemplate(item)">
-						<template #icon><DeleteIcon :size="20" /></template>
+					<NcButton
+						variant="tertiary"
+						:disabled="saving"
+						@click="removeTemplate(item)">
+						<template #icon>
+							<DeleteIcon :size="20" />
+						</template>
 						{{ t('Delete') }}
 					</NcButton>
 				</div>
 			</li>
 		</ul>
-		<NcButton class="new-template" variant="secondary" :disabled="loading || saving" @click="newTemplate">
-			<template #icon><AddIcon :size="20" /></template>
+		<NcButton
+			class="new-template"
+			variant="secondary"
+			:disabled="loading || saving"
+			@click="newTemplate">
+			<template #icon>
+				<AddIcon :size="20" />
+			</template>
 			{{ t('New template') }}
 		</NcButton>
 
 		<NcDialog
 			:open="editorOpen"
 			:name="form.id ? t('Edit PDF template') : t('New PDF template')"
-			@update:open="onDialogOpenChange">
+			@update
+			:open="onDialogOpenChange">
 			<div class="template-form">
 				<label>
 					{{ t('Template name') }}
-					<input v-model="form.name" type="text" maxlength="160" required>
+					<input
+						v-model="form.name"
+						type="text"
+						maxlength="160"
+						required>
 				</label>
 				<label>
 					{{ t('Description (optional)') }}
-					<textarea v-model="form.description" maxlength="2000" rows="2"></textarea>
+					<textarea
+						v-model="form.description"
+						maxlength="2000"
+						rows="2">
 				</label>
 				<fieldset>
 					<legend>{{ t('Font sizes (pt)') }}</legend>
 					<div class="field-grid">
-						<label>{{ t('Title') }}<input v-model.number="form.fontSizes.title" type="number" min="5" max="64" step="0.5"></label>
-						<label>{{ t('Subtitle') }}<input v-model.number="form.fontSizes.subtitle" type="number" min="5" max="64" step="0.5"></label>
-						<label>{{ t('Color legend') }}<input v-model.number="form.fontSizes.colorLegend" type="number" min="5" max="64" step="0.5"></label>
-						<label>{{ t('Column header') }}<input v-model.number="form.fontSizes.columnTitle" type="number" min="5" max="64" step="0.5"></label>
-						<label>{{ t('Score row') }}<input v-model.number="form.fontSizes.scoreRow" type="number" min="5" max="64" step="0.5"></label>
-						<label>{{ t('Break row') }}<input v-model.number="form.fontSizes.breakRow" type="number" min="5" max="64" step="0.5"></label>
+						<label>
+							{{ t('Title') }}
+							<input
+								v-model.number="form.fontSizes.title"
+								type="number"
+								min="5"
+								max="64"
+								step="0.5">
+						</label>
+						<label>
+							{{ t('Subtitle') }}
+							<input
+								v-model.number="form.fontSizes.subtitle"
+								type="number"
+								min="5"
+								max="64"
+								step="0.5">
+						</label>
+						<label>
+							{{ t('Color legend') }}
+							<input
+								v-model.number="form.fontSizes.colorLegend"
+								type="number"
+								min="5"
+								max="64"
+								step="0.5">
+						</label>
+						<label>
+							{{ t('Column header') }}
+							<input
+								v-model.number="form.fontSizes.columnTitle"
+								type="number"
+								min="5"
+								max="64"
+								step="0.5">
+						</label>
+						<label>
+							{{ t('Score row') }}
+							<input
+								v-model.number="form.fontSizes.scoreRow"
+								type="number"
+								min="5"
+								max="64"
+								step="0.5">
+						</label>
+						<label>
+							{{ t('Break row') }}
+							<input
+								v-model.number="form.fontSizes.breakRow"
+								type="number"
+								min="5"
+								max="64"
+								step="0.5">
+						</label>
 					</div>
 				</fieldset>
 				<fieldset>
 					<legend>{{ t('Spacing (mm)') }}</legend>
 					<div class="field-grid">
-						<label>{{ t('Page margin') }}<input v-model.number="form.margin" type="number" min="0" max="50" step="0.5"></label>
-						<label>{{ t('Default cell padding') }}<input v-model.number="form.cellPadding" type="number" min="0" max="20" step="0.5"></label>
+						<label>
+							{{ t('Page margin') }}
+							<input
+								v-model.number="form.margin"
+								type="number"
+								min="0"
+								max="50"
+								step="0.5">
+						</label>
+						<label>
+							{{ t('Default cell padding') }}
+							<input
+								v-model.number="form.cellPadding"
+								type="number"
+								min="0"
+								max="20"
+								step="0.5">
+						</label>
 					</div>
 				</fieldset>
 				<fieldset>
 					<legend>{{ t('Row formatting rules') }}</legend>
-					<p class="hint">{{ t('Rules are evaluated from top to bottom. The first matching rule wins.') }}</p>
-					<div v-for="(rule, index) in form.rules" :key="rule.id" class="rule">
+					<p class="hint">
+						{{ t('Rules are evaluated from top to bottom. The first matching rule wins.') }}
+					</p>
+					<div
+						v-for="(rule, index) in form.rules"
+						:key="rule.id"
+						class="rule">
 						<div class="rule-heading">
 							<strong>{{ t('Rule') }} {{ index + 1 }}</strong>
 							<div class="template-actions">
-								<NcButton variant="tertiary" :aria-label="t('Move rule up')" :disabled="index === 0" @click="moveRule(index, -1)">
-									<template #icon><ArrowUpIcon :size="20" /></template>
+								<NcButton
+									variant="tertiary"
+									:aria-label="t('Move rule up')"
+									:disabled="index === 0"
+									@click="moveRule(index, -1)">
+									<template #icon>
+										<ArrowUpIcon :size="20" />
+									</template>
 								</NcButton>
-								<NcButton variant="tertiary" :aria-label="t('Move rule down')" :disabled="index === form.rules.length - 1" @click="moveRule(index, 1)">
-									<template #icon><ArrowDownIcon :size="20" /></template>
+								<NcButton
+									variant="tertiary"
+									:aria-label="t('Move rule down')"
+									:disabled="index === form.rules.length - 1"
+									@click="moveRule(index, 1)">
+									<template #icon>
+										<ArrowDownIcon :size="20" />
+									</template>
 								</NcButton>
-								<NcButton variant="tertiary" :aria-label="t('Delete rule')" @click="form.rules.splice(index, 1)">
-									<template #icon><DeleteIcon :size="20" /></template>
+								<NcButton
+									variant="tertiary"
+									:aria-label="t('Delete rule')"
+									@click="form.rules.splice(index, 1)">
+									<template #icon>
+										<DeleteIcon :size="20" />
+									</template>
 								</NcButton>
 							</div>
 						</div>
 						<label>
 							{{ t('Legend label (optional)') }}
-							<input v-model="rule.label" type="text" maxlength="160">
+							<input
+								v-model="rule.label"
+								type="text"
+								maxlength="160">
 						</label>
 						<label>
 							{{ t('Match rows') }}
-							<select v-model="rule.kind" :disabled="rule.kind === 'unsupported'">
+							<select
+								v-model="rule.kind"
+								:disabled="rule.kind === 'unsupported'">
 								<option value="tags">{{ t('Score tags') }}</option>
 								<option value="break">{{ t('Break rows') }}</option>
-								<option v-if="rule.kind === 'unsupported'" value="unsupported">{{ t('Advanced condition (preserved)') }}</option>
+								<option
+									v-if="rule.kind === 'unsupported'"
+									value="unsupported">{{ t('Advanced condition (preserved)') }}</option>
 							</select>
 						</label>
 						<template v-if="rule.kind === 'tags'">
 							<div class="rule-condition">
 								<label>
 									{{ t('Tag') }}
-									<input v-model="rule.tag1" type="text" maxlength="160" :placeholder="t('First tag')">
+									<input
+										v-model="rule.tag1"
+										type="text"
+										maxlength="160"
+										:placeholder="t('First tag')">
 								</label>
 								<label>
 									{{ t('Combine') }}
@@ -104,35 +240,73 @@
 								</label>
 								<label v-if="rule.operator">
 									{{ t('Second tag') }}
-									<input v-model="rule.tag2" type="text" maxlength="160" :placeholder="t('Second tag')">
+									<input
+										v-model="rule.tag2"
+										type="text"
+										maxlength="160"
+										:placeholder="t('Second tag')">
 								</label>
 							</div>
 						</template>
-						<p v-else-if="rule.kind === 'unsupported'" class="hint">
+						<p
+							v-else-if="rule.kind === 'unsupported'"
+							class="hint">
 							{{ t('This condition cannot be edited here; it will be kept unchanged.') }}
 						</p>
 						<div class="rule-formatting">
 							<label class="checkbox-field">
-								<input type="checkbox" :checked="rule.backgroundColor !== null" @change="toggleRuleColor(rule)">
+								<input
+									type="checkbox"
+									:checked="rule.backgroundColor !== null"
+									@change="toggleRuleColor(rule)">
 								{{ t('Background color') }}
 							</label>
-							<input v-if="rule.backgroundColor !== null" v-model="rule.backgroundColor" type="color" :aria-label="t('Background color')">
+							<input
+								v-if="rule.backgroundColor !== null"
+								v-model="rule.backgroundColor"
+								type="color"
+								:aria-label="t('Background color')">
 							<label>
 								{{ t('Cell padding override (mm, optional)') }}
-								<input :value="rule.cellPadding ?? ''" type="number" min="0" max="20" step="0.5" :placeholder="t('Default')" @input="setRulePadding(rule, $event)">
+								<input
+									:value="rule.cellPadding ?? ''"
+									type="number"
+									min="0"
+									max="20"
+									step="0.5"
+									:placeholder="t('Default')"
+									@input="setRulePadding(rule, $event)">
 							</label>
 						</div>
 					</div>
-					<NcButton variant="tertiary" :disabled="form.rules.length >= 30" @click="addRule">
-						<template #icon><AddIcon :size="20" /></template>
+					<NcButton
+						variant="tertiary"
+						:disabled="form.rules.length >= 30"
+						@click="addRule">
+						<template #icon>
+							<AddIcon :size="20" />
+						</template>
 						{{ t('Add rule') }}
 					</NcButton>
 				</fieldset>
 			</div>
 			<template #actions>
-				<NcButton :disabled="saving" @click="editorOpen = false">{{ t('Cancel') }}</NcButton>
-				<NcButton variant="primary" :disabled="saving" @click="saveTemplate">
-					<template #icon><NcLoadingIcon v-if="saving" :size="20" /><ConfirmIcon v-else :size="20" /></template>
+				<NcButton
+					:disabled="saving"
+					@click="editorOpen = false">
+					{{ t('Cancel') }}
+				</NcButton>
+				<NcButton
+					variant="primary"
+					:disabled="saving"
+					@click="saveTemplate">
+					<template #icon>
+						<NcLoadingIcon
+							v-if="saving"
+							:size="20"><ConfirmIcon
+							v-else
+							:size="20">
+					</template>
 					{{ saving ? t('Saving…') : t('Save') }}
 				</NcButton>
 			</template>
@@ -140,7 +314,9 @@
 	</div>
 </template>
 
-<script setup lang="ts">
+<script
+	setup
+	lang="ts">
 import type { PdfRuleDraft } from '@/utils/pdfTemplateRules'
 import type { PdfTemplate, PdfTemplateInput } from '@/utils/pdfTemplatesApi'
 
@@ -150,9 +326,9 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import { AddIcon, ArrowDownIcon, ArrowUpIcon, ConfirmIcon, DeleteIcon, EditIcon } from '@/icons/vue-material'
+import { t } from '@/utils/l10n'
 import { editPdfRule, newPdfRule, serializePdfRules } from '@/utils/pdfTemplateRules'
 import { createPdfTemplate, deletePdfTemplate, fetchPdfTemplates, updatePdfTemplate } from '@/utils/pdfTemplatesApi'
-import { t } from '@/utils/l10n'
 
 interface EditorForm {
 	id: string | null
@@ -329,7 +505,9 @@ async function removeTemplate(item: PdfTemplate): Promise<void> {
 }
 </script>
 
-<style scoped lang="scss">
+<style
+	scoped
+	lang="scss">
 .pdf-templates { display: flex; flex-direction: column; gap: 12px; }
 .template-list { padding: 0; margin: 0; list-style: none; }
 .template-item { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--color-border); }
