@@ -28,13 +28,15 @@ class SetlistTemplateValidator {
 			throw new \InvalidArgumentException('Invalid template description');
 		}
 
-		if (!isset($input['fontSizes']) || !is_array($input['fontSizes'])
-			|| (array_is_list($input['fontSizes']) && $input['fontSizes'] !== [])) {
+		/** @var mixed $fontSizes */
+		$fontSizes = $input['fontSizes'] ?? null;
+		if (!is_array($fontSizes) || (array_is_list($fontSizes) && $fontSizes !== [])) {
 			throw new \InvalidArgumentException('fontSizes must be an object');
 		}
-		$this->assertKeys($input['fontSizes'], self::FONT_KEYS, 'fontSizes');
-		foreach (array_keys($input['fontSizes']) as $key) {
-			$this->number($input['fontSizes'][$key], "fontSizes.$key", 5, 64);
+		/** @var array<string, mixed> $fontSizes */
+		$this->assertKeys($fontSizes, self::FONT_KEYS, 'fontSizes');
+		foreach (array_keys($fontSizes) as $key) {
+			$this->number($fontSizes[$key], "fontSizes.$key", 5, 64);
 		}
 
 		$margin = $this->number($input['margin'] ?? null, 'margin', 0, 50);
@@ -78,7 +80,7 @@ class SetlistTemplateValidator {
 		}
 
 		$config = [
-			'fontSizes' => $input['fontSizes'],
+			'fontSizes' => $fontSizes,
 			'margin' => $margin,
 			'cellPadding' => $cellPadding,
 			'rules' => $rules,
