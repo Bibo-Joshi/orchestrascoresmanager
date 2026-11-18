@@ -147,8 +147,8 @@
 <script setup lang="ts">
 import type { PdfLayoutProfile } from '@/utils/pdfLayoutSettings'
 
-import { loadState } from '@nextcloud/initial-state'
 import { showError } from '@nextcloud/dialogs'
+import { loadState } from '@nextcloud/initial-state'
 import { computed, defineModel, onMounted, ref } from 'vue'
 import NcAppSettingsDialog from '@nextcloud/vue/components/NcAppSettingsDialog'
 import NcAppSettingsSection from '@nextcloud/vue/components/NcAppSettingsSection'
