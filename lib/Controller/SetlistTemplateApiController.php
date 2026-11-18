@@ -37,7 +37,8 @@ class SetlistTemplateApiController extends OCSController {
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'GET', url: '/setlist-templates')]
 	public function getTemplates(): DataResponse {
-		return new DataResponse($this->callService(fn () => $this->templateService->getTemplates()));
+		$templates = $this->callService(fn () => $this->templateService->getTemplates());
+		return new DataResponse(array_map($this->forResponse(...), $templates));
 	}
 
 	/**
@@ -48,7 +49,8 @@ class SetlistTemplateApiController extends OCSController {
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'POST', url: '/setlist-templates')]
 	public function postTemplate(array $template): DataResponse {
-		return new DataResponse($this->callService(fn () => $this->templateService->createTemplate($template)), Http::STATUS_CREATED);
+		$created = $this->callService(fn () => $this->templateService->createTemplate($template));
+		return new DataResponse($this->forResponse($created), Http::STATUS_CREATED);
 	}
 
 	/**
@@ -60,7 +62,8 @@ class SetlistTemplateApiController extends OCSController {
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'PATCH', url: '/setlist-templates/{id}')]
 	public function patchTemplate(string $id, array $template): DataResponse {
-		return new DataResponse($this->callService(fn () => $this->templateService->patchTemplate($id, $template)));
+		$updated = $this->callService(fn () => $this->templateService->patchTemplate($id, $template));
+		return new DataResponse($this->forResponse($updated));
 	}
 
 	/**
@@ -73,5 +76,19 @@ class SetlistTemplateApiController extends OCSController {
 	public function deleteTemplate(string $id): DataResponse {
 		$this->callService(fn () => $this->templateService->deleteTemplate($id));
 		return new DataResponse([]);
+	}
+
+	/**
+	 * An empty fontSizes map must be a JSON object, not a JSON array.
+	 * Keep the internal representation as a PHP array so PATCH can merge font sizes.
+	 *
+	 * @param array<string, mixed> $template
+	 * @return array<string, mixed>
+	 */
+	private function forResponse(array $template): array {
+		if (isset($template['fontSizes']) && is_array($template['fontSizes']) && $template['fontSizes'] === []) {
+			$template['fontSizes'] = new \stdClass();
+		}
+		return $template;
 	}
 }
