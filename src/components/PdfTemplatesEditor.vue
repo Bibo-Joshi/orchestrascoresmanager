@@ -60,8 +60,7 @@
 		<NcDialog
 			:open="editorOpen"
 			:name="form.id ? t('Edit PDF template') : t('New PDF template')"
-			@update
-			:open="onDialogOpenChange">
+			@update:open="onDialogOpenChange">
 			<div class="template-form">
 				<label>
 					{{ t('Template name') }}
@@ -76,7 +75,7 @@
 					<textarea
 						v-model="form.description"
 						maxlength="2000"
-						rows="2">
+						rows="2" />
 				</label>
 				<fieldset>
 					<legend>{{ t('Font sizes (pt)') }}</legend>
@@ -303,9 +302,9 @@
 					<template #icon>
 						<NcLoadingIcon
 							v-if="saving"
-							:size="20"><ConfirmIcon
+							:size="20" /><ConfirmIcon
 							v-else
-							:size="20">
+							:size="20" />
 					</template>
 					{{ saving ? t('Saving…') : t('Save') }}
 				</NcButton>
