@@ -13,7 +13,7 @@ fi
 # Prefer non-root Docker; fall back to sudo for the Docker commands only.
 # Keep the script under the invoking user so the bind mount retains user ownership.
 docker_cmd=(docker)
-if ! docker info --format '{{.ServerVersion}}' >/dev/null 2>&1; then
+if { [[ -S /var/run/docker.sock ]] && [[ ! -w /var/run/docker.sock ]]; } || ! docker version --format '{{.Server.Version}}' >/dev/null 2>&1; then
   if ! command -v sudo >/dev/null 2>&1; then
     echo 'Docker access denied and sudo is unavailable.' >&2
     exit 1
