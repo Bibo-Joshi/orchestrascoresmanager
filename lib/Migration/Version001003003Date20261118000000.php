@@ -42,7 +42,7 @@ class Version001003003Date20261118000000 extends SimpleMigrationStep {
 					'length' => 64,
 				]);
 				$table->addForeignKeyConstraint(
-					$schema->getTable('osm_setlist_templates'),
+					$schema->getTable('osm_setlist_templates')->getName(),
 					['default_template_id'],
 					['id'],
 					['onDelete' => 'SET NULL'],
