@@ -47,6 +47,7 @@ final class SetlistTemplateMigrationTest extends TestCase {
 		$this->assertFalse($setlistTable->getColumn('default_template_id')->getNotnull());
 		$foreignKeys = array_values($setlistTable->getForeignKeys());
 		$this->assertCount(1, $foreignKeys);
+		$this->assertSame('oc_osm_setlist_templates', $foreignKeys[0]->getForeignTableName());
 		$this->assertSame(['default_template_id'], $foreignKeys[0]->getLocalColumns());
 		$this->assertSame(['id'], $foreignKeys[0]->getForeignColumns());
 		$this->assertSame('SET NULL', $foreignKeys[0]->getOption('onDelete'));
