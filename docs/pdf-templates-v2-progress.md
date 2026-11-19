@@ -15,7 +15,7 @@ This branch is based on `contrib/pdf-layout-profiles-pr` and follows the require
 - [x] Run PHP-CS-Fixer, Psalm (PHP 8.2), and PHPUnit locally (515 tests, 2259 assertions)
 - [x] Generate and review OpenAPI specifications and TypeScript client, including the setlist GET, POST, PATCH and clone contracts
 - [x] Verify real SQLite migration, FK ON DELETE SET NULL, and template CRUD/setlist association via OCS API on disposable Nextcloud 34
-- [ ] Verify automatic app upgrade and migration on a fresh Nextcloud installation (manual migration already succeeded on an existing disposable instance)
+- [x] Verify first install and automatic versioned upgrades in the Stage 4 database matrix
 - [x] Document an opt-in copy of per-user profiles into shared templates
 
 ## Stage 2: application settings UI
@@ -81,6 +81,53 @@ editor for subsequent adjustments.
 - Frontend lint, Stylelint and the production build passed in the development workspace. The default `vue-tsc` command is blocked by the existing `vue/ref-macros` entry. With `--types vite/client`, the base commit `ab4ee42` has 21 diagnostics and the feature branch has 17. All 17 also occur on the base: missing AG Grid `Module` and an unused binding in `FullPageTable.vue`, nullability and optional calls, incompatible grid rows and callbacks, a string/number mismatch in score comments, and a duration formatter that can return `undefined`. The four baseline diagnostics in `ExportMenu.vue` and `SetlistSidebar.vue` were resolved in Stage 3. The project-wide configuration and unrelated diagnostics remain for follow-up.
 - PHPUnit passed with 671 tests and 2,650 assertions when bootstrapped with the disposable Nextcloud 34 instance. Psalm and PHP-CS-Fixer checks of the changed PHP files passed.
 - The legacy `/settings/user/pdf-layouts` endpoints and their per-user data remain available for a future migration decision. The application UI uses shared templates, and the legacy endpoints are excluded from OpenAPI generation.
-- Automatic app upgrades and migration behavior on MySQL and PostgreSQL still need verification. Use the separate development and test instance for validation.
+- See Stage 4 for the tested upgrade matrix and release prerequisites.
 
 No frontend test files were added, per the maintainer's request in #156.
+
+## Stage 4: upgrade and database acceptance
+
+The isolated test installations used Nextcloud 34.0.6.2. Upgrade fixtures
+were created from `df7ac796`, the last commit before the template migration.
+Before the upgrade, the migration history lacked `001003003Date20261118000000`
+and neither the template table nor the default-template column was present.
+With the updated sources still at `2.0.0`, `occ upgrade` reported “No upgrade
+required” and left the migration pending. With `2.0.1` in the disposable
+package, the same command applied and recorded the migration.
+
+| Database | Fresh install | Upgrade with existing OSM records |
+| --- | --- | --- |
+| SQLite 3.46.1 | Passed | Passed after the SQLite correction. Compared the full fixture responses before and after. |
+| MariaDB 11.4.13 | Passed | Passed from both a clean baseline and an unrecorded partial schema containing a template. Compared complete API snapshots on the clean upgrade and checked fixture values and the single pre-existing template on the partial upgrade. |
+| PostgreSQL 16.16 | Passed | Passed. Verified the original fixture values after upgrading. |
+| Oracle MySQL | Unexecuted | Reviewed the shared Doctrine path. MariaDB results do not verify Oracle MySQL. |
+
+The test instances verified the template primary key, both indices,
+the default-template foreign key and `ON DELETE SET NULL`, along with template
+CRUD and default assignment via OCS. Existing setlists and entries, scores,
+tags, collections, user preferences and legacy PDF profiles were checked.
+The partial MariaDB case retained the pre-existing shared template without a
+duplicate. The upgrade did not import any legacy profiles.
+
+The first SQLite upgrade exposed cascading deletion of setlist entries
+when Doctrine rebuilt the existing setlist table. The corrected SQLite
+upgrade adds the reference and index directly before the schema diff. A
+fresh pre-migration database confirmed that entries survive. A SQLite column
+already present without its foreign key fails early, which avoids the unsafe
+rebuild. MariaDB/MySQL and PostgreSQL use the portable schema path. A pending
+migration can complete compatible partial schema elements. Nextcloud skips a
+migration whose ID is already recorded, so a damaged installation needs a
+separate repair on a restored copy.
+
+Use the maintainer's next monotonically increasing release version for the
+published package. If any target already has `2.0.0`, `2.0.1` is the smallest
+stable bump demonstrated here. If `2.0.0` has yet to be released and all targets
+have an older version, the maintainer can include this migration in
+`2.0.0`. The branch's app version remains `2.0.0`.
+
+PHP-CS-Fixer, Psalm, PHPUnit with integration tests on a clean test copy
+(673 tests, 2,661 assertions), frontend lint, Stylelint and the production
+build passed. For release, rehearse with the approved package and the
+target's database engine and version, verify consistent backup restoration,
+and use the [administrator upgrade and recovery procedure](pdf-templates-v2-upgrade.md).
+No rollback rehearsal or Oracle MySQL runtime test was performed.
