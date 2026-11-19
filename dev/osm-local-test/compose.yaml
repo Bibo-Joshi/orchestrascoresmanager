@@ -1,0 +1,59 @@
+name: osm-pdf-v2-notebook
+services:
+  db:
+    image: mariadb:10.6
+    restart: "no"
+    environment:
+      MARIADB_DATABASE: nextcloud
+      MARIADB_USER: nextcloud
+      MARIADB_PASSWORD: ${OSM_TEST_DB_PASSWORD:?Set OSM_TEST_DB_PASSWORD in .env}
+      MARIADB_ROOT_PASSWORD: ${OSM_TEST_DB_ROOT_PASSWORD:?Set OSM_TEST_DB_ROOT_PASSWORD in .env}
+    volumes:
+      - type: bind
+        source: /mnt/osm-test/mariadb
+        target: /var/lib/mysql
+        bind:
+          create_host_path: false
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+    networks: [test]
+  app:
+    image: nextcloud:34.0.5-apache
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: ${OSM_TEST_DB_PASSWORD:?Set OSM_TEST_DB_PASSWORD in .env}
+      NEXTCLOUD_TRUSTED_DOMAINS: 127.0.0.1
+    volumes:
+      - type: bind
+        source: /mnt/osm-test/nextcloud
+        target: /var/www/html
+        bind:
+          create_host_path: false
+    networks: [test]
+  web:
+    image: nginx:alpine
+    restart: "no"
+    depends_on: [app]
+    ports:
+      - "127.0.0.1:8088:80"
+    volumes:
+      - type: bind
+        source: ./nginx.conf
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
+        bind:
+          create_host_path: false
+    networks: [test, loopback]
+networks:
+  test:
+    internal: true
+  loopback: {}

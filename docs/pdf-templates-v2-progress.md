@@ -131,3 +131,31 @@ build passed. For release, rehearse with the approved package and the
 target's database engine and version, verify consistent backup restoration,
 and use the [administrator upgrade and recovery procedure](pdf-templates-v2-upgrade.md).
 No rollback rehearsal or Oracle MySQL runtime test was performed.
+
+## Stage 5: MariaDB 10.6 and notebook test setup
+
+Nextcloud `34.0.5-apache` (34.0.5.1) and MariaDB `10.6` (10.6.28) passed
+fresh installation and a regular `occ upgrade` from OSM 2.0.0 to a disposable
+2.0.1 package. The baseline used `df7ac796`. Before the upgrade neither
+schema element nor the migration history row existed. The same-version
+control left them absent. A synthetic MariaDB dump was taken before upgrading.
+
+The upgrade preserved the complete API responses for the existing setlist
+apart from the new null `defaultTemplateId`, its entries, scores and their tags,
+collections, user preferences and the legacy PDF profile. Both runs verified
+the migration history, template table, primary key, indices, foreign key,
+template CRUD, default assignment and `ON DELETE SET NULL`. No production
+data was used.
+
+The Compose configuration in `dev/osm-local-test/` ran with substitute
+bind paths on the isolated Cloud host (Docker 29.9.2, Compose 2.40.3).
+The proxy responded over `127.0.0.1:8088`; MariaDB had no published port.
+Bash syntax and Compose configuration validation passed. A mocked mount
+check passed six failure scenarios and a successful launch, and a real
+call on the Cloud host rejected the missing notebook NTFS mount. Lint,
+Stylelint and the production build passed.
+
+The real ntfs3/ext4 loop mount, reboot and unmount procedure and network
+isolation on Docker 27.3.1 with Compose 2.29.7 require notebook verification.
+A real NTSO restore remains a local operator task. See the
+[German setup and restore guide](pdf-templates-v2-local-test-de.md).
