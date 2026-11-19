@@ -16,8 +16,26 @@
 		</template>
 
 		<template #headerActions>
-			<AddScoreBookButton :editable="editable" />
-			<ExportCsvButton :tableRef="scoreBooksTableRef?.tableRef ?? null" />
+			<HeaderActions>
+				<NcActionButton
+					v-if="editable"
+					closeAfterClick
+					@click="showAddDialog = true">
+					<template #icon>
+						<AddIcon :size="20" />
+					</template>
+					{{ t('Add') }}
+				</NcActionButton>
+				<NcActionButton
+					closeAfterClick
+					@click="exportCsv">
+					<template #icon>
+						<DownloadIcon :size="20" />
+					</template>
+					{{ t('Export CSV') }}
+				</NcActionButton>
+			</HeaderActions>
+			<AddScoreBookDialog v-model:open="showAddDialog" />
 		</template>
 
 		<template #sidebar>
@@ -29,13 +47,15 @@
 <script setup lang="ts">
 import { loadState } from '@nextcloud/initial-state'
 import { onMounted, ref } from 'vue'
-import AddScoreBookButton from './components/AddScoreBookButton.vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import AddScoreBookDialog from './components/AddScoreBookDialog.vue'
 import ScoreBookSidebar from './components/ScoreBookSidebar.vue'
 import ScoreBooksTable from './components/ScoreBooksTable.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
-import ExportCsvButton from '@/components/ExportCsvButton.vue'
+import HeaderActions from '@/components/HeaderActions.vue'
 import Layout from '@/components/Layout.vue'
-import { ScoreBookIcon } from '@/icons/vue-material'
+import { useCsvExport } from '@/composables/useCsvExport'
+import { AddIcon, DownloadIcon, ScoreBookIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useTagsStore } from '@/stores/tagsStore'
 import { t } from '@/utils/l10n'
@@ -48,6 +68,9 @@ const editable = ref<boolean>(!!loadState('orchestrascoresmanager', 'editable'))
 
 // Ref to access ScoreBooksTable and its tableRef
 const scoreBooksTableRef = ref<{ tableRef: { exportAsCsv?: (fileName?: string) => boolean } | null } | null>(null)
+
+const showAddDialog = ref(false)
+const { exportCsv } = useCsvExport(() => scoreBooksTableRef.value?.tableRef ?? null)
 
 // Initialize stores on mount
 onMounted(async () => {

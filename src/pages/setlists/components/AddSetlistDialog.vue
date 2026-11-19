@@ -1,14 +1,4 @@
 <template>
-	<NcButton v-if="editable"
-		:size="buttonSize"
-		variant="primary"
-		:text="buttonText(t('Add'))"
-		@click="showCreateDialog = true">
-		<template #icon>
-			<AddIcon />
-		</template>
-	</NcButton>
-
 	<NcDialog
 		v-model:open="showCreateDialog"
 		:name="t('Create setlist')"
@@ -76,23 +66,16 @@ import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcFormGroup from '@nextcloud/vue/components/NcFormGroup'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
-import { useBreakpoints } from '@/composables/useBreakpoints'
-import { AddIcon, CancelIcon, ConfirmIcon } from '@/icons/vue-material'
+import { CancelIcon, ConfirmIcon } from '@/icons/vue-material'
 import { useSetlistsStore } from '@/stores/setlistsStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
 
-interface Props {
-	editable: boolean
-}
-
-defineProps<Props>()
-
+/** Whether the dialog is open */
+const showCreateDialog = defineModel<boolean>('open', { default: false })
 const setlistsStore = useSetlistsStore()
 const router = useRouter()
-const { buttonSize, buttonText } = useBreakpoints()
 
-const showCreateDialog = ref(false)
 const titleError = ref(false)
 
 const form = reactive({

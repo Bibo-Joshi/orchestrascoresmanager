@@ -1,14 +1,4 @@
 <template>
-	<NcButton
-		:size="buttonSize"
-		variant="primary"
-		:text="buttonText(t('Share'))"
-		@click="openDialog">
-		<template #icon>
-			<ShareIcon :size="20" />
-		</template>
-	</NcButton>
-
 	<NcDialog
 		:name="t('Share setlist')"
 		:open="dialogOpen"
@@ -46,13 +36,12 @@
 import type { SetlistShareModel } from '../utils/setlistShareModel.ts'
 import type { FolderCollection, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
 
-import { onBeforeUnmount, ref } from 'vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import { useSetlistShare } from '../composables/useSetlistShare.ts'
 import { buildSetlistShareModel } from '../utils/setlistShareModel.ts'
-import { useBreakpoints } from '@/composables/useBreakpoints'
 import { CancelIcon, LoadingIcon, ShareIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
@@ -67,14 +56,15 @@ interface Props {
 	folderCollection: FolderCollection | null
 }
 
+/** Whether the dialog is open */
+const dialogOpen = defineModel<boolean>('open', { default: false })
+
 const props = defineProps<Props>()
 
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
-const { buttonSize, buttonText } = useBreakpoints()
 const { isGenerating, generate, share } = useSetlistShare()
 
-const dialogOpen = ref(false)
 const isSharing = ref(false)
 const model = ref<SetlistShareModel | null>(null)
 const file = ref<File | null>(null)
@@ -93,11 +83,10 @@ function reset(): void {
 }
 
 /**
- * Open the dialog and generate the share image in the background.
+ * Generate the share image in the background once the dialog is opened.
  */
-async function openDialog(): Promise<void> {
+async function generateImage(): Promise<void> {
 	reset()
-	dialogOpen.value = true
 	await tryShowError(
 		async () => {
 			const newModel = buildSetlistShareModel({
@@ -124,6 +113,12 @@ async function openDialog(): Promise<void> {
 		},
 	)
 }
+
+watch(dialogOpen, (isOpen) => {
+	if (isOpen) {
+		generateImage()
+	}
+})
 
 /**
  * Close the dialog and release the image.

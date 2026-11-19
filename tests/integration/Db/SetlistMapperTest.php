@@ -13,6 +13,9 @@ use OCA\OrchestraScoresManager\Db\SetlistEntry;
 use OCA\OrchestraScoresManager\Db\SetlistEntryMapper;
 use OCA\OrchestraScoresManager\Db\SetlistMapper;
 use OCA\OrchestraScoresManager\Db\TagMapper;
+use OCA\OrchestraScoresManager\Policy\PolicyInterface;
+use OCA\OrchestraScoresManager\Policy\Scope\SetlistScope;
+use OCA\OrchestraScoresManager\Service\PermissionService;
 use OCP\AppFramework\Db\DoesNotExistException;
 
 /**
@@ -24,10 +27,13 @@ final class SetlistMapperTest extends MapperTestCase {
 	private SetlistMapper $mapper;
 	private SetlistEntryMapper $entryMapper;
 	private ScoreMapper $scoreMapper;
+	private bool $canEdit = true;
 
 	protected function setUp(): void {
 		parent::setUp();
-		$this->mapper = new SetlistMapper($this->db);
+		$permissionService = $this->createMock(PermissionService::class);
+		$permissionService->method('canCurrentUserEdit')->willReturnCallback(fn (): bool => $this->canEdit);
+		$this->mapper = new SetlistMapper($this->db, new SetlistScope($permissionService));
 		$this->entryMapper = new SetlistEntryMapper($this->db);
 		$this->scoreMapper = new ScoreMapper(
 			$this->db,
@@ -90,7 +96,7 @@ final class SetlistMapperTest extends MapperTestCase {
 		$setlist2 = $this->createTestSetlist('Setlist 2', new \DateTimeImmutable('2024-02-01'));
 		$setlist3 = $this->createTestSetlist('Setlist 3', new \DateTimeImmutable('2024-03-01'));
 
-		$all = $this->mapper->findAll();
+		$all = $this->mapper->findAllScoped(PolicyInterface::ACTION_READ);
 
 		$this->assertGreaterThanOrEqual(3, count($all));
 		$ids = array_map(fn ($s) => $s->getId(), $all);
@@ -104,7 +110,7 @@ final class SetlistMapperTest extends MapperTestCase {
 		$future1 = $this->createTestSetlist('Future Setlist 1', new \DateTimeImmutable('+1 day'));
 		$future2 = $this->createTestSetlist('Future Setlist 2', new \DateTimeImmutable('+2 days'));
 
-		$futureSetlists = $this->mapper->findFuture();
+		$futureSetlists = $this->mapper->findFutureScoped(PolicyInterface::ACTION_READ);
 
 		$ids = array_map(fn ($s) => $s->getId(), $futureSetlists);
 		$this->assertContains($future1->getId(), $ids);
@@ -118,7 +124,7 @@ final class SetlistMapperTest extends MapperTestCase {
 		// Started 2 hours ago, lasted 1 hour → already finished
 		$finished = $this->createTestSetlist('Finished Setlist', new \DateTimeImmutable('-2 hours'), 3600);
 
-		$ids = array_map(fn ($s) => $s->getId(), $this->mapper->findFuture());
+		$ids = array_map(fn ($s) => $s->getId(), $this->mapper->findFutureScoped(PolicyInterface::ACTION_READ));
 		$this->assertContains($playing->getId(), $ids, 'A currently-playing setlist must be treated as future.');
 		$this->assertNotContains($finished->getId(), $ids);
 	}
@@ -128,7 +134,7 @@ final class SetlistMapperTest extends MapperTestCase {
 		$past2 = $this->createTestSetlist('Past Setlist 2', new \DateTimeImmutable('-1 day'));
 		$future = $this->createTestSetlist('Future Setlist', new \DateTimeImmutable('+1 day'));
 
-		$pastSetlists = $this->mapper->findPast();
+		$pastSetlists = $this->mapper->findPastScoped(PolicyInterface::ACTION_READ);
 
 		$ids = array_map(fn ($s) => $s->getId(), $pastSetlists);
 		$this->assertContains($past1->getId(), $ids);
@@ -142,7 +148,7 @@ final class SetlistMapperTest extends MapperTestCase {
 		// Started 2 hours ago, lasted 1 hour → already finished
 		$finished = $this->createTestSetlist('Finished Setlist', new \DateTimeImmutable('-2 hours'), 3600);
 
-		$ids = array_map(fn ($s) => $s->getId(), $this->mapper->findPast());
+		$ids = array_map(fn ($s) => $s->getId(), $this->mapper->findPastScoped(PolicyInterface::ACTION_READ));
 		$this->assertNotContains($playing->getId(), $ids, 'A currently-playing setlist must not be treated as past.');
 		$this->assertContains($finished->getId(), $ids);
 	}
@@ -159,24 +165,84 @@ final class SetlistMapperTest extends MapperTestCase {
 		$withScore = $this->createSetlistWithScores('Once', new \DateTimeImmutable('2024-02-01'), [$score->getId()]);
 		$this->createSetlistWithScores('Other', new \DateTimeImmutable('2024-03-01'), [$other->getId()]);
 
-		$found = $this->mapper->findByScoreId($score->getId(), false, 'date', 'ASC', 10, 0);
+		$found = $this->mapper->findByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId(), 'date', 'ASC', 10, 0);
 
 		$this->assertSame([$withScoreTwice->getId(), $withScore->getId()], $this->ids($found));
-		$this->assertSame(2, $this->mapper->countByScoreId($score->getId(), false));
+		$this->assertSame(2, $this->mapper->countByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId()));
 	}
 
-	public function testFindByScoreIdPublishedOnly(): void {
+	public function testFindByScoreIdScopedHidesDraftsWithoutEditRights(): void {
 		$score = $this->createTestScore();
 		$published = $this->createSetlistWithScores('Published', new \DateTimeImmutable('2024-01-01'), [$score->getId()], true);
 		$draft = $this->createSetlistWithScores('Draft', new \DateTimeImmutable('2024-02-01'), [$score->getId()], false);
 
-		$publishedOnly = $this->mapper->findByScoreId($score->getId(), true, 'date', 'ASC', 10, 0);
-		$all = $this->mapper->findByScoreId($score->getId(), false, 'date', 'ASC', 10, 0);
+		$this->canEdit = false;
+		$this->assertSame([$published->getId()], $this->ids($this->mapper->findByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId(), 'date', 'ASC', 10, 0)));
+		$this->assertSame(1, $this->mapper->countByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId()));
 
-		$this->assertSame([$published->getId()], $this->ids($publishedOnly));
-		$this->assertSame([$published->getId(), $draft->getId()], $this->ids($all));
-		$this->assertSame(1, $this->mapper->countByScoreId($score->getId(), true));
-		$this->assertSame(2, $this->mapper->countByScoreId($score->getId(), false));
+		$this->canEdit = true;
+		$this->assertSame([$published->getId(), $draft->getId()], $this->ids($this->mapper->findByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId(), 'date', 'ASC', 10, 0)));
+		$this->assertSame(2, $this->mapper->countByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId()));
+	}
+
+	public function testFindByScoreIdScopedOrderingPaginationAndCount(): void {
+		$score = $this->createTestScore();
+		$first = $this->createSetlistWithScores('1', new \DateTimeImmutable('2024-01-01'), [$score->getId()], true);
+		$second = $this->createSetlistWithScores('2', new \DateTimeImmutable('2024-02-01'), [$score->getId()], true);
+		$this->createSetlistWithScores('3', new \DateTimeImmutable('2024-03-01'), [$score->getId()], false);
+		$fourth = $this->createSetlistWithScores('4', new \DateTimeImmutable('2024-04-01'), [$score->getId()], true);
+
+		$this->canEdit = false;
+		$page = $this->mapper->findByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId(), 'date', 'DESC', 2, 1);
+
+		$this->assertSame([$second->getId(), $first->getId()], $this->ids($page));
+		$this->assertNotContains($fourth->getId(), $this->ids($page));
+		$this->assertSame(3, $this->mapper->countByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId()));
+	}
+
+	public function testFindByScoreIdScopedDeniedActionReturnsNothing(): void {
+		$score = $this->createTestScore();
+		$this->createSetlistWithScores('Published', new \DateTimeImmutable('2024-01-01'), [$score->getId()], true);
+
+		$this->canEdit = false;
+		$this->assertSame([], $this->mapper->findByScoreIdScoped(PolicyInterface::ACTION_UPDATE, $score->getId(), 'date', 'ASC', 10, 0));
+		$this->assertSame(0, $this->mapper->countByScoreIdScoped('UNKNOWN', $score->getId()));
+	}
+
+	public function testFindAllScopedCombinedWithStatusFilters(): void {
+		$published = $this->createSetlistWithScores('Published', new \DateTimeImmutable('2024-01-01'), [], true);
+		$draft = $this->createSetlistWithScores('Draft', new \DateTimeImmutable('2024-02-01'), [], false);
+
+		$this->canEdit = false;
+		$ids = $this->ids($this->mapper->findAllScoped(PolicyInterface::ACTION_READ));
+		$this->assertContains($published->getId(), $ids);
+		$this->assertNotContains($draft->getId(), $ids);
+		$this->assertSame([], array_intersect([$published->getId()], $this->ids($this->mapper->findAllScoped(PolicyInterface::ACTION_READ, null, false))));
+
+		$this->canEdit = true;
+		$ids = $this->ids($this->mapper->findAllScoped(PolicyInterface::ACTION_READ));
+		$this->assertContains($draft->getId(), $ids);
+		$this->assertContains($published->getId(), $this->ids($this->mapper->findAllScoped(PolicyInterface::ACTION_READ, null, true)));
+		$this->assertNotContains($draft->getId(), $this->ids($this->mapper->findAllScoped(PolicyInterface::ACTION_READ, null, true)));
+	}
+
+	public function testFindFutureAndPastScopedHideDraftsWithoutEditRights(): void {
+		$futureDraft = $this->createSetlistWithScores('Future draft', new \DateTimeImmutable('+10 days'), [], false);
+		$futurePublished = $this->createSetlistWithScores('Future published', new \DateTimeImmutable('+11 days'), [], true);
+		$pastDraft = $this->createSetlistWithScores('Past draft', new \DateTimeImmutable('-11 days'), [], false);
+		$pastPublished = $this->createSetlistWithScores('Past published', new \DateTimeImmutable('-10 days'), [], true);
+
+		$this->canEdit = false;
+		$future = $this->ids($this->mapper->findFutureScoped(PolicyInterface::ACTION_READ));
+		$past = $this->ids($this->mapper->findPastScoped(PolicyInterface::ACTION_READ));
+		$this->assertContains($futurePublished->getId(), $future);
+		$this->assertNotContains($futureDraft->getId(), $future);
+		$this->assertContains($pastPublished->getId(), $past);
+		$this->assertNotContains($pastDraft->getId(), $past);
+
+		$this->canEdit = true;
+		$this->assertContains($futureDraft->getId(), $this->ids($this->mapper->findFutureScoped(PolicyInterface::ACTION_READ)));
+		$this->assertContains($pastDraft->getId(), $this->ids($this->mapper->findPastScoped(PolicyInterface::ACTION_READ)));
 	}
 
 	public function testFindByScoreIdSortByDateTreatsMissingDateAsNewest(): void {
@@ -185,8 +251,8 @@ final class SetlistMapperTest extends MapperTestCase {
 		$today = $this->createSetlistWithScores('Today', new \DateTimeImmutable('today'), [$score->getId()]);
 		$undated = $this->createSetlistWithScores('Undated', null, [$score->getId()]);
 
-		$desc = $this->mapper->findByScoreId($score->getId(), false, 'date', 'DESC', 10, 0);
-		$asc = $this->mapper->findByScoreId($score->getId(), false, 'date', 'ASC', 10, 0);
+		$desc = $this->mapper->findByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId(), 'date', 'DESC', 10, 0);
+		$asc = $this->mapper->findByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId(), 'date', 'ASC', 10, 0);
 
 		$this->assertSame([$undated->getId(), $today->getId(), $yesterday->getId()], $this->ids($desc));
 		$this->assertSame([$yesterday->getId(), $today->getId(), $undated->getId()], $this->ids($asc));
@@ -200,11 +266,11 @@ final class SetlistMapperTest extends MapperTestCase {
 
 		$this->assertSame(
 			[$a->getId(), $b->getId(), $c->getId()],
-			$this->ids($this->mapper->findByScoreId($score->getId(), false, 'name', 'ASC', 10, 0)),
+			$this->ids($this->mapper->findByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId(), 'name', 'ASC', 10, 0)),
 		);
 		$this->assertSame(
 			[$a->getId(), $c->getId(), $b->getId()],
-			$this->ids($this->mapper->findByScoreId($score->getId(), false, 'creation', 'DESC', 10, 0)),
+			$this->ids($this->mapper->findByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId(), 'creation', 'DESC', 10, 0)),
 		);
 	}
 
@@ -214,17 +280,17 @@ final class SetlistMapperTest extends MapperTestCase {
 		$second = $this->createSetlistWithScores('2', new \DateTimeImmutable('2024-02-01'), [$score->getId()]);
 		$third = $this->createSetlistWithScores('3', new \DateTimeImmutable('2024-03-01'), [$score->getId()]);
 
-		$page = $this->mapper->findByScoreId($score->getId(), false, 'date', 'ASC', 2, 1);
+		$page = $this->mapper->findByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId(), 'date', 'ASC', 2, 1);
 
 		$this->assertSame([$second->getId(), $third->getId()], $this->ids($page));
 		$this->assertNotContains($first->getId(), $this->ids($page));
-		$this->assertSame(3, $this->mapper->countByScoreId($score->getId(), false));
+		$this->assertSame(3, $this->mapper->countByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId()));
 	}
 
 	public function testCountByScoreIdWithoutSetlists(): void {
 		$score = $this->createTestScore();
 
-		$this->assertSame(0, $this->mapper->countByScoreId($score->getId(), false));
-		$this->assertSame([], $this->mapper->findByScoreId($score->getId(), false, 'date', 'DESC', 10, 0));
+		$this->assertSame(0, $this->mapper->countByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId()));
+		$this->assertSame([], $this->mapper->findByScoreIdScoped(PolicyInterface::ACTION_READ, $score->getId(), 'date', 'DESC', 10, 0));
 	}
 }

@@ -8,6 +8,8 @@ use OCA\OrchestraScoresManager\Db\Setlist;
 use OCA\OrchestraScoresManager\Db\SetlistEntry;
 use OCA\OrchestraScoresManager\Db\SetlistEntryMapper;
 use OCA\OrchestraScoresManager\Db\SetlistMapper;
+use OCA\OrchestraScoresManager\Policy\Scope\SetlistScope;
+use OCA\OrchestraScoresManager\Service\PermissionService;
 use OCP\DB\Exception;
 
 /**
@@ -22,7 +24,7 @@ final class SetlistEntryMapperTest extends MapperTestCase {
 	protected function setUp(): void {
 		parent::setUp();
 		$this->mapper = new SetlistEntryMapper($this->db);
-		$this->setlistMapper = new SetlistMapper($this->db);
+		$this->setlistMapper = new SetlistMapper($this->db, new SetlistScope($this->createMock(PermissionService::class)));
 	}
 
 	private function createTestSetlist(string $title = 'Test Setlist'): Setlist {

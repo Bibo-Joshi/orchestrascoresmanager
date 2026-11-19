@@ -22,14 +22,32 @@
 		</template>
 
 		<template #headerActions>
-			<AddScoreToBookButton
+			<HeaderActions>
+				<NcActionButton
+					v-if="editable && scoreBook"
+					closeAfterClick
+					@click="showAddDialog = true">
+					<template #icon>
+						<AddIcon :size="20" />
+					</template>
+					{{ t('Add') }}
+				</NcActionButton>
+				<NcActionButton
+					closeAfterClick
+					@click="exportCsv">
+					<template #icon>
+						<DownloadIcon :size="20" />
+					</template>
+					{{ t('Export CSV') }}
+				</NcActionButton>
+			</HeaderActions>
+			<AddScoreToBookDialog
 				v-if="scoreBook"
-				:editable="editable"
+				v-model:open="showAddDialog"
 				:scoreBookId="scoreBook.id"
 				:existingScoreIds="existingScoreIds"
 				:occupiedIndices="occupiedIndices"
 				@scoreAdded="handleScoreAdded" />
-			<ExportCsvButton :tableRef="scoresTableRef?.tableRef ?? null" />
 		</template>
 
 		<template #sidebar>
@@ -44,13 +62,15 @@ import type { Score, ScoreBook } from '@/api/generated/openapi/data-contracts'
 import { loadState } from '@nextcloud/initial-state'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import AddScoreToBookButton from './components/AddScoreToBookButton.vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import AddScoreToBookDialog from './components/AddScoreToBookDialog.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
-import ExportCsvButton from '@/components/ExportCsvButton.vue'
+import HeaderActions from '@/components/HeaderActions.vue'
 import Layout from '@/components/Layout.vue'
 import ScoreSidebar from '@/components/ScoreSidebar.vue'
 import ScoresTable from '@/components/ScoresTable.vue'
-import { ScoreIcon } from '@/icons/vue-material'
+import { useCsvExport } from '@/composables/useCsvExport'
+import { AddIcon, DownloadIcon, ScoreIcon } from '@/icons/vue-material'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useTagsStore } from '@/stores/tagsStore'
@@ -62,6 +82,7 @@ const scoreBooksStore = useScoreBooksStore()
 const tagsStore = useTagsStore()
 
 const loading = ref(false)
+const showAddDialog = ref(false)
 const loadError = ref(false)
 const editable = ref<boolean>(!!loadState('orchestrascoresmanager', 'editable'))
 
@@ -72,6 +93,8 @@ interface ScoresTableRef {
 
 // Ref to access ScoresTable and its tableRef
 const scoresTableRef = ref<ScoresTableRef | null>(null)
+
+const { exportCsv } = useCsvExport(() => scoresTableRef.value?.tableRef ?? null)
 
 /**
  * Get score book from store by route parameter

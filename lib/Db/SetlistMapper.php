@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\OrchestraScoresManager\Db;
 
+use OCA\OrchestraScoresManager\Policy\Scope\SetlistScope;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\AppFramework\Db\QBMapper;
@@ -16,21 +17,28 @@ use OCP\IDBConnection;
  */
 class SetlistMapper extends QBMapper {
 	/** @psalm-suppress PossiblyUnusedMethod - Constructor used by DI container */
-	public function __construct(IDBConnection $db) {
+	public function __construct(
+		IDBConnection $db,
+		private readonly SetlistScope $setlistScope,
+	) {
 		parent::__construct($db, 'osm_setlists', Setlist::class);
 	}
 
 	/**
+	 * Find all setlists the current user may access for the action.
+	 *
+	 * @param string $action One of the PolicyInterface::ACTION_* constants
 	 * @param bool|null $isDraft Filter by draft status
 	 * @param bool|null $isPublished Filter by published status
 	 * @return Setlist[]
 	 * @throws Exception
 	 */
-	public function findAll(?bool $isDraft = null, ?bool $isPublished = null): array {
+	public function findAllScoped(string $action, ?bool $isDraft = null, ?bool $isPublished = null): array {
 		/* @var $qb IQueryBuilder */
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->getTableName());
 
+		$this->setlistScope->apply($action, $qb);
 		$this->applyStatusFilters($qb, $isDraft, $isPublished);
 
 		$qb->orderBy('start_date_time', 'ASC');
@@ -38,28 +46,46 @@ class SetlistMapper extends QBMapper {
 	}
 
 	/**
-	 * Find all future setlists (start_date_time + duration >= now)
+	 * Find all future setlists (start_date_time + duration >= now) that the current user may access for the action.
+	 *
+	 * @param string $action One of the PolicyInterface::ACTION_* constants
 	 * @param bool|null $isDraft Filter by draft status
 	 * @param bool|null $isPublished Filter by published status
 	 * @return Setlist[]
 	 * @throws Exception
 	 */
-	public function findFuture(?bool $isDraft = null, ?bool $isPublished = null): array {
+	public function findFutureScoped(string $action, ?bool $isDraft = null, ?bool $isPublished = null): array {
+		return $this->filterFuture($this->findAllScoped($action, $isDraft, $isPublished));
+	}
+
+	/**
+	 * @param Setlist[] $setlists
+	 * @return Setlist[]
+	 */
+	private function filterFuture(array $setlists): array {
 		$now = new \DateTimeImmutable();
-		$setlists = $this->findAll($isDraft, $isPublished);
 		return array_values(array_filter($setlists, fn (Setlist $s) => $this->getEndDateTime($s) >= $now));
 	}
 
 	/**
-	 * Find all past setlists (start_date_time + duration < now), ordered by start date descending.
+	 * Find all past setlists (start_date_time + duration < now), ordered by start date descending, that the current user may access for the action.
+	 *
+	 * @param string $action One of the PolicyInterface::ACTION_* constants
 	 * @param bool|null $isDraft Filter by draft status
 	 * @param bool|null $isPublished Filter by published status
 	 * @return Setlist[]
 	 * @throws Exception
 	 */
-	public function findPast(?bool $isDraft = null, ?bool $isPublished = null): array {
+	public function findPastScoped(string $action, ?bool $isDraft = null, ?bool $isPublished = null): array {
+		return $this->filterPast($this->findAllScoped($action, $isDraft, $isPublished));
+	}
+
+	/**
+	 * @param Setlist[] $setlists Ordered by start date ascending
+	 * @return Setlist[] Past setlists ordered by start date descending
+	 */
+	private function filterPast(array $setlists): array {
 		$now = new \DateTimeImmutable();
-		$setlists = $this->findAll($isDraft, $isPublished);
 		$past = array_values(array_filter($setlists, fn (Setlist $s) => $this->getEndDateTime($s) < $now));
 		return array_reverse($past);
 	}
@@ -94,12 +120,13 @@ class SetlistMapper extends QBMapper {
 	}
 
 	/**
-	 * Find a page of setlists that contain the given score, sorted by the given column.
+	 * Find a page of setlists that contain the given score and that the current user may access for the action,
+	 * sorted by the given column.
 	 * Sorting by 'creation' uses the order of creation (id), as setlists have no creation timestamp.
 	 * Setlists without a start date are considered newer than any setlist with a start date when sorting by 'date'.
 	 *
+	 * @param string $action One of the PolicyInterface::ACTION_* constants
 	 * @param int $scoreId
-	 * @param bool $publishedOnly Restrict to published setlists
 	 * @param string $sortBy One of 'creation', 'date', 'name'
 	 * @param string $sortOrder 'ASC' or 'DESC'
 	 * @param int $limit Maximum number of setlists to return
@@ -107,10 +134,11 @@ class SetlistMapper extends QBMapper {
 	 * @return Setlist[]
 	 * @throws Exception
 	 */
-	public function findByScoreId(int $scoreId, bool $publishedOnly, string $sortBy, string $sortOrder, int $limit, int $offset): array {
+	public function findByScoreIdScoped(string $action, int $scoreId, string $sortBy, string $sortOrder, int $limit, int $offset): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select('*')->from($this->getTableName());
-		$this->applyScoreFilter($qb, $scoreId, $publishedOnly);
+		$this->applyScoreFilter($qb, $scoreId);
+		$this->setlistScope->apply($action, $qb);
 
 		$direction = strtoupper($sortOrder) === 'ASC' ? 'ASC' : 'DESC';
 		$column = match ($sortBy) {
@@ -134,17 +162,18 @@ class SetlistMapper extends QBMapper {
 	}
 
 	/**
-	 * Count the setlists that contain the given score.
+	 * Count the setlists that contain the given score and that the current user may access for the action.
 	 *
+	 * @param string $action One of the PolicyInterface::ACTION_* constants
 	 * @param int $scoreId
-	 * @param bool $publishedOnly Restrict to published setlists
 	 * @return int
 	 * @throws Exception
 	 */
-	public function countByScoreId(int $scoreId, bool $publishedOnly): int {
+	public function countByScoreIdScoped(string $action, int $scoreId): int {
 		$qb = $this->db->getQueryBuilder();
 		$qb->select($qb->func()->count('*'))->from($this->getTableName());
-		$this->applyScoreFilter($qb, $scoreId, $publishedOnly);
+		$this->applyScoreFilter($qb, $scoreId);
+		$this->setlistScope->apply($action, $qb);
 
 		$result = $qb->executeQuery();
 		$count = (int)$result->fetchOne();
@@ -153,23 +182,19 @@ class SetlistMapper extends QBMapper {
 	}
 
 	/**
-	 * Restrict the query to setlists containing the score (and optionally only published ones).
+	 * Restrict the query to setlists containing the score.
 	 *
 	 * @param IQueryBuilder $qb
 	 * @param int $scoreId
-	 * @param bool $publishedOnly
 	 * @return void
 	 */
-	private function applyScoreFilter(IQueryBuilder $qb, int $scoreId, bool $publishedOnly): void {
+	private function applyScoreFilter(IQueryBuilder $qb, int $scoreId): void {
 		$sub = $this->db->getQueryBuilder();
 		$sub->select('setlist_id')
 			->from('osm_setlist_entries')
 			->where($sub->expr()->eq('score_id', $qb->createNamedParameter($scoreId, IQueryBuilder::PARAM_INT)));
 
 		$qb->where($qb->expr()->in('id', $qb->createFunction($sub->getSQL())));
-		if ($publishedOnly) {
-			$qb->andWhere($qb->expr()->eq('is_published', $qb->createNamedParameter(true, IQueryBuilder::PARAM_BOOL)));
-		}
 	}
 
 	/**

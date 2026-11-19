@@ -38,41 +38,66 @@
 		</template>
 
 		<template #headerActions>
-			<!-- Search in Table -->
-			<div
-				:style="{width: screenSizeCategory === 'mobile' ? '100%' : screenSizeCategory === 'tablet' ? '40ex' : '60ex'}">
-				<NcTextField
-					v-model="searchText"
-					trailingButtonIcon="close"
-					:placeholder="t('Search Score or Score details')"
-					:showTrailingButton="searchText !== ''"
-					@trailingButtonClick="searchText = undefined">
+			<HeaderSearch v-model="searchText" />
+			<HeaderActions :inline="editable ? 2 : 0">
+				<NcActionButton
+					v-if="editable && isSelectedVersionActive && folderCollection"
+					closeAfterClick
+					@click="showAddDialog = true">
 					<template #icon>
-						<SearchIcon :size="20" />
+						<AddIcon :size="20" />
 					</template>
-				</NcTextField>
-			</div>
+					{{ t('Add') }}
+				</NcActionButton>
+				<template v-if="versions.length > 0 || (editable && folderCollection)">
+					<NcActionSeparator />
+					<NcActionInput
+						v-if="versions.length > 0"
+						v-model="selectedVersionOption"
+						type="multiselect"
+						:label="t('Version')"
+						:options="versionOptions"
+						:clearable="false">
+						<template #icon>
+							<HistoryIcon :size="20" />
+						</template>
+						{{ t('Select version') }}
+					</NcActionInput>
+					<NcActionButton
+						v-if="editable && folderCollection"
+						closeAfterClick
+						:disabled="!isSelectedVersionActive"
+						:aria-label="t('Start new version')"
+						@click="startNewVersion">
+						<template #icon>
+							<HistoryIcon :size="20" />
+						</template>
+						{{ t('New Version') }}
+					</NcActionButton>
+				</template>
+				<NcActionSeparator />
+				<NcActionButton
+					closeAfterClick
+					@click="exportCsv">
+					<template #icon>
+						<DownloadIcon :size="20" />
+					</template>
+					{{ t('Export CSV') }}
+				</NcActionButton>
+				<NcActionButton
+					v-if="folderCollection && selectedVersion && scores.length > 0"
+					closeAfterClick
+					@click="exportToc">
+					<template #icon>
+						<DownloadIcon :size="20" />
+					</template>
+					{{ t('Export ToC & Index') }}
+				</NcActionButton>
+			</HeaderActions>
 
-			<!-- Version Selector -->
-			<NcSelect
-				v-if="versions.length > 0"
-				v-model="selectedVersionOption"
-				:options="versionOptions"
-				:placeholder="t('Select version')"
-				:clearable="false"
-				class="version-selector"
-				@input="handleVersionChange" />
-
-			<!-- Start New Version Button -->
-			<StartNewVersionButton
-				v-if="editable && folderCollection"
-				:folderCollectionId="folderCollection.id"
-				:disabled="!isSelectedVersionActive"
-				@versionCreated="handleVersionCreated" />
-
-			<AddToCollectionButton
+			<AddToCollectionDialog
 				v-if="folderCollection"
-				:editable="editable && isSelectedVersionActive"
+				v-model:open="showAddDialog"
 				:folderCollectionId="folderCollection.id"
 				:isIndexed="isIndexed"
 				:existingScoreIds="existingScoreIds"
@@ -80,16 +105,6 @@
 				:occupiedIndices="occupiedIndices"
 				@scoreAdded="handleScoreAdded"
 				@scorebookAdded="handleScoreBookAdded" />
-
-			<!-- Export CSV Button -->
-			<ExportCsvButton :tableRef="scoresTableRef?.tableRef ?? null" />
-
-			<!-- Export ToC & Index Button -->
-			<ExportTocButton
-				v-if="folderCollection && selectedVersion && scores.length > 0"
-				:folderCollection="folderCollection"
-				:version="selectedVersion"
-				:entries="allEntries" />
 		</template>
 
 		<!-- Sidebar removed - using score table sidebar instead -->
@@ -106,22 +121,24 @@ import { loadState } from '@nextcloud/initial-state'
 import { spawnDialog } from '@nextcloud/vue/functions/dialog'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
+import NcActionInput from '@nextcloud/vue/components/NcActionInput'
+import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import NcSelect from '@nextcloud/vue/components/NcSelect'
-import NcTextField from '@nextcloud/vue/components/NcTextField'
-import AddToCollectionButton from './components/AddToCollectionButton.vue'
-import ExportTocButton from './components/ExportTocButton.vue'
-import StartNewVersionButton from './components/StartNewVersionButton.vue'
+import AddToCollectionDialog from './components/AddToCollectionDialog.vue'
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
-import ExportCsvButton from '@/components/ExportCsvButton.vue'
+import HeaderActions from '@/components/HeaderActions.vue'
+import HeaderSearch from '@/components/HeaderSearch.vue'
 import Layout from '@/components/Layout.vue'
 import ScoreSidebar from '@/components/ScoreSidebar.vue'
 import ScoresTable from '@/components/ScoresTable.vue'
+import { useStartNewVersion } from './composables/useStartNewVersion.ts'
+import { useTocExport } from './composables/useTocExport.ts'
 import { apiClients } from '@/api/client'
-import { useBreakpoints } from '@/composables/useBreakpoints'
+import { useCsvExport } from '@/composables/useCsvExport'
 import { formatDateStr } from '@/composables/useDateFormatting'
-import { ScoreIcon, SearchIcon } from '@/icons/vue-material'
+import { AddIcon, DownloadIcon, HistoryIcon, ScoreIcon } from '@/icons/vue-material'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { useFolderCollectionVersionsStore } from '@/stores/folderCollectionVersionsStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
@@ -148,7 +165,6 @@ const router = useRouter()
 const folderCollectionsStore = useFolderCollectionsStore()
 const versionsStore = useFolderCollectionVersionsStore()
 const scoreBooksStore = useScoreBooksStore()
-const { screenSizeCategory } = useBreakpoints()
 
 const loading = ref(false)
 const loadError = ref(false)
@@ -386,7 +402,7 @@ function handleVersionChange(option: VersionOption) {
 }
 
 /**
- * Handle version created event from StartNewVersionButton
+ * Handle version created by the start new version action
  *
  * @param newVersion - The newly created version
  */
@@ -398,6 +414,15 @@ function handleVersionCreated(newVersion: FolderCollectionVersion) {
 	// Reload data
 	loadData()
 }
+
+const showAddDialog = ref(false)
+const { exportCsv } = useCsvExport(() => scoresTableRef.value?.tableRef ?? null)
+const { exportToc } = useTocExport({
+	folderCollection,
+	version: selectedVersion,
+	entries: allEntries,
+})
+const { startNewVersion } = useStartNewVersion(() => folderCollection.value?.id, handleVersionCreated)
 
 /**
  * Load all data for the collection
@@ -646,9 +671,3 @@ async function deleteScoreBook(scoreBook: ScoreBook | ScoreBookIndexed) {
 	)
 }
 </script>
-
-<style lang="scss" scoped>
-.version-selector {
-	min-width: 200px;
-}
-</style>

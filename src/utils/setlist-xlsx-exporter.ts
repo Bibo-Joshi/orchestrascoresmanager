@@ -1,6 +1,6 @@
 import type { Score, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
 
-import { linkTo } from '@nextcloud/router'
+import { generateUrl } from '@nextcloud/router'
 /**
  * XLSX exporter for setlist GEMA report.
  * Generates an XLSX file with the setlist entries for GEMA reporting.
@@ -8,7 +8,7 @@ import { linkTo } from '@nextcloud/router'
 import { Workbook } from 'exceljs'
 import { isBreakEntry } from '@/utils/setlistScoreUtils'
 
-const TEMPLATE_URL = linkTo('orchestrascoresmanager', 'public/gema-template.xlsx')
+const TEMPLATE_URL = generateUrl('/apps/orchestrascoresmanager/assets/gema-template')
 const DATA_START_ROW = 21
 
 interface PersonNameParts {

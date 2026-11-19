@@ -114,7 +114,18 @@
 		</template>
 
 		<template #headerActions>
-			<AddSetlistButton :editable="editable" />
+			<HeaderActions>
+				<NcActionButton
+					v-if="editable"
+					closeAfterClick
+					@click="showAddDialog = true">
+					<template #icon>
+						<AddIcon :size="20" />
+					</template>
+					{{ t('Add') }}
+				</NcActionButton>
+			</HeaderActions>
+			<AddSetlistDialog v-model:open="showAddDialog" />
 		</template>
 	</Layout>
 </template>
@@ -122,13 +133,15 @@
 <script setup lang="ts">
 import { loadState } from '@nextcloud/initial-state'
 import { onMounted, reactive, ref } from 'vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
-import AddSetlistButton from './components/AddSetlistButton.vue'
+import AddSetlistDialog from './components/AddSetlistDialog.vue'
 import SetlistListItem from './components/SetlistListItem.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
 import ExpandableListItem from '@/components/ExpandableListItem.vue'
+import HeaderActions from '@/components/HeaderActions.vue'
 import Layout from '@/components/Layout.vue'
-import { SetlistIcon } from '@/icons/vue-material'
+import { AddIcon, SetlistIcon } from '@/icons/vue-material'
 import { useSetlistsStore } from '@/stores/setlistsStore'
 import { t } from '@/utils/l10n'
 
@@ -136,6 +149,8 @@ const setlistsStore = useSetlistsStore()
 
 // Load initial state from the server
 const editable = ref<boolean>(!!loadState('orchestrascoresmanager', 'editable'))
+
+const showAddDialog = ref(false)
 
 // Track expanded state of each section
 const expandedSections = reactive({

@@ -42,7 +42,7 @@ class SetlistService {
 
 	/**
 	 * Return setlists filtered by date, draft status, and/or published status.
-	 * Only returns setlists that are allowed to be read based on the policy.
+	 * Only returns setlists that are allowed to be read, see SetlistScope.
 	 *
 	 * @param string $filter Filter: 'all', 'future', or 'past'
 	 * @param bool|null $isDraft Filter by draft status
@@ -53,21 +53,13 @@ class SetlistService {
 	 */
 	public function getSetlists(string $filter = 'all', ?bool $isDraft = null, ?bool $isPublished = null): array {
 		$setlists = match ($filter) {
-			'all' => $this->setlistMapper->findAll($isDraft, $isPublished),
-			'future' => $this->setlistMapper->findFuture($isDraft, $isPublished),
-			'past' => $this->setlistMapper->findPast($isDraft, $isPublished),
+			'all' => $this->setlistMapper->findAllScoped(PolicyInterface::ACTION_READ, $isDraft, $isPublished),
+			'future' => $this->setlistMapper->findFutureScoped(PolicyInterface::ACTION_READ, $isDraft, $isPublished),
+			'past' => $this->setlistMapper->findPastScoped(PolicyInterface::ACTION_READ, $isDraft, $isPublished),
 			default => throw new InvalidArgumentException($this->l->t('Invalid filter parameter. Must be "all", "future", or "past".')),
 		};
 
-		// Filter based on policy - only return setlists user is allowed to read
-		$allowedSetlists = [];
-		foreach ($setlists as $setlist) {
-			if ($this->setlistPolicy->allows(PolicyInterface::ACTION_READ, $setlist)) {
-				$allowedSetlists[] = $setlist;
-			}
-		}
-
-		return array_map(fn ($setlist) => $this->serializeSetlist($setlist), $allowedSetlists);
+		return array_map(fn ($setlist) => $this->serializeSetlist($setlist), $setlists);
 	}
 
 	/**
@@ -121,13 +113,8 @@ class SetlistService {
 			throw new InvalidArgumentException($this->l->t('Invalid sortOrder parameter. Must be "ASC" or "DESC".'));
 		}
 
-		// Drafts/unpublished setlists are only readable by editors, see SetlistPolicy
-		$unpublishedProbe = new Setlist();
-		$unpublishedProbe->setIsPublished(false);
-		$publishedOnly = !$this->setlistPolicy->allows(PolicyInterface::ACTION_READ, $unpublishedProbe);
-
 		// fetch one extra row to find out whether there is a next page
-		$setlists = $this->setlistMapper->findByScoreId($scoreId, $publishedOnly, $sortBy, $sortOrder, $limit + 1, $offset);
+		$setlists = $this->setlistMapper->findByScoreIdScoped(PolicyInterface::ACTION_READ, $scoreId, $sortBy, $sortOrder, $limit + 1, $offset);
 		$hasMore = count($setlists) > $limit;
 		$setlists = array_slice($setlists, 0, $limit);
 
@@ -135,7 +122,7 @@ class SetlistService {
 			'setlists' => array_values(array_map(fn (Setlist $setlist) => $this->serializeSetlist($setlist), $setlists)),
 			'pagination' => [
 				'nextCursor' => $hasMore ? $this->encodeCursor($limit, $sortBy, $sortOrder, $offset + $limit) : null,
-				'total' => $this->setlistMapper->countByScoreId($scoreId, $publishedOnly),
+				'total' => $this->setlistMapper->countByScoreIdScoped(PolicyInterface::ACTION_READ, $scoreId),
 			],
 		];
 	}
