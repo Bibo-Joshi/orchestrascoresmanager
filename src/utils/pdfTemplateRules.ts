@@ -113,7 +113,7 @@ export function editPdfRule(rule: PdfTemplateRule): PdfRuleDraft {
 	}
 
 	// Recognize the exact XOR AST emitted by this editor.
-	const any = rule.expression.any
+	const any = rule.expression?.any
 	if (Array.isArray(any) && any.length === 2) {
 		const firstPart = any[0]
 		if (firstPart && typeof firstPart === 'object' && !Array.isArray(firstPart)) {

@@ -91,6 +91,7 @@ import type { FolderCollection, Setlist, SetlistEntry } from '@/api/generated/op
 import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
 import type { PdfTemplate } from '@/utils/pdfTemplatesApi'
 
+import { showWarning } from '@nextcloud/dialogs'
 import { computed, ref } from 'vue'
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -217,16 +218,27 @@ async function onPdfExport(): Promise<void> {
 				templateId === null ? [] : fetchPdfTemplates(),
 			])
 			const freshScores = new Map(response.data.ocs.data.map((score) => [score.id, score]))
-			await exportSetlistToPdf({
+			const data = {
 				setlist,
 				entries,
-				getScoreById: (id) => freshScores.get(id),
-				getScoreBookById: (id) => scoreBooksStore.getScoreBookById(id),
+				getScoreById: (id: number) => freshScores.get(id),
+				getScoreBookById: (id: number) => scoreBooksStore.getScoreBookById(id),
 				fcvScoresMap,
 				fcvScoreBookIndicesMap,
 				folderCollection,
 				columnConfigs: selectedColumns,
-			}, templates.find(({ id }) => id === templateId))
+			}
+			const template = templates.find(({ id }) => id === templateId)
+			if (template) {
+				try {
+					await exportSetlistToPdf(data, template)
+					return
+				} catch (error) {
+					console.error('Failed to render PDF template', template.id, error)
+					showWarning(t('PDF template “{name}” could not be applied. Using the built-in standard template.', { name: template.name }))
+				}
+			}
+			await exportSetlistToPdf(data)
 		},
 		t('Export failed: '),
 	)
