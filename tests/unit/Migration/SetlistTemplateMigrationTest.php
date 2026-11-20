@@ -134,4 +134,160 @@ final class SetlistTemplateMigrationTest extends TestCase {
 		$migration->changeSchema($this->createMock(IOutput::class), static fn (): ISchemaWrapper => $schema, []);
 		$this->assertCount(1, $setlistTable->getForeignKeys());
 	}
+
+	public function testSkipsPreSchemaChangeForNonSqlite(): void {
+		$db = $this->createMock(IDBConnection::class);
+		$db->method('getDatabaseProvider')->willReturn(IDBConnection::PLATFORM_MYSQL);
+		$db->expects($this->never())->method('executeStatement');
+		(new Version001003003Date20261118000000($db))->preSchemaChange(
+			$this->createMock(IOutput::class),
+			static fn (): ISchemaWrapper => throw new \LogicException('Schema must not be accessed'),
+			[]
+		);
+	}
+
+	public function testSqliteUpgradeRejectsMissingTablePrefix(): void {
+		$setlists = new Table('oc_osm_setlists');
+		$schema = $this->createMock(ISchemaWrapper::class);
+		$schema->method('getTable')->with('osm_setlists')->willReturn($this->schemaTable($setlists));
+		$db = $this->createMock(IDBConnection::class);
+		$db->method('getDatabaseProvider')->willReturn(IDBConnection::PLATFORM_SQLITE);
+		$db->expects($this->never())->method('executeStatement');
+		$this->expectException(\UnexpectedValueException::class);
+		$this->expectExceptionMessage('Missing SQLite table prefix');
+		(new Version001003003Date20261118000000($db))->preSchemaChange(
+			$this->createMock(IOutput::class),
+			static fn (): ISchemaWrapper => $schema,
+			[]
+		);
+	}
+
+	public function testSqliteUpgradeRejectsAnIncompatibleExistingForeignKey(): void {
+		$setlists = new Table('oc_osm_setlists');
+		$setlists->addColumn('default_template_id', 'string', ['notnull' => false, 'length' => 64]);
+		$setlists->addForeignKeyConstraint(
+			'oc_wrong_templates', ['default_template_id'], ['id'], ['onDelete' => 'SET NULL'], 'fk_wrong_templates'
+		);
+		$schema = $this->createMock(ISchemaWrapper::class);
+		$schema->method('getTable')->with('osm_setlists')->willReturn($this->schemaTable($setlists));
+		$db = $this->createMock(IDBConnection::class);
+		$db->method('getDatabaseProvider')->willReturn(IDBConnection::PLATFORM_SQLITE);
+		$db->expects($this->never())->method('executeStatement');
+		$this->expectException(\UnexpectedValueException::class);
+		$this->expectExceptionMessage('Incompatible foreign key');
+		(new Version001003003Date20261118000000($db))->preSchemaChange(
+			$this->createMock(IOutput::class),
+			static fn (): ISchemaWrapper => $schema,
+			['tablePrefix' => 'oc_']
+		);
+	}
+
+	public function testMigrationIgnoresForeignKeyOnAnUnrelatedColumn(): void {
+		$templateTable = new Table('oc_osm_setlist_templates');
+		$templateTable->addColumn('id', 'string', ['length' => 64]);
+		$templateTable->addColumn('name', 'string', ['length' => 160]);
+		$templateTable->setPrimaryKey(['id']);
+		$setlists = new Table('oc_osm_setlists');
+		$setlists->addColumn('id', 'bigint');
+		$setlists->addColumn('default_template_id', 'string', ['notnull' => false, 'length' => 64]);
+		$setlists->addForeignKeyConstraint('oc_other', ['id'], ['id'], ['onDelete' => 'CASCADE'], 'fk_unrelated');
+		$schema = $this->createMock(ISchemaWrapper::class);
+		$schema->method('hasTable')->willReturn(true);
+		$schema->method('getTable')->willReturnCallback(
+			fn (string $name): object => match ($name) {
+				'osm_setlists' => $this->schemaTable($setlists),
+				'osm_setlist_templates' => $this->schemaTable($templateTable),
+			}
+		);
+		$migration = new Version001003003Date20261118000000($this->createMock(IDBConnection::class));
+		$this->assertSame($schema, $migration->changeSchema(
+			$this->createMock(IOutput::class),
+			static fn (): ISchemaWrapper => $schema,
+			[]
+		));
+		$this->assertCount(2, $setlists->getForeignKeys());
+	}
+
+	public function testForeignKeyGuardRejectsMissingReferencedTableName(): void {
+		$migration = new Version001003003Date20261118000000($this->createMock(IDBConnection::class));
+		$method = new \ReflectionMethod($migration, 'hasDefaultTemplateForeignKey');
+		$this->expectException(\UnexpectedValueException::class);
+		$this->expectExceptionMessage('Missing foreign template table name');
+		$method->invoke($migration, $this->createMock(ISchemaWrapper::class), '');
+	}
+
+	public function testTableNameGuardRejectsInvalidName(): void {
+		$migration = new Version001003003Date20261118000000($this->createMock(IDBConnection::class));
+		$method = new \ReflectionMethod($migration, 'validatedTableName');
+		$this->expectException(\UnexpectedValueException::class);
+		$this->expectExceptionMessage('Missing foreign template table name');
+		$method->invoke($migration, null);
+	}
+
+	public function testSchemaTableGuardRejectsNonObject(): void {
+		$migration = new Version001003003Date20261118000000($this->createMock(IDBConnection::class));
+		$method = new \ReflectionMethod($migration, 'requireSchemaTableObject');
+		$this->expectException(\UnexpectedValueException::class);
+		$this->expectExceptionMessage('Unsupported setlist schema table representation');
+		$method->invoke($migration, null);
+	}
+
+	public function testRejectsWrappedTableWithoutForeignKeyAccess(): void {
+		if (!interface_exists(\OCP\DB\Schema\ITable::class)) {
+			$this->markTestSkipped('Nextcloud 35 schema wrapper only');
+		}
+		$builder = $this->getMockBuilder(\OCP\DB\Schema\ITable::class);
+		if (!method_exists(\OCP\DB\Schema\ITable::class, 'getWrappedTable')) {
+			$builder->addMethods(['getWrappedTable']);
+		}
+		$wrappedTable = $builder->getMock();
+		$wrappedTable->method('getWrappedTable')->willReturn(new \stdClass());
+		$schema = $this->createMock(ISchemaWrapper::class);
+		$schema->method('getTable')->with('osm_setlists')->willReturn($wrappedTable);
+		$migration = new Version001003003Date20261118000000($this->createMock(IDBConnection::class));
+		$method = new \ReflectionMethod($migration, 'hasDefaultTemplateForeignKey');
+		$this->expectException(\UnexpectedValueException::class);
+		$this->expectExceptionMessage('Unsupported setlist schema table representation');
+		$method->invoke($migration, $schema, 'oc_osm_setlist_templates');
+	}
+
+	public function testRejectsMalformedSchemaWrapper(): void {
+		if (interface_exists(\OCP\DB\Schema\ITable::class)) {
+			$this->markTestSkipped('Malformed DBAL wrapper fixture for NC34');
+		}
+
+		$templates = new Table('oc_osm_setlist_templates');
+		$templates->addColumn('id', 'string', ['length' => 64]);
+		$templates->addColumn('name', 'string', ['length' => 160]);
+		$templates->setPrimaryKey(['id']);
+
+		// Mimic a schema wrapper returning an unsupported object.
+		$setlists = new class('oc_osm_setlists') extends Table {
+			public function getWrappedTable(): object {
+				return new \stdClass();
+			}
+		};
+		$setlists->addColumn('default_template_id', 'string', ['length' => 64, 'notnull' => false]);
+		$setlists->addIndex(['default_template_id'], 'idx_osm_sl_template');
+
+		$schema = $this->createMock(ISchemaWrapper::class);
+		$schema->method('hasTable')->willReturn(true);
+		$schema->method('getTable')->willReturnCallback(
+			static fn (string $name): Table => match ($name) {
+				'osm_setlists' => $setlists,
+				'osm_setlist_templates' => $templates,
+			}
+		);
+
+		$this->expectException(\UnexpectedValueException::class);
+		$this->expectExceptionMessage('Unsupported setlist schema table representation');
+
+		(new Version001003003Date20261118000000(
+			$this->createMock(IDBConnection::class)
+		))->changeSchema(
+			$this->createMock(IOutput::class),
+			static fn (): ISchemaWrapper => $schema,
+			[]
+		);
+	}
 }

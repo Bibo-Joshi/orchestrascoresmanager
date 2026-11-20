@@ -50,6 +50,25 @@ final class SetlistTemplateValidatorTest extends TestCase {
 	}
 
 	public static function invalidTemplates(): iterable {
+
+		yield 'blank name' => [static function (array &$i): void {
+			$i['name'] = '   ';
+		}];
+		yield 'non-string description' => [static function (array &$i): void {
+			$i['description'] = ['invalid'];
+		}];
+		yield 'rule is not an object' => [static function (array &$i): void {
+			$i['rules'][0] = 'not-an-object';
+		}];
+		yield 'invalid rule label' => [static function (array &$i): void {
+			$i['rules'][0]['label'] = 3;
+		}];
+		yield 'bad rule cell padding' => [static function (array &$i): void {
+			$i['rules'][0]['cellPadding'] = 25;
+		}];
+		yield 'oversized config JSON' => [static function (array &$i): void {
+			$i['rules'][0]['expression'] = ['data' => str_repeat('x', 60000)];
+		}];
 		yield 'missing font sizes' => [static function (array &$i): void {
 			unset($i['fontSizes']);
 		}];

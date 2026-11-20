@@ -119,4 +119,24 @@ final class SetlistTemplateServiceTest extends TestCase {
 		$this->expectException(\InvalidArgumentException::class);
 		$this->service->deleteTemplate('unknown');
 	}
+
+	public function testCreateRejectsMissingAuthenticatedUser(): void {
+		$this->session->method('getUser')->willReturn(null);
+		$this->authorization->expects($this->once())
+			->method('authorizePolicy')->with($this->policy, PolicyInterface::ACTION_CREATE);
+		$this->mapper->expects($this->never())->method('create');
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage('User not authenticated');
+		$this->service->createTemplate(self::validInput());
+	}
+
+	public function testPatchRejectsMalformedStoredFontSizes(): void {
+		$stored = ['id' => 'stage', ...self::validInput()];
+		$stored['fontSizes'] = 'not-an-object';
+		$this->mapper->method('find')->with('stage')->willReturn($stored);
+		$this->mapper->expects($this->never())->method('update');
+		$this->expectException(\UnexpectedValueException::class);
+		$this->expectExceptionMessage('Stored template fontSizes are invalid');
+		$this->service->patchTemplate('stage', ['fontSizes' => ['title' => 20]]);
+	}
 }
