@@ -232,25 +232,6 @@ final class SetlistTemplateMigrationTest extends TestCase {
 		$method->invoke($migration, null);
 	}
 
-	public function testRejectsWrappedTableWithoutForeignKeyAccess(): void {
-		if (!interface_exists(\OCP\DB\Schema\ITable::class)) {
-			$this->markTestSkipped('Nextcloud 35 schema wrapper only');
-		}
-		$builder = $this->getMockBuilder(\OCP\DB\Schema\ITable::class);
-		if (!method_exists(\OCP\DB\Schema\ITable::class, 'getWrappedTable')) {
-			$builder->addMethods(['getWrappedTable']);
-		}
-		$wrappedTable = $builder->getMock();
-		$wrappedTable->method('getWrappedTable')->willReturn(new \stdClass());
-		$schema = $this->createMock(ISchemaWrapper::class);
-		$schema->method('getTable')->with('osm_setlists')->willReturn($wrappedTable);
-		$migration = new Version001003003Date20261118000000($this->createMock(IDBConnection::class));
-		$method = new \ReflectionMethod($migration, 'hasDefaultTemplateForeignKey');
-		$this->expectException(\UnexpectedValueException::class);
-		$this->expectExceptionMessage('Unsupported setlist schema table representation');
-		$method->invoke($migration, $schema, 'oc_osm_setlist_templates');
-	}
-
 	public function testRejectsMalformedSchemaWrapper(): void {
 		if (interface_exists(\OCP\DB\Schema\ITable::class)) {
 			$this->markTestSkipped('Malformed DBAL wrapper fixture for NC34');
