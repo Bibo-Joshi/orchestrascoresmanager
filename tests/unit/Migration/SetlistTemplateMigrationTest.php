@@ -16,10 +16,20 @@ use PHPUnit\Framework\TestCase;
  * The resulting DDL still needs to be tested on a disposable installation.
  */
 final class SetlistTemplateMigrationTest extends TestCase {
+	/**
+	 * NC34 returns DBAL tables; NC35 returns OCP ITable wrappers.
+	 * Keep assertions on the underlying DBAL Table in both cases.
+	 */
+	private function schemaTable(Table $table): object {
+		if (interface_exists(\OCP\DB\Schema\ITable::class)) {
+			return new \OC\DB\Schema\Table($table);
+		}
+		return $table;
+	}
 	public function testSqliteUpgradeAddsInlineReference(): void {
 		$setlists = new Table('custom_osm_setlists');
 		$schema = $this->createMock(ISchemaWrapper::class);
-		$schema->method('getTable')->with('osm_setlists')->willReturn($setlists);
+		$schema->method('getTable')->with('osm_setlists')->willReturn($this->schemaTable($setlists));
 		$db = $this->createMock(IDBConnection::class);
 		$db->method('getDatabaseProvider')->willReturn(IDBConnection::PLATFORM_SQLITE);
 		$statements = [
@@ -45,7 +55,7 @@ final class SetlistTemplateMigrationTest extends TestCase {
 		$setlists = new Table('oc_osm_setlists');
 		$setlists->addColumn('default_template_id', 'string', ['notnull' => false, 'length' => 64]);
 		$schema = $this->createMock(ISchemaWrapper::class);
-		$schema->method('getTable')->with('osm_setlists')->willReturn($setlists);
+		$schema->method('getTable')->with('osm_setlists')->willReturn($this->schemaTable($setlists));
 		$db = $this->createMock(IDBConnection::class);
 		$db->method('getDatabaseProvider')->willReturn(IDBConnection::PLATFORM_SQLITE);
 		$db->expects($this->never())->method('executeStatement');
@@ -69,11 +79,11 @@ final class SetlistTemplateMigrationTest extends TestCase {
 			static fn (string $name): bool => $name === 'osm_setlists'
 		);
 		$schema->expects($this->once())->method('createTable')
-			->with('osm_setlist_templates')->willReturn($templateTable);
+			->with('osm_setlist_templates')->willReturn($this->schemaTable($templateTable));
 		$schema->method('getTable')->willReturnCallback(
-			static fn (string $name): Table => match ($name) {
-				'osm_setlists' => $setlistTable,
-				'osm_setlist_templates' => $templateTable,
+			fn (string $name): object => match ($name) {
+				'osm_setlists' => $this->schemaTable($setlistTable),
+				'osm_setlist_templates' => $this->schemaTable($templateTable),
 			}
 		);
 
@@ -108,8 +118,8 @@ final class SetlistTemplateMigrationTest extends TestCase {
 		$schema->method('hasTable')->willReturn(true);
 		$schema->expects($this->never())->method('createTable');
 		$schema->method('getTable')->willReturnMap([
-			['osm_setlists', $setlistTable],
-			['osm_setlist_templates', $templateTable],
+			['osm_setlists', $this->schemaTable($setlistTable)],
+			['osm_setlist_templates', $this->schemaTable($templateTable)],
 		]);
 
 		$migration = new Version001003003Date20261118000000($this->createMock(IDBConnection::class));

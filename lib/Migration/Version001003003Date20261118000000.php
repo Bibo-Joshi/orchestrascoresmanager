@@ -6,7 +6,6 @@ namespace OCA\OrchestraScoresManager\Migration;
 
 use Closure;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
-use Doctrine\DBAL\Schema\Table as DbalTable;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\Types;
 use OCP\IDBConnection;
@@ -86,13 +85,16 @@ class Version001003003Date20261118000000 extends SimpleMigrationStep {
 			$setlists->addIndex(['default_template_id'], 'idx_osm_sl_template');
 		}
 
-		/** @var string $templateTable */
+		/** @var non-empty-string $templateTable */
 		$templateTable = $templates->getName();
 		if ($this->hasDefaultTemplateForeignKey($schema, $templateTable)) {
 			return $schema;
 		}
-		// NC34 expects a table name; NC35 accepts its ITable wrapper.
-		$foreignTable = $templates instanceof DbalTable ? $templateTable : $templates;
+		// NC34 takes a table name, NC35 takes its ITable wrapper.
+		$foreignTable = $templateTable;
+		if (method_exists($templates, 'getWrappedTable')) {
+			$foreignTable = $templates;
+		}
 		$setlists->addForeignKeyConstraint(
 			$foreignTable,
 			['default_template_id'],
@@ -103,15 +105,23 @@ class Version001003003Date20261118000000 extends SimpleMigrationStep {
 
 		return $schema;
 	}
+	/**
+	 * NC35 hides the FK columns in IForeignKeyConstraint, so the wrapped
+	 * Doctrine table must be inspected for a complete compatibility check.
+	 *
+	 * @psalm-suppress MixedAssignment
+	 * @psalm-suppress MixedMethodCall
+	 */
 	private function hasDefaultTemplateForeignKey(ISchemaWrapper $schema, string $templateTable): bool {
+		if ($templateTable === '') {
+			throw new \UnexpectedValueException('Missing foreign template table name');
+		}
 		$setlists = $schema->getTable('osm_setlists');
-		// Nextcloud 35 wraps Doctrine tables and exposes only constraint names
-		// through IForeignKeyConstraint. Inspect the wrapped DBAL table so
-		// partial/corrupt schemas are still rejected on both NC 34 and 35.
+		// NC34 returns a DBAL table directly; NC35 returns a wrapper.
 		if (method_exists($setlists, 'getWrappedTable')) {
 			$setlists = $setlists->getWrappedTable();
 		}
-		if (!$setlists instanceof DbalTable) {
+		if (!method_exists($setlists, 'getForeignKeys')) {
 			throw new \UnexpectedValueException('Unsupported setlist schema table representation');
 		}
 		/** @var ForeignKeyConstraint $foreignKey */
