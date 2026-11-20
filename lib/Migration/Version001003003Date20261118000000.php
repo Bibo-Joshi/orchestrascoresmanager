@@ -111,12 +111,13 @@ class Version001003003Date20261118000000 extends SimpleMigrationStep {
 		if ($templateTable === '') {
 			throw new \UnexpectedValueException('Missing foreign template table name');
 		}
-		$setlists = $schema->getTable('osm_setlists');
-		// NC34 returns a DBAL table directly; NC35 returns a wrapper.
-		if (is_object($setlists) && method_exists($setlists, 'getWrappedTable')) {
-			$setlists = $setlists->getWrappedTable();
+		// NC34 provides a DBAL table; NC35 wraps it in an OCP table.
+		// Normalize the value to an object at the API boundary.
+		$setlists = $this->requireSchemaTableObject($schema->getTable('osm_setlists'));
+		if (method_exists($setlists, 'getWrappedTable')) {
+			$setlists = $this->requireSchemaTableObject($setlists->getWrappedTable());
 		}
-		if (!is_object($setlists) || !method_exists($setlists, 'getForeignKeys')) {
+		if (!method_exists($setlists, 'getForeignKeys')) {
 			throw new \UnexpectedValueException('Unsupported setlist schema table representation');
 		}
 		/** @var ForeignKeyConstraint $foreignKey */
@@ -136,11 +137,23 @@ class Version001003003Date20261118000000 extends SimpleMigrationStep {
 		return false;
 	}
 
-	/** @return non-empty-string */
-	private function validatedTableName(string $name): string {
-		if ($name === '') {
+	/**
+	 * NC34 does not reliably expose the getName() return type to Psalm.
+	 * Validate it here instead of relying on version-specific annotations.
+	 *
+	 * @return non-empty-string
+	 */
+	private function validatedTableName(mixed $name): string {
+		if (!is_string($name) || $name === '') {
 			throw new \UnexpectedValueException('Missing foreign template table name');
 		}
 		return $name;
+	}
+
+	private function requireSchemaTableObject(mixed $value): object {
+		if (!is_object($value)) {
+			throw new \UnexpectedValueException('Unsupported setlist schema table representation');
+		}
+		return $value;
 	}
 }
