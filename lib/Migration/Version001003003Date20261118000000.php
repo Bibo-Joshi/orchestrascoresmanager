@@ -6,6 +6,7 @@ namespace OCA\OrchestraScoresManager\Migration;
 
 use Closure;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
+use Doctrine\DBAL\Schema\Table as DbalTable;
 use OCP\DB\ISchemaWrapper;
 use OCP\DB\Types;
 use OCP\IDBConnection;
@@ -90,8 +91,10 @@ class Version001003003Date20261118000000 extends SimpleMigrationStep {
 		if ($this->hasDefaultTemplateForeignKey($schema, $templateTable)) {
 			return $schema;
 		}
+		// NC34 expects a table name; NC35 accepts its ITable wrapper.
+		$foreignTable = $templates instanceof DbalTable ? $templateTable : $templates;
 		$setlists->addForeignKeyConstraint(
-			$templateTable,
+			$foreignTable,
 			['default_template_id'],
 			['id'],
 			['onDelete' => 'SET NULL'],
@@ -102,6 +105,15 @@ class Version001003003Date20261118000000 extends SimpleMigrationStep {
 	}
 	private function hasDefaultTemplateForeignKey(ISchemaWrapper $schema, string $templateTable): bool {
 		$setlists = $schema->getTable('osm_setlists');
+		// Nextcloud 35 wraps Doctrine tables and exposes only constraint names
+		// through IForeignKeyConstraint. Inspect the wrapped DBAL table so
+		// partial/corrupt schemas are still rejected on both NC 34 and 35.
+		if (method_exists($setlists, 'getWrappedTable')) {
+			$setlists = $setlists->getWrappedTable();
+		}
+		if (!$setlists instanceof DbalTable) {
+			throw new \UnexpectedValueException('Unsupported setlist schema table representation');
+		}
 		/** @var ForeignKeyConstraint $foreignKey */
 		foreach ($setlists->getForeignKeys() as $foreignKey) {
 			$columns = $foreignKey->getLocalColumns();
