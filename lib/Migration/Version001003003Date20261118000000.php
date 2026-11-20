@@ -85,18 +85,13 @@ class Version001003003Date20261118000000 extends SimpleMigrationStep {
 			$setlists->addIndex(['default_template_id'], 'idx_osm_sl_template');
 		}
 
-		/** @var non-empty-string $templateTable */
-		$templateTable = $templates->getName();
+		$templateTable = $this->validatedTableName($templates->getName());
 		if ($this->hasDefaultTemplateForeignKey($schema, $templateTable)) {
 			return $schema;
 		}
-		// NC34 takes a table name, NC35 takes its ITable wrapper.
-		$foreignTable = $templateTable;
-		if (method_exists($templates, 'getWrappedTable')) {
-			$foreignTable = $templates;
-		}
+		// A validated, prefixed name is accepted by NC34 and NC35.
 		$setlists->addForeignKeyConstraint(
-			$foreignTable,
+			$templateTable,
 			['default_template_id'],
 			['id'],
 			['onDelete' => 'SET NULL'],
@@ -118,10 +113,10 @@ class Version001003003Date20261118000000 extends SimpleMigrationStep {
 		}
 		$setlists = $schema->getTable('osm_setlists');
 		// NC34 returns a DBAL table directly; NC35 returns a wrapper.
-		if (method_exists($setlists, 'getWrappedTable')) {
+		if (is_object($setlists) && method_exists($setlists, 'getWrappedTable')) {
 			$setlists = $setlists->getWrappedTable();
 		}
-		if (!method_exists($setlists, 'getForeignKeys')) {
+		if (!is_object($setlists) || !method_exists($setlists, 'getForeignKeys')) {
 			throw new \UnexpectedValueException('Unsupported setlist schema table representation');
 		}
 		/** @var ForeignKeyConstraint $foreignKey */
@@ -139,5 +134,13 @@ class Version001003003Date20261118000000 extends SimpleMigrationStep {
 			return true;
 		}
 		return false;
+	}
+
+	/** @return non-empty-string */
+	private function validatedTableName(string $name): string {
+		if ($name === '') {
+			throw new \UnexpectedValueException('Missing foreign template table name');
+		}
+		return $name;
 	}
 }
