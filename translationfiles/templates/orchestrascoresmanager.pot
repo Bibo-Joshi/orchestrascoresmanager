@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-11-04 21:06+0000\n"
+"POT-Creation-Date: 2026-11-20 06:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -296,6 +296,9 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
+msgid "PDF templates"
+msgstr ""
+
 msgid "Score book assignment updated"
 msgstr ""
 
@@ -374,6 +377,157 @@ msgstr ""
 msgid "No folder collections yet"
 msgstr ""
 
+msgid "Could not load shared PDF templates."
+msgstr ""
+
+msgid "Please enter a template name."
+msgstr ""
+
+msgid "Please check the font sizes and spacing values."
+msgstr ""
+
+msgid "Each tag rule must have the required tag names."
+msgstr ""
+
+msgid "Invalid rule cell padding."
+msgstr ""
+
+msgid "Could not save PDF template."
+msgstr ""
+
+msgid ""
+"Delete template \"{name}\"? Setlists using it will revert to the standard "
+"template."
+msgstr ""
+
+msgid "Could not delete PDF template."
+msgstr ""
+
+msgid ""
+"Shared templates for PDF setlist exports. The built-in standard template is "
+"always available."
+msgstr ""
+
+msgid "Loading templates…"
+msgstr ""
+
+msgid "No shared templates have been created yet."
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "New template"
+msgstr ""
+
+msgid "Edit PDF template"
+msgstr ""
+
+msgid "New PDF template"
+msgstr ""
+
+msgid "Template name"
+msgstr ""
+
+msgid "Description (optional)"
+msgstr ""
+
+msgid "Font sizes (pt)"
+msgstr ""
+
+msgid "Subtitle"
+msgstr ""
+
+msgid "Color legend"
+msgstr ""
+
+msgid "Column header"
+msgstr ""
+
+msgid "Score row"
+msgstr ""
+
+msgid "Break row"
+msgstr ""
+
+msgid "Spacing (mm)"
+msgstr ""
+
+msgid "Page margin"
+msgstr ""
+
+msgid "Default cell padding"
+msgstr ""
+
+msgid "Row formatting rules"
+msgstr ""
+
+msgid "Rules are evaluated from top to bottom. The first matching rule wins."
+msgstr ""
+
+msgid "Rule"
+msgstr ""
+
+msgid "Move rule up"
+msgstr ""
+
+msgid "Move rule down"
+msgstr ""
+
+msgid "Delete rule"
+msgstr ""
+
+msgid "Legend label (optional)"
+msgstr ""
+
+msgid "Match rows"
+msgstr ""
+
+msgid "Score tags"
+msgstr ""
+
+msgid "Break rows"
+msgstr ""
+
+msgid "Advanced condition (preserved)"
+msgstr ""
+
+msgid "Tag"
+msgstr ""
+
+msgid "First tag"
+msgstr ""
+
+msgid "Combine"
+msgstr ""
+
+msgid "Single tag"
+msgstr ""
+
+msgid "Second tag"
+msgstr ""
+
+msgid "This condition cannot be edited here; it will be kept unchanged."
+msgstr ""
+
+msgid "Background color"
+msgstr ""
+
+msgid "Cell padding override (mm, optional)"
+msgstr ""
+
+msgid "Default"
+msgstr ""
+
+msgid "Add rule"
+msgstr ""
+
+msgid "Saving…"
+msgstr ""
+
 msgid "Operation failed: "
 msgstr ""
 
@@ -399,9 +553,6 @@ msgid "Failed to delete score: "
 msgstr ""
 
 msgid "Details"
-msgstr ""
-
-msgid "Delete"
 msgstr ""
 
 msgid "Comments"
@@ -878,10 +1029,24 @@ msgstr ""
 msgid "Break Duration (HH:MM:SS)"
 msgstr ""
 
+msgid "Failed to load PDF templates"
+msgstr ""
+
+msgid ""
+"PDF template “{name}” could not be applied. Using the built-in standard "
+"template."
+msgstr ""
+
 msgid "Export failed: "
 msgstr ""
 
 msgid "Export PDF"
+msgstr ""
+
+msgid "PDF template"
+msgstr ""
+
+msgid "Standard template (built-in)"
 msgstr ""
 
 msgid "Select and reorder the columns to include in the PDF export."
@@ -950,13 +1115,13 @@ msgstr ""
 msgid "e.g., 90 or 1:30"
 msgstr ""
 
+msgid "Default PDF template"
+msgstr ""
+
 msgid "Is Draft"
 msgstr ""
 
 msgid "Is Published"
-msgstr ""
-
-msgid "Saving…"
 msgstr ""
 
 msgid "Saved"
@@ -1091,6 +1256,9 @@ msgstr ""
 msgid "h"
 msgstr ""
 
+msgid "Overall Duration"
+msgstr ""
+
 msgid "Info"
 msgstr ""
 
@@ -1101,9 +1269,6 @@ msgid "Playtime"
 msgstr ""
 
 msgid "Moderation & Breaks"
-msgstr ""
-
-msgid "Overall Duration"
 msgstr ""
 
 msgid "Invalid duration format"

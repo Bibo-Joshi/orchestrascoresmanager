@@ -193,6 +193,7 @@ export interface Setlist {
   defaultModerationDuration: number | null;
   /** @format int64 */
   folderCollectionVersionId: number | null;
+  defaultTemplateId: string | null;
   isDraft: boolean;
   isPublished: boolean;
 }
@@ -220,6 +221,43 @@ export interface SetlistPage {
     /** @format int64 */
     total: number;
   };
+}
+
+export interface SetlistTemplate {
+  id: string;
+  name: string;
+  description: string | null;
+  fontSizes: {
+    /** @format double */
+    title?: number;
+    /** @format double */
+    subtitle?: number;
+    /** @format double */
+    colorLegend?: number;
+    /** @format double */
+    columnTitle?: number;
+    /** @format double */
+    scoreRow?: number;
+    /** @format double */
+    breakRow?: number;
+  };
+  /** @format double */
+  margin: number;
+  /** @format double */
+  cellPadding: number;
+  rules: {
+    id: string;
+    /** @format int64 */
+    order: number;
+    label?: string | null;
+    expression: Record<string, object>;
+    backgroundColor?: string | null;
+    /** @format double */
+    cellPadding?: number | null;
+  }[];
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Tag {
@@ -972,6 +1010,11 @@ export interface SetlistApiPostSetlistPayload {
    */
   folderCollectionVersionId?: number | null;
   /**
+   * Optional shared PDF template ID
+   * @default null
+   */
+  defaultTemplateId?: string | null;
+  /**
    * Whether the setlist is a draft
    * @default false
    */
@@ -1031,6 +1074,11 @@ export interface SetlistApiPatchSetlistPayload {
    * @default null
    */
   folderCollectionVersionId?: number | null;
+  /**
+   * Optional shared PDF template ID
+   * @default null
+   */
+  defaultTemplateId?: string | null;
   /**
    * Whether the setlist is a draft
    * @default null
@@ -1188,6 +1236,44 @@ export interface SetlistEntryApiPostSetlistEntriesBatchData {
   ocs: {
     meta: OCSMeta;
     data: SetlistEntry[];
+  };
+}
+
+export interface SetlistTemplateApiGetTemplatesData {
+  ocs: {
+    meta: OCSMeta;
+    data: SetlistTemplate[];
+  };
+}
+
+export interface SetlistTemplateApiPostTemplatePayload {
+  /** Template fields excluding generated ID and timestamps */
+  template: Record<string, object>;
+}
+
+export interface SetlistTemplateApiPostTemplateData {
+  ocs: {
+    meta: OCSMeta;
+    data: SetlistTemplate;
+  };
+}
+
+export interface SetlistTemplateApiPatchTemplatePayload {
+  /** Partial template fields */
+  template: Record<string, object>;
+}
+
+export interface SetlistTemplateApiPatchTemplateData {
+  ocs: {
+    meta: OCSMeta;
+    data: SetlistTemplate;
+  };
+}
+
+export interface SetlistTemplateApiDeleteTemplateData {
+  ocs: {
+    meta: OCSMeta;
+    data: object;
   };
 }
 

@@ -84,6 +84,12 @@ import {
   SetlistEntryApiPatchSetlistEntryPayload,
   SetlistEntryApiPostSetlistEntriesBatchData,
   SetlistEntryApiPostSetlistEntriesBatchPayload,
+  SetlistTemplateApiDeleteTemplateData,
+  SetlistTemplateApiGetTemplatesData,
+  SetlistTemplateApiPatchTemplateData,
+  SetlistTemplateApiPatchTemplatePayload,
+  SetlistTemplateApiPostTemplateData,
+  SetlistTemplateApiPostTemplatePayload,
   TagApiGetTagsData,
   TagApiPostTagData,
   TagApiPostTagPayload,
@@ -1607,6 +1613,117 @@ export class Ocs<
       body: data,
       secure: true,
       type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags setlist_template_api
+   * @name SetlistTemplateApiGetTemplates
+   * @summary List shared PDF templates
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/setlist-templates
+   * @secure
+   */
+  setlistTemplateApiGetTemplates = (params: RequestParams = {}) =>
+    this.request<
+      SetlistTemplateApiGetTemplatesData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/setlist-templates`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags setlist_template_api
+   * @name SetlistTemplateApiPostTemplate
+   * @summary Create a shared PDF template
+   * @request POST:/ocs/v2.php/apps/orchestrascoresmanager/setlist-templates
+   * @secure
+   */
+  setlistTemplateApiPostTemplate = (
+    data: SetlistTemplateApiPostTemplatePayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      SetlistTemplateApiPostTemplateData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/setlist-templates`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags setlist_template_api
+   * @name SetlistTemplateApiPatchTemplate
+   * @summary Update a shared PDF template
+   * @request PATCH:/ocs/v2.php/apps/orchestrascoresmanager/setlist-templates/{id}
+   * @secure
+   */
+  setlistTemplateApiPatchTemplate = (
+    id: string,
+    data: SetlistTemplateApiPatchTemplatePayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      SetlistTemplateApiPatchTemplateData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/setlist-templates/${id}`,
+      method: "PATCH",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags setlist_template_api
+   * @name SetlistTemplateApiDeleteTemplate
+   * @summary Delete a shared PDF template
+   * @request DELETE:/ocs/v2.php/apps/orchestrascoresmanager/setlist-templates/{id}
+   * @secure
+   */
+  setlistTemplateApiDeleteTemplate = (id: string, params: RequestParams = {}) =>
+    this.request<
+      SetlistTemplateApiDeleteTemplateData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/setlist-templates/${id}`,
+      method: "DELETE",
+      secure: true,
       format: "json",
       ...params,
     });

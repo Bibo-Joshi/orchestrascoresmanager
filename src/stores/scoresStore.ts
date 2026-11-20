@@ -145,7 +145,12 @@ export const useScoresStore = defineStore('scores', () => {
 	 * @throws { Error } if API call fails
 	 */
 	async function updateScoreTags(id: number, tagIds: number[]): Promise<void> {
-		await apiClients.default.scoreApiPatchScore(id, { tagIds })
+		const response = await apiClients.default.scoreApiPatchScore(id, { tagIds })
+		const updated = response.data.ocs.data
+		const index = scores.value.findIndex((s) => s.id === id)
+		if (index !== -1) {
+			scores.value[index] = { ...scores.value[index], tags: updated.tags }
+		}
 	}
 
 	/**
