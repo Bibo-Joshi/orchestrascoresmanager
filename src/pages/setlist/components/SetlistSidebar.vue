@@ -38,11 +38,10 @@
 
 				<NcTextArea
 					id="description"
-					:modelValue="formData.description ?? ''"
+					v-model="formData.description"
 					:disabled="!editable"
 					:label="t('Description')"
-					:placeholder="t('Enter description')"
-					@update:modelValue="formData.description = $event" />
+					:placeholder="t('Enter description')" />
 
 				<NcSelect
 					v-model="selectedFolderCollectionVersion"
