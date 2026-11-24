@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-11-20 06:49+0000\n"
+"POT-Creation-Date: 2026-11-24 19:08+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -296,7 +296,7 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-msgid "PDF templates"
+msgid "Setlist PDF-Export Templates"
 msgstr ""
 
 msgid "Score book assignment updated"
@@ -377,7 +377,28 @@ msgstr ""
 msgid "No folder collections yet"
 msgstr ""
 
+msgid "Score tags"
+msgstr ""
+
+msgid "Break rows"
+msgstr ""
+
+msgid "Single tag"
+msgstr ""
+
 msgid "Could not load shared PDF templates."
+msgstr ""
+
+msgid "Full"
+msgstr ""
+
+msgid "Compact"
+msgstr ""
+
+msgid "Custom"
+msgstr ""
+
+msgid "Could not read PDF template rules."
 msgstr ""
 
 msgid "Please enter a template name."
@@ -435,6 +456,9 @@ msgstr ""
 msgid "Description (optional)"
 msgstr ""
 
+msgid "Header layout"
+msgstr ""
+
 msgid "Font sizes (pt)"
 msgstr ""
 
@@ -486,15 +510,6 @@ msgstr ""
 msgid "Match rows"
 msgstr ""
 
-msgid "Score tags"
-msgstr ""
-
-msgid "Break rows"
-msgstr ""
-
-msgid "Advanced condition (preserved)"
-msgstr ""
-
 msgid "Tag"
 msgstr ""
 
@@ -504,13 +519,7 @@ msgstr ""
 msgid "Combine"
 msgstr ""
 
-msgid "Single tag"
-msgstr ""
-
 msgid "Second tag"
-msgstr ""
-
-msgid "This condition cannot be edited here; it will be kept unchanged."
 msgstr ""
 
 msgid "Background color"
@@ -1032,11 +1041,6 @@ msgstr ""
 msgid "Failed to load PDF templates"
 msgstr ""
 
-msgid ""
-"PDF template “{name}” could not be applied. Using the built-in standard "
-"template."
-msgstr ""
-
 msgid "Export failed: "
 msgstr ""
 
@@ -1256,12 +1260,6 @@ msgstr ""
 msgid "h"
 msgstr ""
 
-msgid "Overall Duration"
-msgstr ""
-
-msgid "Info"
-msgstr ""
-
 msgid "Date"
 msgstr ""
 
@@ -1269,6 +1267,12 @@ msgid "Playtime"
 msgstr ""
 
 msgid "Moderation & Breaks"
+msgstr ""
+
+msgid "Overall Duration"
+msgstr ""
+
+msgid "Info"
 msgstr ""
 
 msgid "Invalid duration format"

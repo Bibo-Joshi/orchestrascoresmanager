@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-11-20 06:49+0000\n"
+"POT-Creation-Date: 2026-11-24 19:08+0100\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -265,7 +265,7 @@ msgid "Allowed Groups"
 msgstr "Erlaubte Gruppen"
 
 msgid "Select groups…"
-msgstr ""
+msgstr "Gruppen auswählen…"
 
 msgid "Invalid default moderation time format. Use (HH:)MM:SS"
 msgstr "Ungültiges Format für Standard-Moderationszeit. Verwenden Sie (HH:)MM:SS"
@@ -292,13 +292,13 @@ msgid "Select folder collection"
 msgstr "Ordnersammlung auswählen"
 
 msgid "Saving …"
-msgstr ""
+msgstr "Wird gespeichert …"
 
 msgid "Save"
 msgstr "Speichern"
 
-msgid "PDF templates"
-msgstr ""
+msgid "Setlist PDF-Export Templates"
+msgstr "PDF-Exportvorlagen für Setlisten"
 
 msgid "Score book assignment updated"
 msgstr "Notenbuch-Zuweisung aktualisiert"
@@ -343,7 +343,7 @@ msgid "Confirm"
 msgstr "Bestätigen"
 
 msgid "Loading…"
-msgstr ""
+msgstr "Wird geladen…"
 
 msgid "An error occurred"
 msgstr "Ein Fehler ist aufgetreten"
@@ -364,13 +364,13 @@ msgid "Not in any folder collection"
 msgstr "In keiner Ordnersammlung"
 
 msgid "Actions"
-msgstr ""
+msgstr "Aktionen"
 
 msgid "Search Score or Score details"
 msgstr "Partiturtitel und -details durchsuchen"
 
 msgid "Search"
-msgstr ""
+msgstr "Suchen"
 
 msgid "Main app navigation"
 msgstr "Haupt App-Navigation"
@@ -378,95 +378,119 @@ msgstr "Haupt App-Navigation"
 msgid "No folder collections yet"
 msgstr "Noch keine Ordnersammlungen"
 
+msgid "Score tags"
+msgstr "Schlagwörter der Partitur"
+
+msgid "Break rows"
+msgstr "Pausenzeilen"
+
+msgid "Single tag"
+msgstr "Einzelnes Schlagwort"
+
 msgid "Could not load shared PDF templates."
-msgstr ""
+msgstr "Gemeinsame PDF-Vorlagen konnten nicht geladen werden."
+
+msgid "Full"
+msgstr "Vollständig"
+
+msgid "Compact"
+msgstr "Kompakt"
+
+msgid "Custom"
+msgstr "Benutzerdefiniert"
+
+msgid "Could not read PDF template rules."
+msgstr "Die Regeln der PDF-Vorlage konnten nicht gelesen werden."
 
 msgid "Please enter a template name."
-msgstr ""
+msgstr "Bitte einen Vorlagennamen eingeben."
 
 msgid "Please check the font sizes and spacing values."
-msgstr ""
+msgstr "Bitte die Schriftgrößen und Abstände überprüfen."
 
 msgid "Each tag rule must have the required tag names."
-msgstr ""
+msgstr "Für jede Schlagwortregel müssen die erforderlichen Schlagwörter angegeben werden."
 
 msgid "Invalid rule cell padding."
-msgstr ""
+msgstr "Ungültiger Zellinnenabstand der Regel."
 
 msgid "Could not save PDF template."
-msgstr ""
+msgstr "PDF-Vorlage konnte nicht gespeichert werden."
 
 msgid "Delete template \"{name}\"? Setlists using it will revert to the standard template."
-msgstr ""
+msgstr "Vorlage „{name}“ löschen? Setlisten, die diese Vorlage verwenden, werden auf die Standardvorlage zurückgesetzt."
 
 msgid "Could not delete PDF template."
-msgstr ""
+msgstr "PDF-Vorlage konnte nicht gelöscht werden."
 
 msgid "Shared templates for PDF setlist exports. The built-in standard template is always available."
-msgstr ""
+msgstr "Gemeinsame Vorlagen für den PDF-Export von Setlisten. Die integrierte Standardvorlage ist immer verfügbar."
 
 msgid "Loading templates…"
-msgstr ""
+msgstr "Vorlagen werden geladen…"
 
 msgid "No shared templates have been created yet."
-msgstr ""
+msgstr "Es wurden noch keine gemeinsamen Vorlagen erstellt."
 
 msgid "Edit"
-msgstr ""
+msgstr "Bearbeiten"
 
 msgid "Delete"
 msgstr "Löschen"
 
 msgid "New template"
-msgstr ""
+msgstr "Neue Vorlage"
 
 msgid "Edit PDF template"
-msgstr ""
+msgstr "PDF-Vorlage bearbeiten"
 
 msgid "New PDF template"
-msgstr ""
+msgstr "Neue PDF-Vorlage"
 
 msgid "Template name"
-msgstr ""
+msgstr "Vorlagenname"
 
 msgid "Description (optional)"
-msgstr ""
+msgstr "Beschreibung (optional)"
+
+msgid "Header layout"
+msgstr "Kopfbereich"
 
 msgid "Font sizes (pt)"
-msgstr ""
+msgstr "Schriftgrößen (pt)"
 
 msgid "Subtitle"
-msgstr ""
+msgstr "Untertitel"
 
 msgid "Color legend"
-msgstr ""
+msgstr "Farblegende"
 
 msgid "Column header"
-msgstr ""
+msgstr "Spaltenüberschrift"
 
 msgid "Score row"
-msgstr ""
+msgstr "Partiturzeile"
 
 msgid "Break row"
-msgstr ""
+msgstr "Pausenzeile"
 
 msgid "Spacing (mm)"
-msgstr ""
+msgstr "Abstände (mm)"
 
 msgid "Page margin"
-msgstr ""
+msgstr "Seitenrand"
 
 msgid "Default cell padding"
-msgstr ""
+msgstr "Standard-Zellinnenabstand"
 
 msgid "Row formatting rules"
-msgstr ""
+msgstr "Regeln zur Zeilenformatierung"
 
 msgid "Rules are evaluated from top to bottom. The first matching rule wins."
-msgstr ""
+msgstr "Die Regeln werden von oben nach unten ausgewertet. Die erste zutreffende Regel wird angewendet."
 
 msgid "Rule"
-msgstr ""
+msgstr "Regel"
 
 msgid "Move rule up"
 msgstr "Regel nach oben"
@@ -475,55 +499,40 @@ msgid "Move rule down"
 msgstr "Regel nach unten"
 
 msgid "Delete rule"
-msgstr ""
+msgstr "Regel löschen"
 
 msgid "Legend label (optional)"
-msgstr ""
+msgstr "Legendenbeschriftung (optional)"
 
 msgid "Match rows"
-msgstr ""
-
-msgid "Score tags"
-msgstr ""
-
-msgid "Break rows"
-msgstr ""
-
-msgid "Advanced condition (preserved)"
-msgstr ""
+msgstr "Bedingung für Zeilen"
 
 msgid "Tag"
-msgstr ""
+msgstr "Schlagwort"
 
 msgid "First tag"
-msgstr ""
+msgstr "Erstes Schlagwort"
 
 msgid "Combine"
-msgstr ""
-
-msgid "Single tag"
-msgstr ""
+msgstr "Verknüpfung"
 
 msgid "Second tag"
-msgstr ""
-
-msgid "This condition cannot be edited here; it will be kept unchanged."
-msgstr ""
+msgstr "Zweites Schlagwort"
 
 msgid "Background color"
-msgstr ""
+msgstr "Hintergrundfarbe"
 
 msgid "Cell padding override (mm, optional)"
-msgstr ""
+msgstr "Abweichender Zellinnenabstand (mm, optional)"
 
 msgid "Default"
-msgstr ""
+msgstr "Standard"
 
 msgid "Add rule"
-msgstr ""
+msgstr "Regel hinzufügen"
 
 msgid "Saving…"
-msgstr ""
+msgstr "Wird gespeichert…"
 
 msgid "Operation failed: "
 msgstr "Operation fehlgeschlagen: "
@@ -673,7 +682,7 @@ msgid "Add"
 msgstr "Hinzufügen"
 
 msgid "Version"
-msgstr ""
+msgstr "Version"
 
 msgid "Select version"
 msgstr "Version auswählen"
@@ -928,7 +937,7 @@ msgid "No comments yet"
 msgstr "Noch keine Kommentare"
 
 msgid "Write a new comment …"
-msgstr ""
+msgstr "Neuen Kommentar schreiben …"
 
 msgid "GitHub flavored markdown is supported."
 msgstr "GitHub Markdown wird unterstützt."
@@ -1011,10 +1020,7 @@ msgid "Break Duration (HH:MM:SS)"
 msgstr "Pausendauer (HH:MM:SS)"
 
 msgid "Failed to load PDF templates"
-msgstr ""
-
-msgid "PDF template “{name}” could not be applied. Using the built-in standard template."
-msgstr ""
+msgstr "PDF-Vorlagen konnten nicht geladen werden"
 
 msgid "Export failed: "
 msgstr "Export fehlgeschlagen: "
@@ -1023,10 +1029,10 @@ msgid "Export PDF"
 msgstr "PDF exportieren"
 
 msgid "PDF template"
-msgstr ""
+msgstr "PDF-Vorlage"
 
 msgid "Standard template (built-in)"
-msgstr ""
+msgstr "Standardvorlage (integriert)"
 
 msgid "Select and reorder the columns to include in the PDF export."
 msgstr "Spalten für den PDF-Export auswählen und sortieren."
@@ -1095,7 +1101,7 @@ msgid "e.g., 90 or 1:30"
 msgstr "z.B. 90 oder 1:30"
 
 msgid "Default PDF template"
-msgstr ""
+msgstr "Standard-PDF-Vorlage"
 
 msgid "Is Draft"
 msgstr "Ist Entwurf"
@@ -1188,7 +1194,7 @@ msgid "This index is already occupied"
 msgstr "Dieser Index ist bereits belegt"
 
 msgid "Loading occupied indices…"
-msgstr ""
+msgstr "Belegte Positionen werden geladen…"
 
 msgid "Index is unchanged"
 msgstr "Index unverändert"
@@ -1235,12 +1241,6 @@ msgstr "Inhalt"
 msgid "h"
 msgstr "h"
 
-msgid "Overall Duration"
-msgstr "Gesamtdauer"
-
-msgid "Info"
-msgstr "Info"
-
 msgid "Date"
 msgstr "Datum"
 
@@ -1249,6 +1249,12 @@ msgstr "Spielzeit"
 
 msgid "Moderation & Breaks"
 msgstr "Moderation & Pausen"
+
+msgid "Overall Duration"
+msgstr "Gesamtdauer"
+
+msgid "Info"
+msgstr "Info"
 
 msgid "Invalid duration format"
 msgstr "Ungültiges Spieldauerformat"
