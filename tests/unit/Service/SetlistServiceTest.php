@@ -9,6 +9,8 @@ use OCA\OrchestraScoresManager\Db\Setlist;
 use OCA\OrchestraScoresManager\Db\SetlistEntry;
 use OCA\OrchestraScoresManager\Db\SetlistEntryMapper;
 use OCA\OrchestraScoresManager\Db\SetlistMapper;
+use OCA\OrchestraScoresManager\Db\SetlistTemplate;
+use OCA\OrchestraScoresManager\Db\SetlistTemplateMapper;
 use OCA\OrchestraScoresManager\Policy\PolicyInterface;
 use OCA\OrchestraScoresManager\Policy\SetlistPolicy;
 use OCA\OrchestraScoresManager\Service\AuthorizationService;
@@ -28,6 +30,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class SetlistServiceTest extends TestCase {
 	private SetlistMapper $setlistMapper;
+	private SetlistTemplateMapper $setlistTemplateMapper;
 	private SetlistEntryMapper $setlistEntryMapper;
 	private SetlistValidationHelper $validationHelper;
 	private AuthorizationService $authorizationService;
@@ -42,6 +45,7 @@ final class SetlistServiceTest extends TestCase {
 		parent::setUp();
 
 		$this->setlistMapper = $this->createMock(SetlistMapper::class);
+		$this->setlistTemplateMapper = $this->createMock(SetlistTemplateMapper::class);
 		$this->setlistEntryMapper = $this->createMock(SetlistEntryMapper::class);
 		$this->validationHelper = $this->createMock(SetlistValidationHelper::class);
 		$this->authorizationService = $this->createMock(AuthorizationService::class);
@@ -62,7 +66,8 @@ final class SetlistServiceTest extends TestCase {
 			$this->userSettingsService,
 			$this->folderCollectionService,
 			$this->userSession,
-			$this->l10n
+			$this->l10n,
+			$this->setlistTemplateMapper
 		);
 	}
 
@@ -846,4 +851,62 @@ final class SetlistServiceTest extends TestCase {
 			'garbage cursor' => [null, '!!!', null, null],
 		];
 	}
+
+	public function testCreateWithValidDefaultTemplate(): void {
+		$setlist = new Setlist();
+		$setlist->setTitle('Concert');
+		$setlist->setDefaultTemplateId(42);
+
+		$this->setlistTemplateMapper->expects($this->once())
+			->method('find')->with(42)->willReturn(new SetlistTemplate());
+
+		$this->setlistMapper->expects($this->once())
+			->method('insert')->with($setlist)->willReturn($setlist);
+
+		$this->assertSame(42, $this->service->createSetlist($setlist)['defaultTemplateId']);
+	}
+
+	public function testCreateRejectsUnknownDefaultTemplate(): void {
+		$setlist = new Setlist();
+		$setlist->setTitle('Concert');
+		$setlist->setDefaultTemplateId(42);
+
+		$this->setlistTemplateMapper->method('find')
+			->with(42)->willThrowException(new DoesNotExistException('Not found'));
+
+		$this->setlistMapper->expects($this->never())->method('insert');
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->service->createSetlist($setlist);
+	}
+
+	public function testUpdateRejectsUnknownDefaultTemplate(): void {
+		$setlist = new Setlist();
+		$setlist->setId(1);
+		$setlist->setDefaultTemplateId(42);
+
+		$this->setlistMapper->method('find')->with(1)->willReturn($setlist);
+		$this->setlistTemplateMapper->method('find')
+			->with(42)->willThrowException(new DoesNotExistException('Not found'));
+
+		$this->setlistMapper->expects($this->never())->method('update');
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->service->updateSetlist($setlist);
+	}
+
+	public function testUpdateClearsDefaultTemplate(): void {
+		$setlist = new Setlist();
+		$setlist->setId(1);
+		$setlist->setDefaultTemplateId(null);
+
+		$this->setlistMapper->method('find')->with(1)->willReturn($setlist);
+		$this->setlistTemplateMapper->expects($this->never())->method('find');
+
+		$this->setlistMapper->expects($this->once())
+			->method('update')->with($setlist)->willReturn($setlist);
+
+		$this->assertNull($this->service->updateSetlist($setlist)['defaultTemplateId']);
+	}
+
 }

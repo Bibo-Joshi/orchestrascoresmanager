@@ -57,23 +57,21 @@
 
 <script setup lang="ts">
 import type { FolderCollection, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
-import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
-import type { PdfTemplate } from '@/utils/pdfTemplatesApi'
+import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdfexport'
 
-import { showWarning } from '@nextcloud/dialogs'
 import { computed, ref, watch } from 'vue'
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
-import { apiClients } from '@/api/client'
 import { CancelIcon, DownloadIcon, DragVerticalIcon } from '@/icons/vue-material'
+import { usePdfTemplatesStore } from '@/stores/pdfTemplatesStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
+import { useScoresStore } from '@/stores/scoresStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
-import { exportSetlistToPdf } from '@/utils/pdf-exporter'
-import { fetchPdfTemplates } from '@/utils/pdfTemplatesApi'
+import { exportSetlistToPdf } from '@/utils/pdfexport'
 
 interface Props {
 	setlist: Setlist
@@ -91,6 +89,8 @@ const dialogOpen = defineModel<boolean>('open', { default: false })
 const props = defineProps<Props>()
 
 const scoreBooksStore = useScoreBooksStore()
+const pdfTemplatesStore = usePdfTemplatesStore()
+const scoresStore = useScoresStore()
 
 interface DialogColumn extends PdfColumnConfig {
 	enabled: boolean
@@ -98,9 +98,9 @@ interface DialogColumn extends PdfColumnConfig {
 
 const dialogColumns = ref<DialogColumn[]>([])
 const hasUserCustomizedColumns = ref(false)
-const selectedPdfTemplateId = ref<string | null>(null)
-const availablePdfTemplates = ref<PdfTemplate[]>([])
-const loadingTemplates = ref(false)
+const selectedPdfTemplateId = ref<number | null>(null)
+const availablePdfTemplates = computed(() => pdfTemplatesStore.templates)
+const loadingTemplates = computed(() => pdfTemplatesStore.isLoading)
 const pdfExporting = ref(false)
 
 /**
@@ -146,15 +146,10 @@ watch(dialogOpen, async (isOpen) => {
 	populateColumns()
 	const setlistId = props.setlist.id
 	selectedPdfTemplateId.value = null
-	availablePdfTemplates.value = []
-	loadingTemplates.value = true
-	try {
-		await tryShowError(async () => {
-			availablePdfTemplates.value = await fetchPdfTemplates()
-		}, t('Failed to load PDF templates'))
-	} finally {
-		loadingTemplates.value = false
-	}
+	await tryShowError(
+		() => pdfTemplatesStore.initialize(),
+		t('Failed to load PDF templates'),
+	)
 	if (!dialogOpen.value || setlistId !== props.setlist.id) {
 		return
 	}
@@ -187,32 +182,20 @@ async function onPdfExport(): Promise<void> {
 	try {
 		await tryShowError(
 			async () => {
-				const [response, templates] = await Promise.all([
-					apiClients.default.scoreApiGetScores(),
-					templateId === null ? [] : fetchPdfTemplates(),
-				])
-				const freshScores = new Map(response.data.ocs.data.map((score) => [score.id, score]))
 				const data = {
 					setlist,
 					entries,
-					getScoreById: (id: number) => freshScores.get(id),
+					getScoreById: (id: number) => scoresStore.getScoreById(id),
 					getScoreBookById: (id: number) => scoreBooksStore.getScoreBookById(id),
 					fcvScoresMap,
 					fcvScoreBookIndicesMap,
 					folderCollection,
 					columnConfigs: selectedColumns,
 				}
-				const template = templates.find(({ id }) => id === templateId)
-				if (template) {
-					try {
-						await exportSetlistToPdf(data, template)
-						return
-					} catch (error) {
-						console.error('Failed to render PDF template', template.id, error)
-						showWarning(t('PDF template “{name}” could not be applied. Using the built-in standard template.', { name: template.name }))
-					}
-				}
-				await exportSetlistToPdf(data)
+				const template = templateId === null
+					? undefined
+					: pdfTemplatesStore.getTemplateById(templateId)
+				await exportSetlistToPdf(data, template)
 			},
 			t('Export failed: '),
 		)

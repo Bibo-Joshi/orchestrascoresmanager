@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace OCA\OrchestraScoresManager\Service;
 
+use DateTimeImmutable;
+use InvalidArgumentException;
+use OCA\OrchestraScoresManager\Db\SetlistTemplate;
 use OCA\OrchestraScoresManager\Db\SetlistTemplateMapper;
 use OCA\OrchestraScoresManager\Policy\PolicyInterface;
 use OCA\OrchestraScoresManager\Policy\SetlistTemplatePolicy;
+use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\IUserSession;
 
-/**
- * Shared template operations and authorization, independent of the PDF renderer.
- */
 class SetlistTemplateService {
-	/** @psalm-suppress PossiblyUnusedMethod - Service instantiated by Nextcloud DI */
+	/** @psalm-suppress PossiblyUnusedMethod - Constructor used by DI container */
 	public function __construct(
 		private readonly SetlistTemplateMapper $mapper,
 		private readonly SetlistTemplateValidator $validator,
@@ -23,55 +24,75 @@ class SetlistTemplateService {
 	) {
 	}
 
-	/** @return list<array<string, mixed>> */
+	/** @return SetlistTemplate[] */
 	public function getTemplates(): array {
 		$this->authorizationService->authorizePolicy($this->policy, PolicyInterface::ACTION_READ);
 		return $this->mapper->findAll();
 	}
 
-	/** @return array<string, mixed> */
-	public function createTemplate(array $input): array {
+	public function createTemplate(array $input): SetlistTemplate {
 		$this->authorizationService->authorizePolicy($this->policy, PolicyInterface::ACTION_CREATE);
+
 		$validated = $this->validator->validate($input);
 		$userId = $this->userSession->getUser()?->getUID();
+
 		if ($userId === null) {
-			throw new \InvalidArgumentException('User not authenticated');
+			throw new InvalidArgumentException('User not authenticated');
 		}
-		$id = bin2hex(random_bytes(16));
-		return $this->mapper->create(
-			$id, $validated['name'], $validated['description'], $validated['config'], $userId
-		);
+
+		$now = new DateTimeImmutable();
+
+		$template = SetlistTemplate::fromParams([
+			'name' => $validated['name'],
+			'description' => $validated['description'],
+			'configJson' => json_encode($validated['config'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
+			'createdBy' => $userId,
+			'createdAt' => $now,
+			'updatedAt' => $now,
+		]);
+
+		return $this->mapper->insert($template);
 	}
 
-	/** @return array<string, mixed> */
-	public function patchTemplate(string $id, array $changes): array {
+	public function patchTemplate(int $id, array $changes): SetlistTemplate {
 		$this->authorizationService->authorizePolicy($this->policy, PolicyInterface::ACTION_UPDATE);
-		$previous = $this->findExisting($id);
+
+		$template = $this->findExisting($id);
+		$previous = $template->jsonSerialize();
+
 		if (isset($changes['id']) && $changes['id'] !== $id) {
-			throw new \InvalidArgumentException('Template ID cannot be modified');
+			throw new InvalidArgumentException('Template ID cannot be modified');
 		}
-		unset($previous['createdBy'], $previous['createdAt'], $previous['updatedAt']);
-		// PATCH can update one font size without discarding the other values.
+
+		unset($previous['id'], $previous['createdBy'], $previous['createdAt'], $previous['updatedAt']);
+
 		if (isset($changes['fontSizes']) && is_array($changes['fontSizes'])) {
-			if (!isset($previous['fontSizes']) || !is_array($previous['fontSizes'])) {
-				throw new \UnexpectedValueException('Stored template fontSizes are invalid');
-			}
-			$changes['fontSizes'] = array_replace($previous['fontSizes'], $changes['fontSizes']);
+			$changes['fontSizes'] = array_replace(
+				$previous['fontSizes'] ?? [],
+				$changes['fontSizes']
+			);
 		}
+
 		$validated = $this->validator->validate(array_replace($previous, $changes));
-		return $this->mapper->update(
-			$id, $validated['name'], $validated['description'], $validated['config']
-		);
+
+		$template->setName($validated['name']);
+		$template->setDescription($validated['description']);
+		$template->setConfigJson(json_encode($validated['config'], JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
+		$template->setUpdatedAt(new DateTimeImmutable());
+
+		return $this->mapper->update($template);
 	}
 
-	public function deleteTemplate(string $id): void {
+	public function deleteTemplate(int $id): void {
 		$this->authorizationService->authorizePolicy($this->policy, PolicyInterface::ACTION_DELETE);
-		$this->findExisting($id);
-		$this->mapper->delete($id);
+		$this->mapper->deleteAndClearDefaults($this->findExisting($id));
 	}
 
-	/** @return array<string, mixed> */
-	private function findExisting(string $id): array {
-		return $this->mapper->find($id) ?? throw new \InvalidArgumentException('Template not found');
+	private function findExisting(int $id): SetlistTemplate {
+		try {
+			return $this->mapper->find($id);
+		} catch (DoesNotExistException $e) {
+			throw new InvalidArgumentException('Template not found', 0, $e);
+		}
 	}
 }

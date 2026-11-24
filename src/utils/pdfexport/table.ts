@@ -1,12 +1,16 @@
+/**
+ * Render setlist entries and apply row formatting rules.
+ */
+
 import type { jsPDF } from 'jspdf'
 import type { Styles } from 'jspdf-autotable'
 import type { prepareEntries } from './data.ts'
-import type { Setlist } from '@/api/generated/openapi/data-contracts'
-import type { PdfTemplateFontSizes, PdfTemplateRule } from '@/utils/pdfTemplatesApi'
+import type { Setlist, SetlistTemplate } from '@/api/generated/openapi/data-contracts'
 
 import { autoTable } from 'jspdf-autotable'
 import { createRuleMatcher } from './rules.ts'
-
+type PdfTemplateRule = SetlistTemplate['rules'][number]
+type PdfTemplateFontSizes = NonNullable<SetlistTemplate['fontSizes']>
 /**
  * Render the entries in the selected column order and apply the first matching rule per row.
  * @param doc The PDF document.
@@ -15,7 +19,7 @@ import { createRuleMatcher } from './rules.ts'
  * @param entries Prepared headers, cells and rule facts.
  * @param setlist Setlist properties exposed to rules.
  * @param fontSizes Font sizes in points.
- * @param cellPadding Template padding in mm, omitted for the built-in template.
+ * @param cellPadding Template padding in mm.
  * @param rules Shared template rules in priority order.
  */
 export async function renderEntriesTable(
@@ -25,16 +29,15 @@ export async function renderEntriesTable(
 	entries: ReturnType<typeof prepareEntries>,
 	setlist: Setlist,
 	fontSizes: Required<PdfTemplateFontSizes>,
-	cellPadding: number | undefined,
+	cellPadding: number,
 	rules: PdfTemplateRule[],
 ): Promise<void> {
 	const { columns, rows } = entries
 	const headers = columns.map(({ label }) => label)
-	const customTemplate = cellPadding !== undefined
 	const columnStyles: Record<number, Partial<Styles>> = {}
-	doc.setFontSize(customTemplate ? fontSizes.columnTitle : fontSizes.scoreRow)
+	doc.setFontSize(fontSizes.columnTitle)
 	headers.forEach((header, index) => {
-		columnStyles[index] = { minCellWidth: doc.getTextWidth(header) + 2 * (cellPadding ?? 1.5) }
+		columnStyles[index] = { minCellWidth: doc.getTextWidth(header) + 2 * cellPadding }
 	})
 
 	const rowRules: Array<PdfTemplateRule | undefined> = []
@@ -57,25 +60,24 @@ export async function renderEntriesTable(
 			fontSize: fontSizes.scoreRow,
 			overflow: 'linebreak',
 			lineWidth: 0,
-			...(customTemplate ? { cellPadding } : {}),
+			cellPadding,
 		},
 		headStyles: {
-			...(customTemplate ? { fontSize: fontSizes.columnTitle } : {}),
+			fontSize: fontSizes.columnTitle,
 			fontStyle: 'bold',
 			fillColor: false,
 			textColor: [0, 0, 0],
 			lineColor: [0, 0, 0],
 			lineWidth: { bottom: 0.8, top: 0, left: 0, right: 0 },
 		},
-		alternateRowStyles: customTemplate ? undefined : { fillColor: [245, 245, 245] },
+		alternateRowStyles: { fillColor: [245, 245, 245] },
 		columnStyles,
 		didParseCell: ({ section, row, cell }) => {
-			if (!customTemplate || section !== 'body') {
+			if (section !== 'body') {
 				return
 			}
 			if (rows[row.index]?.isBreak) {
 				cell.styles.fontSize = fontSizes.breakRow
-				cell.styles.fontStyle = 'bold'
 			}
 			const rule = rowRules[row.index]
 			if (rule?.backgroundColor) {

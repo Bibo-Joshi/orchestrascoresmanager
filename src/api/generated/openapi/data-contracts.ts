@@ -193,7 +193,8 @@ export interface Setlist {
   defaultModerationDuration: number | null;
   /** @format int64 */
   folderCollectionVersionId: number | null;
-  defaultTemplateId: string | null;
+  /** @format int64 */
+  defaultTemplateId: number | null;
   isDraft: boolean;
   isPublished: boolean;
 }
@@ -224,9 +225,22 @@ export interface SetlistPage {
 }
 
 export interface SetlistTemplate {
-  id: string;
+  /** @format int64 */
+  id: number;
   name: string;
   description: string | null;
+  headerInfo: {
+    entries: (
+      | "date"
+      | "startTime"
+      | "endTime"
+      | "playDuration"
+      | "breaksDuration"
+      | "overallDuration"
+      | "folderCollection"
+    )[];
+    layout: "table" | "subtitle";
+  };
   fontSizes: {
     /** @format double */
     title?: number;
@@ -240,7 +254,7 @@ export interface SetlistTemplate {
     scoreRow?: number;
     /** @format double */
     breakRow?: number;
-  };
+  } | null;
   /** @format double */
   margin: number;
   /** @format double */
@@ -1011,9 +1025,10 @@ export interface SetlistApiPostSetlistPayload {
   folderCollectionVersionId?: number | null;
   /**
    * Optional shared PDF template ID
+   * @format int64
    * @default null
    */
-  defaultTemplateId?: string | null;
+  defaultTemplateId?: number | null;
   /**
    * Whether the setlist is a draft
    * @default false
@@ -1076,9 +1091,10 @@ export interface SetlistApiPatchSetlistPayload {
   folderCollectionVersionId?: number | null;
   /**
    * Optional shared PDF template ID
+   * @format int64
    * @default null
    */
-  defaultTemplateId?: string | null;
+  defaultTemplateId?: number | null;
   /**
    * Whether the setlist is a draft
    * @default null
@@ -1247,8 +1263,51 @@ export interface SetlistTemplateApiGetTemplatesData {
 }
 
 export interface SetlistTemplateApiPostTemplatePayload {
-  /** Template fields excluding generated ID and timestamps */
-  template: Record<string, object>;
+  /** Template fields */
+  template: {
+    name: string;
+    description?: string | null;
+    headerInfo?: {
+      entries: (
+        | "date"
+        | "startTime"
+        | "endTime"
+        | "playDuration"
+        | "breaksDuration"
+        | "overallDuration"
+        | "folderCollection"
+      )[];
+      layout: "table" | "subtitle";
+    };
+    fontSizes?: {
+      /** @format double */
+      title?: number;
+      /** @format double */
+      subtitle?: number;
+      /** @format double */
+      colorLegend?: number;
+      /** @format double */
+      columnTitle?: number;
+      /** @format double */
+      scoreRow?: number;
+      /** @format double */
+      breakRow?: number;
+    } | null;
+    /** @format double */
+    margin: number;
+    /** @format double */
+    cellPadding: number;
+    rules: {
+      id: string;
+      /** @format int64 */
+      order: number;
+      label?: string | null;
+      expression: Record<string, object>;
+      backgroundColor?: string | null;
+      /** @format double */
+      cellPadding?: number | null;
+    }[];
+  };
 }
 
 export interface SetlistTemplateApiPostTemplateData {
@@ -1260,7 +1319,50 @@ export interface SetlistTemplateApiPostTemplateData {
 
 export interface SetlistTemplateApiPatchTemplatePayload {
   /** Partial template fields */
-  template: Record<string, object>;
+  template: {
+    name?: string;
+    description?: string | null;
+    headerInfo?: {
+      entries: (
+        | "date"
+        | "startTime"
+        | "endTime"
+        | "playDuration"
+        | "breaksDuration"
+        | "overallDuration"
+        | "folderCollection"
+      )[];
+      layout: "table" | "subtitle";
+    };
+    fontSizes?: {
+      /** @format double */
+      title?: number;
+      /** @format double */
+      subtitle?: number;
+      /** @format double */
+      colorLegend?: number;
+      /** @format double */
+      columnTitle?: number;
+      /** @format double */
+      scoreRow?: number;
+      /** @format double */
+      breakRow?: number;
+    } | null;
+    /** @format double */
+    margin?: number;
+    /** @format double */
+    cellPadding?: number;
+    rules?: {
+      id: string;
+      /** @format int64 */
+      order: number;
+      label?: string | null;
+      expression: Record<string, object>;
+      backgroundColor?: string | null;
+      /** @format double */
+      cellPadding?: number | null;
+    }[];
+  };
 }
 
 export interface SetlistTemplateApiPatchTemplateData {

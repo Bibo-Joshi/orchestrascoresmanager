@@ -3,14 +3,14 @@ import type { Score, ScoreBook, SetlistEntry } from '@/api/generated/openapi/dat
 /**
  * Shared utilities for resolving score-information display values from setlist entries.
  *
- * Used by both SetlistEntriesTable (AG Grid value getters) and pdf-exporter (PDF cell values)
+ * Used by both SetlistEntriesTable (AG Grid value getters) and pdfexport (PDF cell values)
  * to avoid duplication of the score-field resolution logic.
  */
 import { t } from '@/utils/l10n'
 
 /**
  * Score-information fields that can be resolved from a setlist entry.
- * Matches the colId values used in SetlistEntriesTable and the PdfColumnId entries in pdf-exporter.
+ * Matches the colId values used in SetlistEntriesTable and the PdfColumnId entries in pdfexport.
  */
 export type ScoreInfoField = 'title' | 'difficulty' | 'bookName' | 'bookIndex' | 'fcvIndex' | 'gemaIds'
 

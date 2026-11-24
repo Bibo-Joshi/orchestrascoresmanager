@@ -72,11 +72,10 @@
 				<label v-if="editable" class="pdf-template-select">
 					{{ t('Default PDF template') }}
 					<select
-						:value="selectedTemplateId"
-						:disabled="!templatesLoaded || isSaving"
-						@change="selectTemplate">
-						<option value="">{{ t('Standard template (built-in)') }}</option>
-						<option v-for="template in pdfTemplates" :key="template.id" :value="template.id">
+						v-model="formData.defaultTemplateId"
+						:disabled="!pdfTemplatesStore.isLoaded || isSaving">
+						<option :value="null">{{ t('Standard template (built-in)') }}</option>
+						<option v-for="template in pdfTemplatesStore.templates" :key="template.id" :value="template.id">
 							{{ template.name }}
 						</option>
 					</select>
@@ -110,11 +109,10 @@
 
 <script setup lang="ts">
 import type { Setlist } from '@/api/generated/openapi/data-contracts'
-import type { PdfTemplate } from '@/utils/pdfTemplatesApi'
 
 import { showError } from '@nextcloud/dialogs'
 import debounce from 'lodash.debounce'
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import NcAppSidebar from '@nextcloud/vue/components/NcAppSidebar'
 import NcAppSidebarTab from '@nextcloud/vue/components/NcAppSidebarTab'
 import NcButton from '@nextcloud/vue/components/NcButton'
@@ -130,11 +128,11 @@ import { useBreakpoints } from '@/composables/useBreakpoints.ts'
 import { formatDateStr } from '@/composables/useDateFormatting.ts'
 import { EditIcon, InfoIcon } from '@/icons/vue-material'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
+import { usePdfTemplatesStore } from '@/stores/pdfTemplatesStore'
 import { useSetlistSidebarStore } from '@/stores/setlistSidebarStore'
 import { useSetlistsStore } from '@/stores/setlistsStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
-import { fetchPdfTemplates } from '@/utils/pdfTemplatesApi'
 import { formatDurationHHMM, formatDurationHHMMSS, parseDurationHHMM, parseDurationHHMMSS, restrictToTimeFormat as restrictInputToTimeFormat } from '@/utils/timeFormatUtils'
 
 interface Props {
@@ -147,19 +145,13 @@ const props = defineProps<Props>()
 const setlistSidebarStore = useSetlistSidebarStore()
 const setlistsStore = useSetlistsStore()
 const folderCollectionsStore = useFolderCollectionsStore()
+const pdfTemplatesStore = usePdfTemplatesStore()
 const { buttonSize } = useBreakpoints()
 
 const nameEditable = ref(false)
 const isSaving = ref(false)
 const isSavingError = ref(false)
 const skipNextSave = ref(false)
-const pdfTemplates = ref<PdfTemplate[]>([])
-const templatesLoaded = ref(false)
-const templateChange = ref<{ id: string | null }>()
-const selectedTemplateId = computed(() => {
-	const id = templateChange.value ? templateChange.value.id : props.setlist?.defaultTemplateId
-	return pdfTemplates.value.find((template) => template.id === id)?.id ?? ''
-})
 
 interface FormData {
 	title: string
@@ -167,6 +159,7 @@ interface FormData {
 	description: string | null
 	defaultModerationTimeStr: string
 	durationStr: string
+	defaultTemplateId: number | null
 	isDraft: boolean
 	isPublished: boolean
 }
@@ -177,6 +170,7 @@ const formData = ref<FormData>({
 	description: null,
 	defaultModerationTimeStr: '',
 	durationStr: '',
+	defaultTemplateId: null,
 	isDraft: false,
 	isPublished: false,
 })
@@ -227,6 +221,9 @@ async function initializeFormData() {
 	}
 
 	const options = await getFolderCollectionVersionOptions(setlist.folderCollectionVersionId)
+	if (props.editable) {
+		await tryShowError(() => pdfTemplatesStore.initialize(), t('Failed to load PDF templates'))
+	}
 	if (props.setlist?.id !== setlist.id) {
 		return
 	}
@@ -243,6 +240,7 @@ async function initializeFormData() {
 		durationStr: setlist.duration !== null
 			? formatDurationHHMM(setlist.duration)
 			: '',
+		defaultTemplateId: setlist.defaultTemplateId,
 		isDraft: setlist.isDraft,
 		isPublished: setlist.isPublished,
 	}
@@ -257,43 +255,9 @@ onUnmounted(() => debouncedSave.cancel())
 watch(() => props.setlist?.id, async (newId, oldId) => {
 	if (newId !== oldId) {
 		debouncedSave.cancel()
-		templateChange.value = undefined
 		await initializeFormData()
 	}
 }, { immediate: true })
-
-watch(
-	() => setlistSidebarStore.isOpen && props.editable ? props.setlist?.id : undefined,
-	async (id, _oldId, onCleanup) => {
-		templatesLoaded.value = false
-		pdfTemplates.value = []
-		if (id === undefined) {
-			return
-		}
-		let current = true
-		onCleanup(() => {
-			current = false
-		})
-		await tryShowError(async () => {
-			const templates = await fetchPdfTemplates()
-			if (current) {
-				pdfTemplates.value = templates
-				templatesLoaded.value = true
-			}
-		}, t('Failed to load PDF templates'))
-	},
-	{ immediate: true },
-)
-
-/**
- * Schedule the selected default as part of the sidebar's normal autosave.
- * @param event Template selection event.
- */
-function selectTemplate(event: Event): void {
-	const id = (event.target as HTMLSelectElement).value || null
-	templateChange.value = { id }
-	debouncedSave()
-}
 
 /**
  * Watch all form fields and auto-save with debounce
@@ -366,7 +330,6 @@ async function handleSave() {
 	}
 
 	isSaving.value = true
-	const pendingTemplate = templateChange.value
 
 	await tryShowError(
 		async () => {
@@ -379,20 +342,14 @@ async function handleSave() {
 				folderCollectionVersionId: selectedFolderCollectionVersion.value?.value ?? null,
 				isDraft: formData.value.isDraft,
 				isPublished: formData.value.isPublished,
-				...(pendingTemplate ? { defaultTemplateId: pendingTemplate.id } : {}),
+				defaultTemplateId: formData.value.defaultTemplateId,
 			})
-			if (templateChange.value === pendingTemplate) {
-				templateChange.value = undefined
-			}
 			isSavingError.value = false
 		},
 		t('Failed to update setlist: '),
 		() => {
 			isSaving.value = false
 			isSavingError.value = true
-			if (templateChange.value === pendingTemplate) {
-				templateChange.value = undefined
-			}
 		},
 	)
 

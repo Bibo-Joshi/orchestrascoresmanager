@@ -1,3 +1,7 @@
+/**
+ * Prepare setlist entries, column values and summary data for PDF export.
+ */
+
 import type { FolderCollection, Score, ScoreBook, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
 import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
 
@@ -227,7 +231,7 @@ export function prepareEntries(data: PdfSetlistData) {
 		return {
 			cells: columns.map(({ id }) => getEntryCellValue(id, entry, startTime, duration, moderation, score, getScoreBookById, fcvScoresMap, fcvScoreBookIndicesMap)),
 			isBreak: isBreakEntry(entry),
-			facts: { ...entry, tags: score?.tags ?? [] },
+			facts: { ...entry, tags: (score?.tags ?? []).map((tag) => tag.trim().toLowerCase()) },
 		}
 	})
 	return { columns, rows }

@@ -49,7 +49,72 @@ final class SetlistTemplateValidatorTest extends TestCase {
 		$this->assertSame(null, $this->validator->validate($input)['description']);
 	}
 
+	public function testMoreThanThirtyRulesAreAllowed(): void {
+		$input = self::validTemplate();
+		$rule = $input['rules'][0];
+		$input['rules'] = [];
+
+		for ($i = 0; $i < 40; $i++) {
+			$input['rules'][] = array_replace($rule, [
+				'id' => 'rule-' . $i,
+				'order' => $i,
+			]);
+		}
+
+		$validated = $this->validator->validate($input);
+
+		$this->assertCount(40, $validated['config']['rules']);
+	}
+
+	public function testDefaultHeaderInfo(): void {
+		$validated = $this->validator->validate(self::validTemplate());
+
+		$this->assertSame([
+			'entries' => ['date', 'startTime', 'endTime', 'playDuration', 'breaksDuration', 'overallDuration', 'folderCollection'],
+			'layout' => 'table',
+		], $validated['config']['headerInfo']);
+	}
+
+	public function testCompactHeaderInfo(): void {
+		$input = self::validTemplate();
+		$input['headerInfo'] = [
+			'entries' => ['date', 'startTime', 'overallDuration'],
+			'layout' => 'subtitle',
+		];
+
+		$this->assertSame($input['headerInfo'], $this->validator->validate($input)['config']['headerInfo']);
+	}
+
+	public function testCustomHeaderInfo(): void {
+		$input = self::validTemplate();
+		$input['headerInfo'] = [
+			'entries' => ['folderCollection', 'overallDuration', 'date'],
+			'layout' => 'subtitle',
+		];
+
+		$this->assertSame($input['headerInfo'], $this->validator->validate($input)['config']['headerInfo']);
+	}
+
 	public static function invalidTemplates(): iterable {
+
+		yield 'invalid header layout' => [static function (array &$i): void {
+			$i['headerInfo'] = ['entries' => ['date'], 'layout' => 'invalid'];
+		}];
+		yield 'unknown header entry' => [static function (array &$i): void {
+			$i['headerInfo'] = ['entries' => ['unknown'], 'layout' => 'table'];
+		}];
+		yield 'duplicate header entry' => [static function (array &$i): void {
+			$i['headerInfo'] = ['entries' => ['date', 'date'], 'layout' => 'table'];
+		}];
+		yield 'invalid header entries' => [static function (array &$i): void {
+			$i['headerInfo'] = ['entries' => 'date', 'layout' => 'table'];
+		}];
+		yield 'missing header layout' => [static function (array &$i): void {
+			$i['headerInfo'] = ['entries' => ['date']];
+		}];
+		yield 'null header info' => [static function (array &$i): void {
+			$i['headerInfo'] = null;
+		}];
 
 		yield 'blank name' => [static function (array &$i): void {
 			$i['name'] = '   ';
@@ -69,9 +134,6 @@ final class SetlistTemplateValidatorTest extends TestCase {
 		yield 'oversized config JSON' => [static function (array &$i): void {
 			$i['rules'][0]['expression'] = ['data' => str_repeat('x', 60000)];
 		}];
-		yield 'missing font sizes' => [static function (array &$i): void {
-			unset($i['fontSizes']);
-		}];
 		yield 'unknown font key' => [static function (array &$i): void {
 			$i['fontSizes']['strange'] = 10;
 		}];
@@ -86,9 +148,6 @@ final class SetlistTemplateValidatorTest extends TestCase {
 		}];
 		yield 'string padding' => [static function (array &$i): void {
 			$i['cellPadding'] = '1.5';
-		}];
-		yield 'too many rules' => [static function (array &$i): void {
-			$i['rules'] = array_fill(0, 31, $i['rules'][0]);
 		}];
 		yield 'duplicate order' => [static function (array &$i): void {
 			$i['rules'][] = ['id' => 'other', 'order' => 0, 'expression' => []];
@@ -108,6 +167,20 @@ final class SetlistTemplateValidatorTest extends TestCase {
 		yield 'unknown top-level field' => [static function (array &$i): void {
 			$i['private'] = true;
 		}];
+	}
+
+	public function testMissingFontSizesAreAllowed(): void {
+		$input = self::validTemplate();
+		unset($input['fontSizes']);
+
+		$this->assertSame([], $this->validator->validate($input)['config']['fontSizes']);
+	}
+
+	public function testNullFontSizesAreAllowed(): void {
+		$input = self::validTemplate();
+		$input['fontSizes'] = null;
+
+		$this->assertSame([], $this->validator->validate($input)['config']['fontSizes']);
 	}
 
 	#[DataProvider('invalidTemplates')]

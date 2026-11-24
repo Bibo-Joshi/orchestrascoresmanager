@@ -688,7 +688,8 @@
                         "nullable": true
                     },
                     "defaultTemplateId": {
-                        "type": "string",
+                        "type": "integer",
+                        "format": "int64",
                         "nullable": true
                     },
                     "isDraft": {
@@ -782,6 +783,7 @@
                     "id",
                     "name",
                     "description",
+                    "headerInfo",
                     "fontSizes",
                     "margin",
                     "cellPadding",
@@ -792,7 +794,8 @@
                 ],
                 "properties": {
                     "id": {
-                        "type": "string"
+                        "type": "integer",
+                        "format": "int64"
                     },
                     "name": {
                         "type": "string"
@@ -801,8 +804,40 @@
                         "type": "string",
                         "nullable": true
                     },
+                    "headerInfo": {
+                        "type": "object",
+                        "required": [
+                            "entries",
+                            "layout"
+                        ],
+                        "properties": {
+                            "entries": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "date",
+                                        "startTime",
+                                        "endTime",
+                                        "playDuration",
+                                        "breaksDuration",
+                                        "overallDuration",
+                                        "folderCollection"
+                                    ]
+                                }
+                            },
+                            "layout": {
+                                "type": "string",
+                                "enum": [
+                                    "table",
+                                    "subtitle"
+                                ]
+                            }
+                        }
+                    },
                     "fontSizes": {
                         "type": "object",
+                        "nullable": true,
                         "properties": {
                             "title": {
                                 "type": "number",
@@ -8011,7 +8046,8 @@
                                         "description": "The ID of the folder collection version"
                                     },
                                     "defaultTemplateId": {
-                                        "type": "string",
+                                        "type": "integer",
+                                        "format": "int64",
                                         "nullable": true,
                                         "default": null,
                                         "description": "Optional shared PDF template ID"
@@ -8378,7 +8414,8 @@
                                         "description": "The ID of the folder collection version"
                                     },
                                     "defaultTemplateId": {
-                                        "type": "string",
+                                        "type": "integer",
+                                        "format": "int64",
                                         "nullable": true,
                                         "default": null,
                                         "description": "Optional shared PDF template ID"
@@ -10059,9 +10096,129 @@
                                 "properties": {
                                     "template": {
                                         "type": "object",
-                                        "description": "Template fields excluding generated ID and timestamps",
-                                        "additionalProperties": {
-                                            "type": "object"
+                                        "description": "Template fields",
+                                        "required": [
+                                            "name",
+                                            "margin",
+                                            "cellPadding",
+                                            "rules"
+                                        ],
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "nullable": true
+                                            },
+                                            "headerInfo": {
+                                                "type": "object",
+                                                "required": [
+                                                    "entries",
+                                                    "layout"
+                                                ],
+                                                "properties": {
+                                                    "entries": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "date",
+                                                                "startTime",
+                                                                "endTime",
+                                                                "playDuration",
+                                                                "breaksDuration",
+                                                                "overallDuration",
+                                                                "folderCollection"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "layout": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "table",
+                                                            "subtitle"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "fontSizes": {
+                                                "type": "object",
+                                                "nullable": true,
+                                                "properties": {
+                                                    "title": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    },
+                                                    "subtitle": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    },
+                                                    "colorLegend": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    },
+                                                    "columnTitle": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    },
+                                                    "scoreRow": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    },
+                                                    "breakRow": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    }
+                                                }
+                                            },
+                                            "margin": {
+                                                "type": "number",
+                                                "format": "double"
+                                            },
+                                            "cellPadding": {
+                                                "type": "number",
+                                                "format": "double"
+                                            },
+                                            "rules": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "id",
+                                                        "order",
+                                                        "expression"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "order": {
+                                                            "type": "integer",
+                                                            "format": "int64"
+                                                        },
+                                                        "label": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        },
+                                                        "expression": {
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "backgroundColor": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        },
+                                                        "cellPadding": {
+                                                            "type": "number",
+                                                            "format": "double",
+                                                            "nullable": true
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -10171,8 +10328,122 @@
                                     "template": {
                                         "type": "object",
                                         "description": "Partial template fields",
-                                        "additionalProperties": {
-                                            "type": "object"
+                                        "properties": {
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "nullable": true
+                                            },
+                                            "headerInfo": {
+                                                "type": "object",
+                                                "required": [
+                                                    "entries",
+                                                    "layout"
+                                                ],
+                                                "properties": {
+                                                    "entries": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string",
+                                                            "enum": [
+                                                                "date",
+                                                                "startTime",
+                                                                "endTime",
+                                                                "playDuration",
+                                                                "breaksDuration",
+                                                                "overallDuration",
+                                                                "folderCollection"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "layout": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "table",
+                                                            "subtitle"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "fontSizes": {
+                                                "type": "object",
+                                                "nullable": true,
+                                                "properties": {
+                                                    "title": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    },
+                                                    "subtitle": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    },
+                                                    "colorLegend": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    },
+                                                    "columnTitle": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    },
+                                                    "scoreRow": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    },
+                                                    "breakRow": {
+                                                        "type": "number",
+                                                        "format": "double"
+                                                    }
+                                                }
+                                            },
+                                            "margin": {
+                                                "type": "number",
+                                                "format": "double"
+                                            },
+                                            "cellPadding": {
+                                                "type": "number",
+                                                "format": "double"
+                                            },
+                                            "rules": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "required": [
+                                                        "id",
+                                                        "order",
+                                                        "expression"
+                                                    ],
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "order": {
+                                                            "type": "integer",
+                                                            "format": "int64"
+                                                        },
+                                                        "label": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        },
+                                                        "expression": {
+                                                            "type": "object",
+                                                            "additionalProperties": {
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "backgroundColor": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        },
+                                                        "cellPadding": {
+                                                            "type": "number",
+                                                            "format": "double",
+                                                            "nullable": true
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -10187,7 +10458,8 @@
                         "description": "Stable template ID",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer",
+                            "format": "int64"
                         }
                     },
                     {
@@ -10283,7 +10555,8 @@
                         "description": "Stable template ID",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "integer",
+                            "format": "int64"
                         }
                     },
                     {

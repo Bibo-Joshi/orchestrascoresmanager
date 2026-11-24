@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace OCA\OrchestraScoresManager\Service;
 
+use OCA\OrchestraScoresManager\Db\SetlistTemplate;
+
 /**
  * Validate public template metadata and formatting properties.
  * Rule expressions are intentionally opaque: their syntax belongs to the
@@ -11,7 +13,7 @@ namespace OCA\OrchestraScoresManager\Service;
  */
 class SetlistTemplateValidator {
 	private const FONT_KEYS = ['title', 'subtitle', 'colorLegend', 'columnTitle', 'scoreRow', 'breakRow'];
-	private const CONFIG_KEYS = ['fontSizes', 'margin', 'cellPadding', 'rules'];
+	private const CONFIG_KEYS = ['fontSizes', 'margin', 'cellPadding', 'rules', 'headerInfo'];
 
 	/**
 	 * @return array{name:string,description:?string,config:array}
@@ -20,30 +22,35 @@ class SetlistTemplateValidator {
 		$this->assertKeys($input, ['id', 'name', 'description', ...self::CONFIG_KEYS], 'template');
 
 		$name = $input['name'] ?? null;
+		// The maximum length matches the database column definition.
 		if (!is_string($name) || trim($name) === '' || mb_strlen($name) > 160) {
 			throw new \InvalidArgumentException('Invalid template name');
 		}
+
 		$description = $input['description'] ?? null;
-		if ($description !== null && (!is_string($description) || mb_strlen($description) > 2000)) {
+
+		// Keep the description within the capacity of a database TEXT column.
+		if ($description !== null && (!is_string($description) || strlen($description) > 60000)) {
 			throw new \InvalidArgumentException('Invalid template description');
 		}
 
 		/** @var mixed $fontSizes */
-		$fontSizes = $input['fontSizes'] ?? null;
+		$fontSizes = $input['fontSizes'] ?? [];
 		if (!is_array($fontSizes) || (array_is_list($fontSizes) && $fontSizes !== [])) {
 			throw new \InvalidArgumentException('fontSizes must be an object');
 		}
 		/** @var array<string, mixed> $fontSizes */
 		$this->assertKeys($fontSizes, self::FONT_KEYS, 'fontSizes');
+		// Restrict formatting values to practical ranges for A4 PDF layouts.
 		foreach (array_keys($fontSizes) as $key) {
-			$this->number($fontSizes[$key], "fontSizes.$key", 5, 64);
+			$this->requireNumberInRange($fontSizes[$key], "fontSizes.$key", 5, 64);
 		}
 
-		$margin = $this->number($input['margin'] ?? null, 'margin', 0, 50);
-		$cellPadding = $this->number($input['cellPadding'] ?? null, 'cellPadding', 0, 20);
+		$margin = $this->requireNumberInRange($input['margin'] ?? null, 'margin', 0, 50);
+		$cellPadding = $this->requireNumberInRange($input['cellPadding'] ?? null, 'cellPadding', 0, 20);
 
 		$rules = $input['rules'] ?? null;
-		if (!is_array($rules) || !array_is_list($rules) || count($rules) > 30) {
+		if (!is_array($rules) || !array_is_list($rules)) {
 			throw new \InvalidArgumentException('Invalid formatting rules');
 		}
 		$seenIds = [];
@@ -55,7 +62,7 @@ class SetlistTemplateValidator {
 			$this->assertKeys($rule, ['id', 'order', 'label', 'expression', 'backgroundColor', 'cellPadding'], 'rule');
 			$id = $rule['id'] ?? null;
 			$order = $rule['order'] ?? null;
-			if (!is_string($id) || trim($id) === '' || strlen($id) > 64 || isset($seenIds[$id])
+			if (!is_string($id) || trim($id) === '' || isset($seenIds[$id])
 				|| !is_int($order) || $order < 0 || isset($seenOrders[$order])) {
 				throw new \InvalidArgumentException('Invalid or duplicate rule ID/order');
 			}
@@ -63,7 +70,7 @@ class SetlistTemplateValidator {
 			$seenOrders[$order] = true;
 			if (array_key_exists('label', $rule)
 				&& $rule['label'] !== null
-				&& (!is_string($rule['label']) || mb_strlen($rule['label']) > 160)) {
+				&& !is_string($rule['label'])) {
 				throw new \InvalidArgumentException('Invalid rule label');
 			}
 			// Deliberately do not validate the expression's rule-engine schema.
@@ -75,7 +82,7 @@ class SetlistTemplateValidator {
 				throw new \InvalidArgumentException('Invalid rule background color');
 			}
 			if (array_key_exists('cellPadding', $rule) && $rule['cellPadding'] !== null) {
-				$this->number($rule['cellPadding'], 'rule.cellPadding', 0, 20);
+				$this->requireNumberInRange($rule['cellPadding'], 'rule.cellPadding', 0, 20);
 			}
 		}
 
@@ -84,8 +91,11 @@ class SetlistTemplateValidator {
 			'margin' => $margin,
 			'cellPadding' => $cellPadding,
 			'rules' => $rules,
+			'headerInfo' => $this->validateHeaderInfo(array_key_exists('headerInfo', $input) ? $input['headerInfo'] : SetlistTemplate::DEFAULT_HEADER_INFO),
 		];
 		$json = json_encode($config, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+
+		// Keep the encoded configuration within the capacity of a database TEXT column.
 		if (strlen($json) > 60000) {
 			throw new \InvalidArgumentException('Template configuration is too large');
 		}
@@ -97,7 +107,40 @@ class SetlistTemplateValidator {
 		];
 	}
 
-	private function number(mixed $value, string $field, float $min, float $max): float {
+	private function validateHeaderInfo(mixed $headerInfo): array {
+		if (!is_array($headerInfo)) {
+			throw new \InvalidArgumentException('Invalid headerInfo');
+		}
+		$this->assertKeys($headerInfo, ['entries', 'layout'], 'headerInfo');
+
+		$entries = $headerInfo['entries'] ?? null;
+		$layout = $headerInfo['layout'] ?? null;
+
+		if (!is_array($entries) || !array_is_list($entries)) {
+			throw new \InvalidArgumentException('Invalid headerInfo entries');
+		}
+
+		if (!in_array($layout, ['table', 'subtitle'], true)) {
+			throw new \InvalidArgumentException('Invalid headerInfo layout');
+		}
+
+		$seen = [];
+		foreach ($entries as $entry) {
+			if (!is_string($entry)
+				|| !in_array($entry, SetlistTemplate::DEFAULT_HEADER_INFO['entries'], true)
+				|| isset($seen[$entry])) {
+				throw new \InvalidArgumentException('Invalid or duplicate headerInfo entry');
+			}
+			$seen[$entry] = true;
+		}
+
+		return [
+			'entries' => $entries,
+			'layout' => $layout,
+		];
+	}
+
+	private function requireNumberInRange(mixed $value, string $field, float $min, float $max): float {
 		if ((!is_float($value) && !is_int($value)) || !is_finite((float)$value) || $value < $min || $value > $max) {
 			throw new \InvalidArgumentException("Invalid $field");
 		}

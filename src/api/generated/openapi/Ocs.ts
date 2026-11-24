@@ -1681,7 +1681,7 @@ export class Ocs<
    * @secure
    */
   setlistTemplateApiPatchTemplate = (
-    id: string,
+    id: number,
     data: SetlistTemplateApiPatchTemplatePayload,
     params: RequestParams = {},
   ) =>
@@ -1711,7 +1711,7 @@ export class Ocs<
    * @request DELETE:/ocs/v2.php/apps/orchestrascoresmanager/setlist-templates/{id}
    * @secure
    */
-  setlistTemplateApiDeleteTemplate = (id: string, params: RequestParams = {}) =>
+  setlistTemplateApiDeleteTemplate = (id: number, params: RequestParams = {}) =>
     this.request<
       SetlistTemplateApiDeleteTemplateData,
       {

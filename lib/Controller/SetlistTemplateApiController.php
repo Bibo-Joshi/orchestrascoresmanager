@@ -41,13 +41,13 @@ class SetlistTemplateApiController extends OCSController {
 	#[ApiRoute(verb: 'GET', url: '/setlist-templates')]
 	public function getTemplates(): DataResponse {
 		$templates = $this->callService(fn () => $this->templateService->getTemplates());
-		return new DataResponse(array_map($this->forResponse(...), $templates));
+		return new DataResponse($templates);
 	}
 
 	/**
 	 * Create a shared PDF template
 	 *
-	 * @param array<string, mixed> $template Template fields excluding generated ID and timestamps
+	 * @param array{name:string,description?:string|null,headerInfo?:array{entries:list<'date'|'startTime'|'endTime'|'playDuration'|'breaksDuration'|'overallDuration'|'folderCollection'>,layout:'table'|'subtitle'},fontSizes?:array{title?:float,subtitle?:float,colorLegend?:float,columnTitle?:float,scoreRow?:float,breakRow?:float}|null,margin:float,cellPadding:float,rules:list<array{id:string,order:int,label?:string|null,expression:array<string,mixed>,backgroundColor?:string|null,cellPadding?:float|null}>} $template Template fields
 	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerSetlistTemplate, array{}>
 	 *
 	 * 201: Created template
@@ -56,51 +56,38 @@ class SetlistTemplateApiController extends OCSController {
 	#[ApiRoute(verb: 'POST', url: '/setlist-templates')]
 	public function postTemplate(array $template): DataResponse {
 		$created = $this->callService(fn () => $this->templateService->createTemplate($template));
-		return new DataResponse($this->forResponse($created), Http::STATUS_CREATED);
+		return new DataResponse($created, Http::STATUS_CREATED);
 	}
 
 	/**
 	 * Update a shared PDF template
 	 *
-	 * @param string $id Stable template ID
-	 * @param array<string, mixed> $template Partial template fields
+	 * @param int $id Stable template ID
+	 * @param array{name?:string,description?:string|null,headerInfo?:array{entries:list<'date'|'startTime'|'endTime'|'playDuration'|'breaksDuration'|'overallDuration'|'folderCollection'>,layout:'table'|'subtitle'},fontSizes?:array{title?:float,subtitle?:float,colorLegend?:float,columnTitle?:float,scoreRow?:float,breakRow?:float}|null,margin?:float,cellPadding?:float,rules?:list<array{id:string,order:int,label?:string|null,expression:array<string,mixed>,backgroundColor?:string|null,cellPadding?:float|null}>} $template Partial template fields
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerSetlistTemplate, array{}>
 	 *
 	 * 200: Updated template
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'PATCH', url: '/setlist-templates/{id}')]
-	public function patchTemplate(string $id, array $template): DataResponse {
+	public function patchTemplate(int $id, array $template): DataResponse {
 		$updated = $this->callService(fn () => $this->templateService->patchTemplate($id, $template));
-		return new DataResponse($this->forResponse($updated));
+		return new DataResponse($updated);
 	}
 
 	/**
 	 * Delete a shared PDF template
 	 *
-	 * @param string $id Stable template ID
+	 * @param int $id Stable template ID
 	 * @return DataResponse<Http::STATUS_OK, array{}, array{}>
 	 *
 	 * 200: Deleted template
 	 */
 	#[NoAdminRequired]
 	#[ApiRoute(verb: 'DELETE', url: '/setlist-templates/{id}')]
-	public function deleteTemplate(string $id): DataResponse {
+	public function deleteTemplate(int $id): DataResponse {
 		$this->callService(fn () => $this->templateService->deleteTemplate($id));
 		return new DataResponse([]);
 	}
 
-	/**
-	 * An empty fontSizes map must be a JSON object, not a JSON array.
-	 * Keep the internal representation as a PHP array so PATCH can merge font sizes.
-	 *
-	 * @param array<string, mixed> $template
-	 * @return array<string, mixed>
-	 */
-	private function forResponse(array $template): array {
-		if (isset($template['fontSizes']) && is_array($template['fontSizes']) && $template['fontSizes'] === []) {
-			$template['fontSizes'] = new \stdClass();
-		}
-		return $template;
-	}
 }

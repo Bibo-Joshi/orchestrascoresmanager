@@ -9,6 +9,7 @@ use OCA\OrchestraScoresManager\Db\Setlist;
 use OCA\OrchestraScoresManager\Db\SetlistEntry;
 use OCA\OrchestraScoresManager\Db\SetlistEntryMapper;
 use OCA\OrchestraScoresManager\Db\SetlistMapper;
+use OCA\OrchestraScoresManager\Db\SetlistTemplateMapper;
 use OCA\OrchestraScoresManager\Policy\PolicyInterface;
 use OCA\OrchestraScoresManager\Policy\SetlistPolicy;
 use OCA\OrchestraScoresManager\Utility\SetlistValidationHelper;
@@ -37,6 +38,7 @@ class SetlistService {
 		private readonly FolderCollectionService $folderCollectionService,
 		private readonly IUserSession $userSession,
 		private readonly IL10N $l,
+		private readonly SetlistTemplateMapper $setlistTemplateMapper,
 	) {
 	}
 
@@ -225,6 +227,7 @@ class SetlistService {
 			}
 		}
 
+		$this->validateDefaultTemplate($setlist);
 		$created = $this->setlistMapper->insert($setlist);
 		return $this->serializeSetlist($created);
 	}
@@ -261,6 +264,7 @@ class SetlistService {
 			}
 		}
 
+		$this->validateDefaultTemplate($setlist);
 		$updated = $this->setlistMapper->update($setlist);
 		return $this->serializeSetlist($updated);
 	}
@@ -378,6 +382,7 @@ class SetlistService {
 		$clone->setIsDraft(true);
 		$clone->setIsPublished(false);
 
+		$this->validateDefaultTemplate($clone);
 		$created = $this->setlistMapper->insert($clone);
 
 		// Copy all entries from the source setlist
@@ -394,6 +399,19 @@ class SetlistService {
 		}
 
 		return $this->serializeSetlist($created);
+	}
+
+	private function validateDefaultTemplate(Setlist $setlist): void {
+		$templateId = $setlist->getDefaultTemplateId();
+		if ($templateId === null) {
+			return;
+		}
+
+		try {
+			$this->setlistTemplateMapper->find($templateId);
+		} catch (DoesNotExistException $e) {
+			throw new InvalidArgumentException('Template not found', 0, $e);
+		}
 	}
 
 	/**

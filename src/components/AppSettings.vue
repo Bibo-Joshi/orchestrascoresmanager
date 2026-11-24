@@ -32,7 +32,7 @@
 				</div>
 			</NcFormGroup>
 		</NcAppSettingsSection>
-		<NcAppSettingsSection v-if="editable" id="pdf-templates" :name="t('PDF templates')">
+		<NcAppSettingsSection v-if="editable" id="pdf-templates" :name="t('Setlist PDF-Export Templates')">
 			<PdfTemplatesEditor />
 		</NcAppSettingsSection>
 	</NcAppSettingsDialog>

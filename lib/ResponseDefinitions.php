@@ -126,10 +126,11 @@ namespace OCA\OrchestraScoresManager;
  *     index: int|null
  * }
  * @psalm-type OrchestraScoresManagerSetlistTemplate = array{
- *     id: string,
+ *     id: int,
  *     name: string,
  *     description: string|null,
- *     fontSizes: array{title?:float,subtitle?:float,colorLegend?:float,columnTitle?:float,scoreRow?:float,breakRow?:float},
+ *     headerInfo: array{entries:list<'date'|'startTime'|'endTime'|'playDuration'|'breaksDuration'|'overallDuration'|'folderCollection'>,layout:'table'|'subtitle'},
+ *     fontSizes: array{title?:float,subtitle?:float,colorLegend?:float,columnTitle?:float,scoreRow?:float,breakRow?:float}|null,
  *     margin: float,
  *     cellPadding: float,
  *     rules: list<array{id:string,order:int,label?:string|null,expression:array<string,mixed>,backgroundColor?:string|null,cellPadding?:float|null}>,
@@ -145,7 +146,7 @@ namespace OCA\OrchestraScoresManager;
  *     duration: int|null,
  *     defaultModerationDuration: int|null,
  *     folderCollectionVersionId: int|null,
- *     defaultTemplateId: string|null,
+ *     defaultTemplateId: int|null,
  *     isDraft: bool,
  *     isPublished: bool
  * }

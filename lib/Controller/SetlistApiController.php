@@ -82,7 +82,7 @@ class SetlistApiController extends OCSController {
 	 * @param int|null $duration The duration in seconds
 	 * @param int|null $defaultModerationDuration The default moderation duration in seconds
 	 * @param int|null $folderCollectionVersionId The ID of the folder collection version
-	 * @param string|null $defaultTemplateId Optional shared PDF template ID
+	 * @param int|null $defaultTemplateId Optional shared PDF template ID
 	 * @param bool $isDraft Whether the setlist is a draft
 	 * @param bool $isPublished Whether the setlist is published
 	 *
@@ -101,7 +101,7 @@ class SetlistApiController extends OCSController {
 		?int $duration = null,
 		?int $defaultModerationDuration = null,
 		?int $folderCollectionVersionId = null,
-		?string $defaultTemplateId = null,
+		?int $defaultTemplateId = null,
 		bool $isDraft = false,
 		bool $isPublished = false,
 	): DataResponse {
@@ -136,7 +136,7 @@ class SetlistApiController extends OCSController {
 	 * @param int|null $duration The duration in seconds
 	 * @param int|null $defaultModerationDuration The default moderation duration in seconds
 	 * @param int|null $folderCollectionVersionId The ID of the folder collection version
-	 * @param string|null $defaultTemplateId Optional shared PDF template ID
+	 * @param int|null $defaultTemplateId Optional shared PDF template ID
 	 * @param bool|null $isDraft Whether the setlist is a draft
 	 * @param bool|null $isPublished Whether the setlist is published
 	 *
@@ -158,7 +158,7 @@ class SetlistApiController extends OCSController {
 		?int $duration = null,
 		?int $defaultModerationDuration = null,
 		?int $folderCollectionVersionId = null,
-		?string $defaultTemplateId = null,
+		?int $defaultTemplateId = null,
 		?bool $isDraft = null,
 		?bool $isPublished = null,
 	): DataResponse {

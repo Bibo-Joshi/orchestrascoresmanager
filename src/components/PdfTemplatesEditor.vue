@@ -77,6 +77,16 @@
 						maxlength="2000"
 						rows="2" />
 				</label>
+				<label>
+					{{ t('Header layout') }}
+					<select v-model="headerPreset">
+						<option value="full">{{ t('Full') }}</option>
+						<option value="compact">{{ t('Compact') }}</option>
+						<option v-if="headerPreset === 'custom'" value="custom" disabled>
+							{{ t('Custom') }}
+						</option>
+					</select>
+				</label>
 				<fieldset>
 					<legend>{{ t('Font sizes (pt)') }}</legend>
 					<div class="field-grid">
@@ -209,13 +219,9 @@
 						<label>
 							{{ t('Match rows') }}
 							<select
-								v-model="rule.kind"
-								:disabled="rule.kind === 'unsupported'">
+								v-model="rule.kind">
 								<option value="tags">{{ t('Score tags') }}</option>
 								<option value="break">{{ t('Break rows') }}</option>
-								<option
-									v-if="rule.kind === 'unsupported'"
-									value="unsupported">{{ t('Advanced condition (preserved)') }}</option>
 							</select>
 						</label>
 						<template v-if="rule.kind === 'tags'">
@@ -247,11 +253,6 @@
 								</label>
 							</div>
 						</template>
-						<p
-							v-else-if="rule.kind === 'unsupported'"
-							class="hint">
-							{{ t('This condition cannot be edited here; it will be kept unchanged.') }}
-						</p>
 						<div class="rule-formatting">
 							<label class="checkbox-field">
 								<input
@@ -315,25 +316,29 @@
 </template>
 
 <script setup lang="ts">
-import type { PdfRuleDraft } from '@/utils/pdfTemplateRules'
-import type { PdfTemplate, PdfTemplateInput } from '@/utils/pdfTemplatesApi'
+import type { SetlistTemplate, SetlistTemplateApiPostTemplatePayload } from '@/api/generated/openapi/data-contracts'
+import type { PdfRuleDraft } from '@/utils/pdfexport/ruleEditor'
 
 import { showError } from '@nextcloud/dialogs'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import { AddIcon, ArrowDownIcon, ArrowUpIcon, ConfirmIcon, DeleteIcon, EditIcon } from '@/icons/vue-material'
+import { usePdfTemplatesStore } from '@/stores/pdfTemplatesStore'
+import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
-import { DEFAULT_PDF_TEMPLATE_FONTS } from '@/utils/pdfexport/defaults'
-import { editPdfRule, newPdfRule, serializePdfRules } from '@/utils/pdfTemplateRules'
-import { createPdfTemplate, deletePdfTemplate, fetchPdfTemplates, updatePdfTemplate } from '@/utils/pdfTemplatesApi'
+import { COMPACT_PDF_HEADER_INFO, DEFAULT_PDF_TEMPLATE, FULL_PDF_HEADER_INFO } from '@/utils/pdfexport/defaults'
+import { newPdfRule, parsePdfTemplateRule, serializePdfRules } from '@/utils/pdfexport/ruleEditor'
+
+type TemplateInput = SetlistTemplateApiPostTemplatePayload['template']
 
 interface EditorForm {
-	id: string | null
+	headerInfo: SetlistTemplate['headerInfo']
+	id: number | null
 	name: string
 	description: string
-	fontSizes: Required<PdfTemplateInput['fontSizes']>
+	fontSizes: Required<NonNullable<TemplateInput['fontSizes']>>
 	margin: number
 	cellPadding: number
 	rules: PdfRuleDraft[]
@@ -342,48 +347,71 @@ interface EditorForm {
 function emptyForm(): EditorForm {
 	return {
 		id: null,
+		headerInfo: { ...FULL_PDF_HEADER_INFO, entries: [...FULL_PDF_HEADER_INFO.entries] },
 		name: '',
 		description: '',
-		fontSizes: { ...DEFAULT_PDF_TEMPLATE_FONTS },
-		margin: 8,
-		cellPadding: 1.5,
+		fontSizes: { ...DEFAULT_PDF_TEMPLATE.fontSizes },
+		margin: DEFAULT_PDF_TEMPLATE.margin,
+		cellPadding: DEFAULT_PDF_TEMPLATE.cellPadding,
 		rules: [],
 	}
 }
 
-const templates = ref<PdfTemplate[]>([])
-const loading = ref(false)
+const pdfTemplatesStore = usePdfTemplatesStore()
+const templates = computed(() => pdfTemplatesStore.templates)
+const loading = computed(() => pdfTemplatesStore.isLoading)
 const saving = ref(false)
 const editorOpen = ref(false)
 const form = ref<EditorForm>(emptyForm())
 
-async function refreshTemplates(): Promise<void> {
-	loading.value = true
-	try {
-		templates.value = await fetchPdfTemplates()
-	} catch {
-		showError(t('Could not load shared PDF templates.'))
-	} finally {
-		loading.value = false
-	}
-}
+const headerPreset = computed({
+	get(): 'full' | 'compact' | 'custom' {
+		const { layout, entries } = form.value.headerInfo
+		const matches = (preset: SetlistTemplate['headerInfo']) => layout === preset.layout && JSON.stringify(entries) === JSON.stringify(preset.entries)
 
-onMounted(refreshTemplates)
+		if (matches(FULL_PDF_HEADER_INFO)) {
+			return 'full'
+		}
+		if (matches(COMPACT_PDF_HEADER_INFO)) {
+			return 'compact'
+		}
+		return 'custom'
+	},
+	set(value: 'full' | 'compact' | 'custom') {
+		if (value === 'custom') {
+			return
+		}
+		const preset = value === 'compact' ? COMPACT_PDF_HEADER_INFO : FULL_PDF_HEADER_INFO
+		form.value.headerInfo = { ...preset, entries: [...preset.entries] }
+	},
+})
+
+onMounted(async () => {
+	await tryShowError(() => pdfTemplatesStore.initialize(), t('Could not load shared PDF templates.'))
+})
 
 function newTemplate(): void {
 	form.value = emptyForm()
 	editorOpen.value = true
 }
 
-function editTemplate(template: PdfTemplate): void {
+function editTemplate(template: SetlistTemplate): void {
+	let rules: PdfRuleDraft[]
+	try {
+		rules = [...template.rules].sort((a, b) => a.order - b.order).map(parsePdfTemplateRule)
+	} catch {
+		showError(t('Could not read PDF template rules.'))
+		return
+	}
 	form.value = {
 		id: template.id,
+		headerInfo: { ...template.headerInfo, entries: [...template.headerInfo.entries] },
 		name: template.name,
 		description: template.description ?? '',
-		fontSizes: { ...DEFAULT_PDF_TEMPLATE_FONTS, ...template.fontSizes },
+		fontSizes: { ...DEFAULT_PDF_TEMPLATE.fontSizes, ...template.fontSizes },
 		margin: template.margin,
 		cellPadding: template.cellPadding,
-		rules: [...template.rules].sort((a, b) => a.order - b.order).map(editPdfRule),
+		rules,
 	}
 	editorOpen.value = true
 }
@@ -424,7 +452,7 @@ function numberInRange(value: unknown, min: number, max: number): boolean {
 	return typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max
 }
 
-function makePayload(): PdfTemplateInput | null {
+function makePayload(): TemplateInput | null {
 	const current = form.value
 	if (!current.name.trim()) {
 		showError(t('Please enter a template name.'))
@@ -447,6 +475,7 @@ function makePayload(): PdfTemplateInput | null {
 	}
 	return {
 		name: current.name.trim(),
+		headerInfo: current.headerInfo,
 		description: current.description.trim() || null,
 		fontSizes: { ...current.fontSizes },
 		margin: current.margin,
@@ -465,13 +494,12 @@ async function saveTemplate(): Promise<void> {
 	}
 	saving.value = true
 	try {
-		if (form.value.id) {
-			await updatePdfTemplate(form.value.id, payload)
+		if (form.value.id !== null) {
+			await pdfTemplatesStore.updateTemplate(form.value.id, payload)
 		} else {
-			await createPdfTemplate(payload)
+			await pdfTemplatesStore.createTemplate(payload)
 		}
 		editorOpen.value = false
-		await refreshTemplates()
 	} catch {
 		showError(t('Could not save PDF template.'))
 	} finally {
@@ -479,14 +507,13 @@ async function saveTemplate(): Promise<void> {
 	}
 }
 
-async function removeTemplate(item: PdfTemplate): Promise<void> {
+async function removeTemplate(item: SetlistTemplate): Promise<void> {
 	if (!window.confirm(t('Delete template "{name}"? Setlists using it will revert to the standard template.', { name: item.name }))) {
 		return
 	}
 	saving.value = true
 	try {
-		await deletePdfTemplate(item.id)
-		await refreshTemplates()
+		await pdfTemplatesStore.deleteTemplate(item.id)
 	} catch {
 		showError(t('Could not delete PDF template.'))
 	} finally {

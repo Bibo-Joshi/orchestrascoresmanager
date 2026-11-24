@@ -149,7 +149,7 @@ export const useScoresStore = defineStore('scores', () => {
 		const updated = response.data.ocs.data
 		const index = scores.value.findIndex((s) => s.id === id)
 		if (index !== -1) {
-			scores.value[index] = { ...scores.value[index], tags: updated.tags }
+			scores.value[index] = { ...updated }
 		}
 	}
 
