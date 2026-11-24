@@ -3,51 +3,44 @@
 		<p>
 			{{ t('Shared templates for PDF setlist exports. The built-in standard template is always available.') }}
 		</p>
-		<p v-if="loading">
-			{{ t('Loading templates…') }}
-		</p>
-		<p
-			v-else-if="templates.length === 0"
-			class="hint">
-			{{ t('No shared templates have been created yet.') }}
-		</p>
-		<ul
-			v-else
-			class="template-list">
-			<li
-				v-for="item in templates"
-				:key="item.id"
-				class="template-item">
-				<div class="template-info">
-					<strong>{{ item.name }}</strong>
-					<p v-if="item.description">
+		<ContentStateWrapper
+			:loading="loading"
+			:error="loadError"
+			:isEmpty="templates.length === 0"
+			:loadingText="t('Loading templates…')"
+			:errorText="t('Could not load shared PDF templates.')"
+			:emptyText="t('No shared templates have been created yet.')">
+			<ul>
+				<NcListItem
+					v-for="item in templates"
+					:key="item.id"
+					:name="item.name"
+					forceDisplayActions>
+					<template v-if="item.description" #subname>
 						{{ item.description }}
-					</p>
-				</div>
-				<div class="template-actions">
-					<NcButton
-						variant="tertiary"
-						:disabled="saving"
-						@click="editTemplate(item)">
-						<template #icon>
-							<EditIcon :size="20" />
-						</template>
-						{{ t('Edit') }}
-					</NcButton>
-					<NcButton
-						variant="tertiary"
-						:disabled="saving"
-						@click="removeTemplate(item)">
-						<template #icon>
-							<DeleteIcon :size="20" />
-						</template>
-						{{ t('Delete') }}
-					</NcButton>
-				</div>
-			</li>
-		</ul>
+					</template>
+					<template #actions>
+						<NcActionButton
+							:disabled="saving"
+							@click="editTemplate(item)">
+							<template #icon>
+								<EditIcon :size="20" />
+							</template>
+							{{ t('Edit') }}
+						</NcActionButton>
+						<NcActionButton
+							:disabled="saving"
+							@click="removeTemplate(item)">
+							<template #icon>
+								<DeleteIcon :size="20" />
+							</template>
+							{{ t('Delete') }}
+						</NcActionButton>
+					</template>
+				</NcListItem>
+			</ul>
+		</ContentStateWrapper>
 		<NcButton
-			class="new-template"
 			variant="secondary"
 			:disabled="loading || saving"
 			@click="newTemplate">
@@ -62,111 +55,87 @@
 			:name="form.id ? t('Edit PDF template') : t('New PDF template')"
 			@update:open="onDialogOpenChange">
 			<div class="template-form">
-				<label>
-					{{ t('Template name') }}
-					<input
-						v-model="form.name"
-						type="text"
-						maxlength="160"
-						required>
-				</label>
-				<label>
-					{{ t('Description (optional)') }}
-					<textarea
-						v-model="form.description"
-						maxlength="2000"
-						rows="2" />
-				</label>
-				<label>
-					{{ t('Header layout') }}
-					<select v-model="headerPreset">
-						<option value="full">{{ t('Full') }}</option>
-						<option value="compact">{{ t('Compact') }}</option>
-						<option v-if="headerPreset === 'custom'" value="custom" disabled>
-							{{ t('Custom') }}
-						</option>
-					</select>
-				</label>
+				<NcTextField
+					v-model="form.name"
+					:label="t('Template name')"
+					maxlength="160"
+					required />
+				<NcTextArea
+					v-model="form.description"
+					:label="t('Description (optional)')"
+					:rows="2"
+					resize="vertical" />
+				<NcSelect
+					:modelValue="headerPresetOptions.find((option) => option.value === headerPreset)"
+					:options="headerPresetOptions"
+					:inputLabel="t('Header layout')"
+					:clearable="false"
+					:searchable="false"
+					@update:modelValue="headerPreset = $event?.value ?? headerPreset" />
 				<fieldset>
 					<legend>{{ t('Font sizes (pt)') }}</legend>
 					<div class="field-grid">
-						<label>
-							{{ t('Title') }}
-							<input
-								v-model.number="form.fontSizes.title"
-								type="number"
-								min="5"
-								max="64"
-								step="0.5">
-						</label>
-						<label>
-							{{ t('Subtitle') }}
-							<input
-								v-model.number="form.fontSizes.subtitle"
-								type="number"
-								min="5"
-								max="64"
-								step="0.5">
-						</label>
-						<label>
-							{{ t('Color legend') }}
-							<input
-								v-model.number="form.fontSizes.colorLegend"
-								type="number"
-								min="5"
-								max="64"
-								step="0.5">
-						</label>
-						<label>
-							{{ t('Column header') }}
-							<input
-								v-model.number="form.fontSizes.columnTitle"
-								type="number"
-								min="5"
-								max="64"
-								step="0.5">
-						</label>
-						<label>
-							{{ t('Score row') }}
-							<input
-								v-model.number="form.fontSizes.scoreRow"
-								type="number"
-								min="5"
-								max="64"
-								step="0.5">
-						</label>
-						<label>
-							{{ t('Break row') }}
-							<input
-								v-model.number="form.fontSizes.breakRow"
-								type="number"
-								min="5"
-								max="64"
-								step="0.5">
-						</label>
+						<NcTextField
+							v-model.number="form.fontSizes.title"
+							:label="t('Title')"
+							type="number"
+							min="5"
+							max="64"
+							step="0.5" />
+						<NcTextField
+							v-model.number="form.fontSizes.subtitle"
+							:label="t('Subtitle')"
+							type="number"
+							min="5"
+							max="64"
+							step="0.5" />
+						<NcTextField
+							v-model.number="form.fontSizes.colorLegend"
+							:label="t('Color legend')"
+							type="number"
+							min="5"
+							max="64"
+							step="0.5" />
+						<NcTextField
+							v-model.number="form.fontSizes.columnTitle"
+							:label="t('Column header')"
+							type="number"
+							min="5"
+							max="64"
+							step="0.5" />
+						<NcTextField
+							v-model.number="form.fontSizes.scoreRow"
+							:label="t('Score row')"
+							type="number"
+							min="5"
+							max="64"
+							step="0.5" />
+						<NcTextField
+							v-model.number="form.fontSizes.breakRow"
+							:label="t('Break row')"
+							type="number"
+							min="5"
+							max="64"
+							step="0.5" />
 					</div>
 				</fieldset>
 				<fieldset>
 					<legend>{{ t('Spacing (mm)') }}</legend>
 					<div class="field-grid">
-						<label>
-							{{ t('Page margin') }}
-							<input
-								v-model.number="form.margin"
-								type="number"
-								min="0"
-								max="50"
-								step="0.5">
-						</label>
-						<label>
-							{{ t('Default cell padding') }}
-							<input
-								v-model.number="form.cellPadding"
-								type="number"
-								min="0"
-								max="20"
-								step="0.5">
-						</label>
+						<NcTextField
+							v-model.number="form.margin"
+							:label="t('Page margin')"
+							type="number"
+							min="0"
+							max="50"
+							step="0.5" />
+						<NcTextField
+							v-model.number="form.cellPadding"
+							:label="t('Default cell padding')"
+							type="number"
+							min="0"
+							max="20"
+							step="0.5" />
 					</div>
 				</fieldset>
 				<fieldset>
@@ -209,79 +178,70 @@
 								</NcButton>
 							</div>
 						</div>
-						<label>
-							{{ t('Legend label (optional)') }}
-							<input
-								v-model="rule.label"
-								type="text"
-								maxlength="160">
-						</label>
-						<label>
-							{{ t('Match rows') }}
-							<select
-								v-model="rule.kind">
-								<option value="tags">{{ t('Score tags') }}</option>
-								<option value="break">{{ t('Break rows') }}</option>
-							</select>
-						</label>
+						<NcTextField
+							v-model="rule.label"
+							:label="t('Legend label (optional)')" />
+						<NcSelect
+							:modelValue="ruleKindOptions.find((option) => option.value === rule.kind)"
+							:options="ruleKindOptions"
+							:inputLabel="t('Match rows')"
+							:clearable="false"
+							:searchable="false"
+							@update:modelValue="rule.kind = $event?.value ?? rule.kind" />
 						<template v-if="rule.kind === 'tags'">
 							<div class="rule-condition">
-								<label>
-									{{ t('Tag') }}
-									<input
-										v-model="rule.tag1"
-										type="text"
-										maxlength="160"
-										:placeholder="t('First tag')">
-								</label>
-								<label>
-									{{ t('Combine') }}
-									<select v-model="rule.operator">
-										<option value="">{{ t('Single tag') }}</option>
-										<option value="AND">AND</option>
-										<option value="OR">OR</option>
-										<option value="XOR">XOR</option>
-									</select>
-								</label>
-								<label v-if="rule.operator">
-									{{ t('Second tag') }}
-									<input
-										v-model="rule.tag2"
-										type="text"
-										maxlength="160"
-										:placeholder="t('Second tag')">
-								</label>
+								<NcTextField
+									v-model="rule.tag1"
+									:label="t('Tag')"
+									:placeholder="t('First tag')" />
+								<NcSelect
+									:modelValue="ruleOperatorOptions.find((option) => option.value === rule.operator)"
+									:options="ruleOperatorOptions"
+									:inputLabel="t('Combine')"
+									:clearable="false"
+									:searchable="false"
+									@update:modelValue="rule.operator = $event?.value ?? ''" />
+								<NcTextField
+									v-if="rule.operator"
+									v-model="rule.tag2"
+									:label="t('Second tag')"
+									:placeholder="t('Second tag')" />
 							</div>
 						</template>
 						<div class="rule-formatting">
-							<label class="checkbox-field">
-								<input
-									type="checkbox"
-									:checked="rule.backgroundColor !== null"
-									@change="toggleRuleColor(rule)">
+							<NcCheckboxRadioSwitch
+								:modelValue="rule.backgroundColor !== null"
+								type="switch"
+								@update:modelValue="toggleRuleColor(rule)">
 								{{ t('Background color') }}
-							</label>
-							<input
+							</NcCheckboxRadioSwitch>
+							<NcColorPicker
 								v-if="rule.backgroundColor !== null"
-								v-model="rule.backgroundColor"
-								type="color"
-								:aria-label="t('Background color')">
-							<label>
-								{{ t('Cell padding override (mm, optional)') }}
-								<input
-									:value="rule.cellPadding ?? ''"
-									type="number"
-									min="0"
-									max="20"
-									step="0.5"
-									:placeholder="t('Default')"
-									@input="setRulePadding(rule, $event)">
-							</label>
+								:modelValue="rule.backgroundColor"
+								:advancedFields="true"
+								@update:modelValue="rule.backgroundColor = $event ?? null">
+								<NcButton variant="secondary">
+									<template #icon>
+										<span
+											class="color-swatch"
+											:style="{ backgroundColor: rule.backgroundColor }" />
+									</template>
+									{{ rule.backgroundColor }}
+								</NcButton>
+							</NcColorPicker>
+							<NcTextField
+								:label="t('Cell padding override (mm, optional)')"
+								:modelValue="rule.cellPadding ?? ''"
+								type="number"
+								min="0"
+								max="20"
+								step="0.5"
+								:placeholder="t('Default')"
+								@update:modelValue="setRulePadding(rule, $event)" />
 						</div>
 					</div>
 					<NcButton
 						variant="tertiary"
-						:disabled="form.rules.length >= 30"
 						@click="addRule">
 						<template #icon>
 							<AddIcon :size="20" />
@@ -321,9 +281,17 @@ import type { PdfRuleDraft } from '@/utils/pdfexport/ruleEditor'
 
 import { showError } from '@nextcloud/dialogs'
 import { computed, onMounted, ref } from 'vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcButton from '@nextcloud/vue/components/NcButton'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
+import NcColorPicker from '@nextcloud/vue/components/NcColorPicker'
 import NcDialog from '@nextcloud/vue/components/NcDialog'
+import NcListItem from '@nextcloud/vue/components/NcListItem'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
+import NcSelect from '@nextcloud/vue/components/NcSelect'
+import NcTextArea from '@nextcloud/vue/components/NcTextArea'
+import NcTextField from '@nextcloud/vue/components/NcTextField'
+import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
 import { AddIcon, ArrowDownIcon, ArrowUpIcon, ConfirmIcon, DeleteIcon, EditIcon } from '@/icons/vue-material'
 import { usePdfTemplatesStore } from '@/stores/pdfTemplatesStore'
 import { tryShowError } from '@/utils/errorHandling'
@@ -360,9 +328,22 @@ function emptyForm(): EditorForm {
 const pdfTemplatesStore = usePdfTemplatesStore()
 const templates = computed(() => pdfTemplatesStore.templates)
 const loading = computed(() => pdfTemplatesStore.isLoading)
+const loadError = ref(false)
 const saving = ref(false)
 const editorOpen = ref(false)
 const form = ref<EditorForm>(emptyForm())
+
+const ruleKindOptions = [
+	{ value: 'tags', label: t('Score tags') },
+	{ value: 'break', label: t('Break rows') },
+]
+
+const ruleOperatorOptions = [
+	{ value: '', label: t('Single tag') },
+	{ value: 'AND', label: 'AND' },
+	{ value: 'OR', label: 'OR' },
+	{ value: 'XOR', label: 'XOR' },
+]
 
 const headerPreset = computed({
 	get(): 'full' | 'compact' | 'custom' {
@@ -387,8 +368,18 @@ const headerPreset = computed({
 })
 
 onMounted(async () => {
-	await tryShowError(() => pdfTemplatesStore.initialize(), t('Could not load shared PDF templates.'))
+	await tryShowError(
+		() => pdfTemplatesStore.initialize(),
+		t('Could not load shared PDF templates.'),
+		() => { loadError.value = true },
+	)
 })
+
+const headerPresetOptions = computed(() => [
+	{ value: 'full', label: t('Full') },
+	{ value: 'compact', label: t('Compact') },
+	...(headerPreset.value === 'custom' ? [{ value: 'custom', label: t('Custom') }] : []),
+])
 
 function newTemplate(): void {
 	form.value = emptyForm()
@@ -423,9 +414,7 @@ function onDialogOpenChange(open: boolean): void {
 }
 
 function addRule(): void {
-	if (form.value.rules.length < 30) {
-		form.value.rules.push(newPdfRule())
-	}
+	form.value.rules.push(newPdfRule())
 }
 
 function moveRule(index: number, delta: number): void {
@@ -443,9 +432,10 @@ function toggleRuleColor(rule: PdfRuleDraft): void {
 	rule.backgroundColor = rule.backgroundColor === null ? '#FFE2B8' : null
 }
 
-function setRulePadding(rule: PdfRuleDraft, event: Event): void {
-	const input = event.target as HTMLInputElement
-	rule.cellPadding = input.value.trim() === '' ? null : Number(input.value)
+function setRulePadding(rule: PdfRuleDraft, value: unknown): void {
+	rule.cellPadding = value === null || value === undefined || String(value).trim() === ''
+		? null
+		: Number(value)
 }
 
 function numberInRange(value: unknown, min: number, max: number): boolean {
@@ -523,24 +513,60 @@ async function removeTemplate(item: SetlistTemplate): Promise<void> {
 </script>
 
 <style scoped lang="scss">
-.pdf-templates { display: flex; flex-direction: column; gap: 12px; }
-.template-list { padding: 0; margin: 0; list-style: none; }
-.template-item { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--color-border); }
-.template-info { flex: 1; min-width: 150px; overflow-wrap: anywhere; }
-.template-info p { margin: 3px 0; color: var(--color-text-maxcontrast); }
-.template-actions { display: flex; align-items: center; gap: 4px; }
-.new-template { width: 100%; }
-.template-form { display: flex; flex-direction: column; gap: 16px; max-height: 65vh; overflow-y: auto; padding: 4px; }
-.template-form label { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.template-form input:not([type='checkbox']):not([type='color']), .template-form textarea, .template-form select { width: 100%; min-width: 0; box-sizing: border-box; padding: 7px; border: 1px solid var(--color-border); border-radius: var(--border-radius); }
-.template-form fieldset { border: 1px solid var(--color-border); border-radius: var(--border-radius); padding: 12px; }
-.template-form legend { font-weight: 600; padding: 0 4px; }
-.field-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
-.rule { margin: 12px 0; padding: 12px; border: 1px solid var(--color-border); border-radius: var(--border-radius); display: flex; flex-direction: column; gap: 10px; }
-.rule-heading { display: flex; align-items: center; justify-content: space-between; }
-.rule-condition { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
-.rule-formatting { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.rule-formatting > label:last-child { flex: 1 1 160px; }
-.template-form label.checkbox-field { flex-direction: row; align-items: center; }
-.hint { color: var(--color-text-maxcontrast); font-size: 0.9em; }
+.pdf-templates,
+.template-form {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.template-form {
+	max-height: 65vh;
+	overflow-y: auto;
+	padding: 4px;
+}
+
+.template-form fieldset {
+	border: 1px solid var(--color-border);
+	border-radius: var(--border-radius);
+	padding: 12px;
+}
+
+.field-grid,
+.rule-condition {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 10px;
+}
+
+.rule {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding-block: 12px;
+	border-bottom: 1px solid var(--color-border);
+}
+
+.rule-heading,
+.template-actions,
+.rule-formatting {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.rule-heading {
+	justify-content: space-between;
+}
+
+.rule-formatting {
+	flex-wrap: wrap;
+}
+
+.color-swatch {
+	width: 20px;
+	height: 20px;
+	border: 1px solid var(--color-border);
+	border-radius: var(--border-radius);
+}
 </style>

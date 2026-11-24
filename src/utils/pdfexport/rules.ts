@@ -22,7 +22,7 @@ export function createRuleMatcher(rules: PdfTemplateRule[]) {
 	const compiled = rules.map((rule) => ({
 		rule,
 		engine: new Engine([{
-			conditions: rule.expression as TopLevelCondition,
+			conditions: rule.expression as unknown as TopLevelCondition,
 			event: { type: 'format-row' },
 		}]),
 	}))
