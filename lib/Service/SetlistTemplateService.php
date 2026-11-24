@@ -67,8 +67,12 @@ class SetlistTemplateService {
 		unset($previous['id'], $previous['createdBy'], $previous['createdAt'], $previous['updatedAt']);
 
 		if (isset($changes['fontSizes']) && is_array($changes['fontSizes'])) {
+			$previousFontSizes = $previous['fontSizes'] ?? [];
+			if (!is_array($previousFontSizes)) {
+				throw new \UnexpectedValueException('Stored template fontSizes are invalid');
+			}
 			$changes['fontSizes'] = array_replace(
-				$previous['fontSizes'] ?? [],
+				$previousFontSizes,
 				$changes['fontSizes']
 			);
 		}

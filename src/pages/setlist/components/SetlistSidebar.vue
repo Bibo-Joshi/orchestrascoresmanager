@@ -252,6 +252,16 @@ async function initializeFormData() {
 const debouncedSave = debounce(handleSave, 800)
 onUnmounted(() => debouncedSave.cancel())
 
+watch(
+	() => pdfTemplatesStore.templates.map((template) => template.id),
+	(ids, previousIds) => {
+		const selectedId = formData.value.defaultTemplateId
+		if (selectedId !== null && previousIds.includes(selectedId) && !ids.includes(selectedId)) {
+			formData.value.defaultTemplateId = null
+		}
+	},
+)
+
 watch(() => props.setlist?.id, async (newId, oldId) => {
 	if (newId !== oldId) {
 		debouncedSave.cancel()

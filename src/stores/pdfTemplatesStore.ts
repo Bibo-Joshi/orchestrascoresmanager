@@ -7,6 +7,7 @@ import type {
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { apiClients } from '@/api/client'
+import { useSetlistsStore } from '@/stores/setlistsStore'
 
 export const usePdfTemplatesStore = defineStore('pdfTemplates', () => {
 	const templates = ref<SetlistTemplate[]>([])
@@ -68,6 +69,7 @@ export const usePdfTemplatesStore = defineStore('pdfTemplates', () => {
 	async function deleteTemplate(id: number): Promise<void> {
 		await apiClients.default.setlistTemplateApiDeleteTemplate(id)
 		templates.value = templates.value.filter((template) => template.id !== id)
+		useSetlistsStore().clearDefaultTemplateReferences(id)
 	}
 
 	return {

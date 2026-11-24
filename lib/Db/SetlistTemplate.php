@@ -73,7 +73,7 @@ class SetlistTemplate extends Entity implements JsonSerializable {
 			'id' => $this->id,
 			'name' => $this->name,
 			'description' => $this->description,
-			'fontSizes' => empty($fontSizes) ? null : $fontSizes,
+			'fontSizes' => $fontSizes === [] ? null : $fontSizes,
 			'margin' => $config['margin'],
 			'cellPadding' => $config['cellPadding'],
 			'rules' => $config['rules'],
