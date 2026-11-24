@@ -201,4 +201,18 @@ final class SetlistTemplateServiceTest extends TestCase {
 		$this->expectException(\UnexpectedValueException::class);
 		$this->service->patchTemplate(1, ['fontSizes' => ['title' => 20]]);
 	}
+
+	public function testPatchRejectsNonObjectConfiguration(): void {
+		$template = self::savedTemplate();
+		$template->setConfigJson('[]');
+
+		$this->mapper->method('find')->with(1)->willReturn($template);
+		$this->mapper->expects($this->never())->method('update');
+
+		$this->expectException(\UnexpectedValueException::class);
+		$this->expectExceptionMessage('Stored PDF template configuration must be a JSON object');
+
+		$this->service->patchTemplate(1, ['margin' => 10]);
+	}
+
 }

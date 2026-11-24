@@ -97,6 +97,22 @@ final class SetlistTemplateValidatorTest extends TestCase {
 
 	public static function invalidTemplates(): iterable {
 
+		yield 'font sizes as string' => [static function (array &$i): void {
+			$i['fontSizes'] = 'invalid';
+		}];
+
+		yield 'font sizes as list' => [static function (array &$i): void {
+			$i['fontSizes'] = [12, 16];
+		}];
+
+		yield 'rules as string' => [static function (array &$i): void {
+			$i['rules'] = 'invalid';
+		}];
+
+		yield 'rules as associative array' => [static function (array &$i): void {
+			$i['rules'] = ['rule' => []];
+		}];
+
 		yield 'invalid header layout' => [static function (array &$i): void {
 			$i['headerInfo'] = ['entries' => ['date'], 'layout' => 'invalid'];
 		}];

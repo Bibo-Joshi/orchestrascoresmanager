@@ -67,10 +67,9 @@ class SetlistTemplateService {
 		unset($previous['id'], $previous['createdBy'], $previous['createdAt'], $previous['updatedAt']);
 
 		if (isset($changes['fontSizes']) && is_array($changes['fontSizes'])) {
+			// The entity has already validated the stored font sizes.
+			/** @var array $previousFontSizes */
 			$previousFontSizes = $previous['fontSizes'] ?? [];
-			if (!is_array($previousFontSizes)) {
-				throw new \UnexpectedValueException('Stored template fontSizes are invalid');
-			}
 			$changes['fontSizes'] = array_replace(
 				$previousFontSizes,
 				$changes['fontSizes']
