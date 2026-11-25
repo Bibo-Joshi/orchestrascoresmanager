@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Score, ScoreIndexed, Setlist } from '@/api/generated/openapi/data-contracts'
+import type { FolderCollection, Score, ScoreIndexed, Setlist } from '@/api/generated/openapi/data-contracts'
 import type { EntityOption } from '@/composables/useEntitySelect'
 
 import { showError } from '@nextcloud/dialogs'
@@ -70,6 +70,7 @@ import FocusTrap from '@/components/FocusTrap.vue'
 import { apiClients } from '@/api/client'
 import { createScoreOptions, filterScores } from '@/composables/useEntitySelect'
 import { CancelIcon, ConfirmIcon } from '@/icons/vue-material'
+import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
 import { t } from '@/utils/l10n'
@@ -77,6 +78,12 @@ import { formatDurationHHMMSS, parseDurationHHMMSS, restrictToTimeFormat as rest
 
 interface Props {
 	setlist: Setlist
+	/** Map of score ID to FCV index (direct scores only) */
+	fcvScoresMap?: Map<number, number>
+	/** Map of score book ID to FCV index */
+	fcvScoreBookIndicesMap?: Map<number, number>
+	/** Folder collection of the setlist's FCV, if any */
+	folderCollection?: FolderCollection | null
 }
 
 /** Whether the dialog is open */
@@ -86,6 +93,7 @@ const props = defineProps<Props>()
 
 const setlistEntriesStore = useSetlistEntriesStore()
 const scoresStore = useScoresStore()
+const scoreBooksStore = useScoreBooksStore()
 
 /**
  * Entry type options for the first dropdown
@@ -101,6 +109,32 @@ const breakDurationStr = ref('')
 const fcvScoreOptions = ref<EntityOption<Score>[]>([])
 
 /**
+ * Build an unambiguous label for a score in the dropdown.
+ * Indexed folder collections: prefix with the index. Otherwise: append arranger and score book title.
+ *
+ * @param score - The score to build the label for
+ * @return Label string
+ */
+function formatScoreLabel(score: Score): string {
+	if (props.folderCollection?.collectionType === 'indexed') {
+		let index: string | number | undefined = props.fcvScoresMap?.get(score.id)
+		if (index === undefined && score.scoreBook) {
+			const bookIndex = props.fcvScoreBookIndicesMap?.get(score.scoreBook.id)
+			if (bookIndex !== undefined) {
+				index = `${bookIndex}.${score.scoreBook.index}`
+			}
+		}
+		return index !== undefined ? `${index} - ${score.title}` : score.title
+	}
+
+	const details = [
+		score.arranger,
+		score.scoreBook ? scoreBooksStore.getScoreBookById(score.scoreBook.id)?.title : null,
+	].filter((detail): detail is string => !!detail)
+	return details.length > 0 ? `${score.title} (${details.join(', ')})` : score.title
+}
+
+/**
  * Get available scores based on whether setlist has a folder collection version
  */
 const availableScoreOptions = computed(() => {
@@ -110,7 +144,7 @@ const availableScoreOptions = computed(() => {
 	}
 
 	// Otherwise, show all scores
-	return createScoreOptions(scoresStore.scoresSorted)
+	return createScoreOptions(scoresStore.scoresSorted, false, undefined, formatScoreLabel)
 })
 
 /**
@@ -205,7 +239,7 @@ async function loadFcvScores() {
 		const fcvScores = scoresResponse.data.ocs.data as (Score | ScoreIndexed)[]
 
 		// Build options from FCV scores
-		const options = createScoreOptions(fcvScores)
+		const options = createScoreOptions(fcvScores, false, undefined, formatScoreLabel)
 
 		// Sort by title
 		options.sort((a, b) => a.entity.title.localeCompare(b.entity.title))

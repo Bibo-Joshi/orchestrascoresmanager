@@ -29,12 +29,14 @@ export function formatEntityLabel(title: string, titleShort?: string | string[] 
  * @param scores - Array of scores
  * @param excludeInBook - Whether to exclude scores already in a book
  * @param excludeScoreBooksIds - Set of score book IDs to exclude scores from
+ * @param labelFormatter - Optional function to customize the option label; defaults to title with short titles
  * @return Array of score options for NcSelect
  */
 export function createScoreOptions(
 	scores: Score[],
 	excludeInBook: boolean = false,
 	excludeScoreBooksIds?: Set<number>,
+	labelFormatter?: (score: Score) => string,
 ): EntityOption<Score>[] {
 	return scores
 		.filter((score) => {
@@ -46,7 +48,7 @@ export function createScoreOptions(
 			return !excludeInBook || score.scoreBook === null
 		})
 		.map((score) => ({
-			label: formatEntityLabel(score.title, score.titlesShort),
+			label: labelFormatter ? labelFormatter(score) : formatEntityLabel(score.title, score.titlesShort),
 			value: score.id,
 			entity: score,
 		}))
