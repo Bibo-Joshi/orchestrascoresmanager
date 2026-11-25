@@ -79,7 +79,10 @@
 				<AddSetlistEntryDialog
 					v-if="editable"
 					v-model:open="showAddEntryDialog"
-					:setlist="setlist" />
+					:setlist="setlist"
+					:fcvScoresMap="fcvScoresMap"
+					:fcvScoreBookIndicesMap="fcvScoreBookIndicesMap"
+					:folderCollection="folderCollection" />
 				<PdfExportDialog
 					v-model:open="showPdfExportDialog"
 					:setlist="setlist"
