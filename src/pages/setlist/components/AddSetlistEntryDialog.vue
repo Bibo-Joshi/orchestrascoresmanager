@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Score, ScoreIndexed, Setlist } from '@/api/generated/openapi/data-contracts'
+import type { FolderCollection, Score, ScoreBookIndexed, ScoreIndexed, Setlist } from '@/api/generated/openapi/data-contracts'
 import type { EntityOption } from '@/composables/useEntitySelect'
 
 import { showError } from '@nextcloud/dialogs'
@@ -70,6 +70,7 @@ import FocusTrap from '@/components/FocusTrap.vue'
 import { apiClients } from '@/api/client'
 import { createScoreOptions, filterScores } from '@/composables/useEntitySelect'
 import { CancelIcon, ConfirmIcon } from '@/icons/vue-material'
+import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { useSetlistEntriesStore } from '@/stores/setlistEntriesStore'
 import { t } from '@/utils/l10n'
@@ -86,6 +87,7 @@ const props = defineProps<Props>()
 
 const setlistEntriesStore = useSetlistEntriesStore()
 const scoresStore = useScoresStore()
+const scoreBooksStore = useScoreBooksStore()
 
 /**
  * Entry type options for the first dropdown
@@ -99,6 +101,35 @@ const selectedEntryType = ref<{ label: string, value: 'score' | 'break' } | null
 const selectedScore = ref<EntityOption<Score> | null>(null)
 const breakDurationStr = ref('')
 const fcvScoreOptions = ref<EntityOption<Score>[]>([])
+const fcvCollection = ref<FolderCollection | null>(null)
+const fcvScoreBookIndices = ref<Map<number, number>>(new Map())
+const fcvScoreIndices = ref<Map<number, number>>(new Map())
+
+/**
+ * Build an unambiguous label for a score in the dropdown.
+ * Indexed folder collections: prefix with the index. Otherwise: append arranger and score book title.
+ *
+ * @param score - The score to build the label for
+ * @return Label string
+ */
+function formatScoreLabel(score: Score): string {
+	if (fcvCollection.value?.collectionType === 'indexed') {
+		let index: string | number | undefined = fcvScoreIndices.value.get(score.id)
+		if (index === undefined && score.scoreBook) {
+			const bookIndex = fcvScoreBookIndices.value.get(score.scoreBook.id)
+			if (bookIndex !== undefined) {
+				index = `${bookIndex}.${score.scoreBook.index}`
+			}
+		}
+		return index !== undefined ? `${index} - ${score.title}` : score.title
+	}
+
+	const details = [
+		score.arranger,
+		score.scoreBook ? scoreBooksStore.getScoreBookById(score.scoreBook.id)?.title : null,
+	].filter((detail): detail is string => !!detail)
+	return details.length > 0 ? `${score.title} (${details.join(', ')})` : score.title
+}
 
 /**
  * Get available scores based on whether setlist has a folder collection version
@@ -110,7 +141,7 @@ const availableScoreOptions = computed(() => {
 	}
 
 	// Otherwise, show all scores
-	return createScoreOptions(scoresStore.scoresSorted)
+	return createScoreOptions(scoresStore.scoresSorted, false, undefined, formatScoreLabel)
 })
 
 /**
@@ -197,6 +228,9 @@ async function loadFcvScores() {
 		const versionResponse = await apiClients.default.folderCollectionVersionApiGetFolderCollectionVersion(props.setlist.folderCollectionVersionId)
 		const version = versionResponse.data.ocs.data
 
+		const collectionResponse = await apiClients.default.folderCollectionApiGetFolderCollection(version.folderCollectionId)
+		fcvCollection.value = collectionResponse.data.ocs.data
+
 		// Load the scores for this folder collection version
 		const scoresResponse = await apiClients.default.folderCollectionApiGetFolderCollectionScores(
 			version.folderCollectionId,
@@ -204,8 +238,22 @@ async function loadFcvScores() {
 		)
 		const fcvScores = scoresResponse.data.ocs.data as (Score | ScoreIndexed)[]
 
+		const scoreBooksResponse = await apiClients.default.folderCollectionApiGetFolderCollectionScoreBooks(
+			version.folderCollectionId,
+			{ versionId: props.setlist.folderCollectionVersionId },
+		)
+		const fcvScoreBooks = scoreBooksResponse.data.ocs.data as ScoreBookIndexed[]
+		fcvScoreBookIndices.value = new Map(
+			fcvScoreBooks.filter((book) => book.index !== undefined && book.index !== null).map((book): [number, number] => [book.id, book.index]),
+		)
+		fcvScoreIndices.value = new Map(
+			(fcvScores as ScoreIndexed[])
+				.filter((score) => !score.viaScoreBook && score.index !== undefined && score.index !== null)
+				.map((score): [number, number] => [score.id, score.index]),
+		)
+
 		// Build options from FCV scores
-		const options = createScoreOptions(fcvScores)
+		const options = createScoreOptions(fcvScores, false, undefined, formatScoreLabel)
 
 		// Sort by title
 		options.sort((a, b) => a.entity.title.localeCompare(b.entity.title))
