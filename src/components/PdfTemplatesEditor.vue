@@ -60,6 +60,8 @@
 					v-model="form.name"
 					:label="t('Template name')"
 					maxlength="160"
+					:error="!form.name.trim()"
+					:helperText="!form.name.trim() ? t('Please enter a template name.') : ''"
 					required />
 				<NcTextArea
 					v-model="form.description"
@@ -82,42 +84,60 @@
 							type="number"
 							min="5"
 							max="64"
-							step="0.5" />
+							step="0.5"
+							:error="!!rangeError(form.fontSizes.title, 5, 64)"
+							:helperText="rangeError(form.fontSizes.title, 5, 64)"
+							required />
 						<NcTextField
 							v-model.number="form.fontSizes.subtitle"
 							:label="t('Subtitle')"
 							type="number"
 							min="5"
 							max="64"
-							step="0.5" />
+							step="0.5"
+							:error="!!rangeError(form.fontSizes.subtitle, 5, 64)"
+							:helperText="rangeError(form.fontSizes.subtitle, 5, 64)"
+							required />
 						<NcTextField
 							v-model.number="form.fontSizes.colorLegend"
 							:label="t('Color legend')"
 							type="number"
 							min="5"
 							max="64"
-							step="0.5" />
+							step="0.5"
+							:error="!!rangeError(form.fontSizes.colorLegend, 5, 64)"
+							:helperText="rangeError(form.fontSizes.colorLegend, 5, 64)"
+							required />
 						<NcTextField
 							v-model.number="form.fontSizes.columnTitle"
 							:label="t('Column header')"
 							type="number"
 							min="5"
 							max="64"
-							step="0.5" />
+							step="0.5"
+							:error="!!rangeError(form.fontSizes.columnTitle, 5, 64)"
+							:helperText="rangeError(form.fontSizes.columnTitle, 5, 64)"
+							required />
 						<NcTextField
 							v-model.number="form.fontSizes.scoreRow"
 							:label="t('Score row')"
 							type="number"
 							min="5"
 							max="64"
-							step="0.5" />
+							step="0.5"
+							:error="!!rangeError(form.fontSizes.scoreRow, 5, 64)"
+							:helperText="rangeError(form.fontSizes.scoreRow, 5, 64)"
+							required />
 						<NcTextField
 							v-model.number="form.fontSizes.breakRow"
 							:label="t('Break row')"
 							type="number"
 							min="5"
 							max="64"
-							step="0.5" />
+							step="0.5"
+							:error="!!rangeError(form.fontSizes.breakRow, 5, 64)"
+							:helperText="rangeError(form.fontSizes.breakRow, 5, 64)"
+							required />
 					</div>
 				</fieldset>
 				<fieldset>
@@ -129,14 +149,20 @@
 							type="number"
 							min="0"
 							max="50"
-							step="0.5" />
+							step="0.5"
+							:error="!!rangeError(form.margin, 0, 50)"
+							:helperText="rangeError(form.margin, 0, 50)"
+							required />
 						<NcTextField
 							v-model.number="form.cellPadding"
 							:label="t('Default cell padding')"
 							type="number"
 							min="0"
 							max="20"
-							step="0.5" />
+							step="0.5"
+							:error="!!rangeError(form.cellPadding, 0, 20)"
+							:helperText="rangeError(form.cellPadding, 0, 20)"
+							required />
 					</div>
 				</fieldset>
 				<fieldset>
@@ -196,7 +222,10 @@
 								<NcTextField
 									v-model="rule.tag1"
 									:label="t('Tag')"
-									:placeholder="t('First tag')" />
+									:placeholder="t('First tag')"
+									:error="!rule.tag1.trim()"
+									:helperText="!rule.tag1.trim() ? t('Each tag rule must have the required tag names.') : ''"
+									required />
 								<NcSelect
 									:modelValue="ruleOperatorOptions.find((option) => option.value === rule.operator)"
 									:options="ruleOperatorOptions"
@@ -208,7 +237,10 @@
 									v-if="rule.operator"
 									v-model="rule.tag2"
 									:label="t('Second tag')"
-									:placeholder="t('Second tag')" />
+									:placeholder="t('Second tag')"
+									:error="!rule.tag2.trim()"
+									:helperText="!rule.tag2.trim() ? t('Each tag rule must have the required tag names.') : ''"
+									required />
 							</div>
 						</template>
 						<div class="rule-formatting">
@@ -240,6 +272,8 @@
 								max="20"
 								step="0.5"
 								:placeholder="t('Default')"
+								:error="rule.cellPadding !== null && !numberInRange(rule.cellPadding, 0, 20)"
+								:helperText="rule.cellPadding !== null && !numberInRange(rule.cellPadding, 0, 20) ? t('Invalid rule cell padding.') + ' (0–20)' : ''"
 								@update:modelValue="setRulePadding(rule, $event)" />
 						</div>
 					</div>
@@ -261,7 +295,7 @@
 				</NcButton>
 				<NcButton
 					variant="primary"
-					:disabled="saving"
+					:disabled="saving || !isFormValid"
 					@click="saveTemplate">
 					<template #icon>
 						<NcLoadingIcon
@@ -337,6 +371,18 @@ const loadError = ref(false)
 const saving = ref(false)
 const editorOpen = ref(false)
 const form = ref<EditorForm>(emptyForm())
+
+const isFormValid = computed(() => {
+	const current = form.value
+	return !!current.name.trim()
+		&& Object.values(current.fontSizes).every((size) => numberInRange(size, 5, 64))
+		&& numberInRange(current.margin, 0, 50)
+		&& numberInRange(current.cellPadding, 0, 20)
+		&& current.rules.every((rule) => (
+			(rule.kind !== 'tags' || (!!rule.tag1.trim() && (!rule.operator || !!rule.tag2.trim())))
+			&& (rule.cellPadding === null || numberInRange(rule.cellPadding, 0, 20))
+		))
+})
 
 const ruleKindOptions = [
 	{ value: 'tags', label: t('Score tags') },
@@ -458,27 +504,18 @@ function numberInRange(value: unknown, min: number, max: number): boolean {
 	return typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max
 }
 
-function makePayload(): TemplateInput | null {
+/**
+ * Return the validation message for a required numeric field.
+ * @param value Field value.
+ * @param min Minimum inclusive value.
+ * @param max Maximum inclusive value.
+ */
+function rangeError(value: unknown, min: number, max: number): string {
+	return numberInRange(value, min, max) ? '' : `${t('Please check the font sizes and spacing values.')} (${min}–${max})`
+}
+
+function makePayload(): TemplateInput {
 	const current = form.value
-	if (!current.name.trim()) {
-		showError(t('Please enter a template name.'))
-		return null
-	}
-	if (Object.values(current.fontSizes).some((size) => !numberInRange(size, 5, 64))
-		|| !numberInRange(current.margin, 0, 50) || !numberInRange(current.cellPadding, 0, 20)) {
-		showError(t('Please check the font sizes and spacing values.'))
-		return null
-	}
-	for (const rule of current.rules) {
-		if (rule.kind === 'tags' && (!rule.tag1.trim() || (rule.operator && !rule.tag2.trim()))) {
-			showError(t('Each tag rule must have the required tag names.'))
-			return null
-		}
-		if (rule.cellPadding !== null && !numberInRange(rule.cellPadding, 0, 20)) {
-			showError(t('Invalid rule cell padding.'))
-			return null
-		}
-	}
 	return {
 		name: current.name.trim(),
 		headerInfo: current.headerInfo,
@@ -491,13 +528,10 @@ function makePayload(): TemplateInput | null {
 }
 
 async function saveTemplate(): Promise<void> {
-	if (saving.value) {
+	if (saving.value || !isFormValid.value) {
 		return
 	}
 	const payload = makePayload()
-	if (!payload) {
-		return
-	}
 	saving.value = true
 	try {
 		await tryShowError(
