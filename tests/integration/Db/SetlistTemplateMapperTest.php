@@ -29,7 +29,7 @@ final class SetlistTemplateMapperTest extends MapperTestCase {
 		return $this->mapper->insert(SetlistTemplate::fromParams([
 			'name' => $name,
 			'description' => null,
-			'configJson' => '{"fontSizes":{"title":16},"margin":8,"cellPadding":1.5,"rules":[]}',
+			'configJson' => '{"fontSizes":{"title":16},"margin":8,"cellPadding":1.5,"rules":[],"headerInfo":{"entries":["date"],"layout":"table"}}',
 			'createdBy' => 'editor',
 			'createdAt' => $now,
 			'updatedAt' => $now,

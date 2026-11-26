@@ -35,6 +35,7 @@ final class SetlistTemplateApiControllerTest extends TestCase {
 			'id' => $id,
 			'name' => 'Stage',
 			'configJson' => json_encode([
+				'headerInfo' => ['entries' => ['date'], 'layout' => 'table'],
 				'fontSizes' => $fontSizes,
 				'margin' => 8,
 				'cellPadding' => 1.5,

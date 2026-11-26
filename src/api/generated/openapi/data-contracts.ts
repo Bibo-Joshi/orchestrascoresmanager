@@ -229,49 +229,79 @@ export interface SetlistTemplate {
   id: number;
   name: string;
   description: string | null;
-  headerInfo: {
-    entries: (
-      | "date"
-      | "startTime"
-      | "endTime"
-      | "playDuration"
-      | "breaksDuration"
-      | "overallDuration"
-      | "folderCollection"
-    )[];
-    layout: "table" | "subtitle";
-  };
-  fontSizes: {
-    /** @format double */
-    title?: number;
-    /** @format double */
-    subtitle?: number;
-    /** @format double */
-    colorLegend?: number;
-    /** @format double */
-    columnTitle?: number;
-    /** @format double */
-    scoreRow?: number;
-    /** @format double */
-    breakRow?: number;
-  } | null;
+  headerInfo: SetlistTemplateHeaderInfo;
+  fontSizes: SetlistTemplateFontSizes | null;
   /** @format double */
   margin: number;
   /** @format double */
   cellPadding: number;
-  rules: {
-    id: string;
-    /** @format int64 */
-    order: number;
-    label?: string | null;
-    expression: Record<string, object>;
-    backgroundColor?: string | null;
-    /** @format double */
-    cellPadding?: number | null;
-  }[];
+  rules: SetlistTemplateRule[];
   createdBy: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface SetlistTemplateCreate {
+  name: string;
+  description?: string | null;
+  headerInfo: SetlistTemplateHeaderInfo;
+  fontSizes?: SetlistTemplateFontSizes | null;
+  /** @format double */
+  margin: number;
+  /** @format double */
+  cellPadding: number;
+  rules: SetlistTemplateRule[];
+}
+
+export interface SetlistTemplateFontSizes {
+  /** @format double */
+  title?: number;
+  /** @format double */
+  subtitle?: number;
+  /** @format double */
+  colorLegend?: number;
+  /** @format double */
+  columnTitle?: number;
+  /** @format double */
+  scoreRow?: number;
+  /** @format double */
+  breakRow?: number;
+}
+
+export interface SetlistTemplateHeaderInfo {
+  entries: (
+    | "date"
+    | "startTime"
+    | "endTime"
+    | "playDuration"
+    | "breaksDuration"
+    | "overallDuration"
+    | "folderCollection"
+  )[];
+  layout: "table" | "subtitle";
+}
+
+export interface SetlistTemplatePatch {
+  name?: string;
+  description?: string | null;
+  headerInfo?: SetlistTemplateHeaderInfo;
+  fontSizes?: SetlistTemplateFontSizes | null;
+  /** @format double */
+  margin?: number;
+  /** @format double */
+  cellPadding?: number;
+  rules?: SetlistTemplateRule[];
+}
+
+export interface SetlistTemplateRule {
+  id: string;
+  /** @format int64 */
+  order: number;
+  label?: string | null;
+  expression: Record<string, object>;
+  backgroundColor?: string | null;
+  /** @format double */
+  cellPadding?: number | null;
 }
 
 export interface Tag {
@@ -1264,50 +1294,7 @@ export interface SetlistTemplateApiGetTemplatesData {
 
 export interface SetlistTemplateApiPostTemplatePayload {
   /** Template fields */
-  template: {
-    name: string;
-    description?: string | null;
-    headerInfo?: {
-      entries: (
-        | "date"
-        | "startTime"
-        | "endTime"
-        | "playDuration"
-        | "breaksDuration"
-        | "overallDuration"
-        | "folderCollection"
-      )[];
-      layout: "table" | "subtitle";
-    };
-    fontSizes?: {
-      /** @format double */
-      title?: number;
-      /** @format double */
-      subtitle?: number;
-      /** @format double */
-      colorLegend?: number;
-      /** @format double */
-      columnTitle?: number;
-      /** @format double */
-      scoreRow?: number;
-      /** @format double */
-      breakRow?: number;
-    } | null;
-    /** @format double */
-    margin: number;
-    /** @format double */
-    cellPadding: number;
-    rules: {
-      id: string;
-      /** @format int64 */
-      order: number;
-      label?: string | null;
-      expression: Record<string, object>;
-      backgroundColor?: string | null;
-      /** @format double */
-      cellPadding?: number | null;
-    }[];
-  };
+  template: SetlistTemplateCreate;
 }
 
 export interface SetlistTemplateApiPostTemplateData {
@@ -1319,50 +1306,7 @@ export interface SetlistTemplateApiPostTemplateData {
 
 export interface SetlistTemplateApiPatchTemplatePayload {
   /** Partial template fields */
-  template: {
-    name?: string;
-    description?: string | null;
-    headerInfo?: {
-      entries: (
-        | "date"
-        | "startTime"
-        | "endTime"
-        | "playDuration"
-        | "breaksDuration"
-        | "overallDuration"
-        | "folderCollection"
-      )[];
-      layout: "table" | "subtitle";
-    };
-    fontSizes?: {
-      /** @format double */
-      title?: number;
-      /** @format double */
-      subtitle?: number;
-      /** @format double */
-      colorLegend?: number;
-      /** @format double */
-      columnTitle?: number;
-      /** @format double */
-      scoreRow?: number;
-      /** @format double */
-      breakRow?: number;
-    } | null;
-    /** @format double */
-    margin?: number;
-    /** @format double */
-    cellPadding?: number;
-    rules?: {
-      id: string;
-      /** @format int64 */
-      order: number;
-      label?: string | null;
-      expression: Record<string, object>;
-      backgroundColor?: string | null;
-      /** @format double */
-      cellPadding?: number | null;
-    }[];
-  };
+  template: SetlistTemplatePatch;
 }
 
 export interface SetlistTemplateApiPatchTemplateData {

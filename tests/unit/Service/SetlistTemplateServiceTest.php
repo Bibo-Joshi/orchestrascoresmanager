@@ -44,6 +44,10 @@ final class SetlistTemplateServiceTest extends TestCase {
 			'name' => 'Stage layout',
 			'description' => null,
 			'fontSizes' => ['title' => 16, 'scoreRow' => 8],
+			'headerInfo' => [
+				'entries' => ['date', 'startTime', 'endTime', 'playDuration', 'breaksDuration', 'overallDuration', 'folderCollection'],
+				'layout' => 'table',
+			],
 			'margin' => 8,
 			'cellPadding' => 1.5,
 			'rules' => [],
@@ -57,7 +61,7 @@ final class SetlistTemplateServiceTest extends TestCase {
 			'id' => 1,
 			'name' => 'Stage layout',
 			'description' => null,
-			'configJson' => '{"fontSizes":{"title":16,"scoreRow":8},"margin":8,"cellPadding":1.5,"rules":[]}',
+			'configJson' => '{"fontSizes":{"title":16,"scoreRow":8},"margin":8,"cellPadding":1.5,"rules":[],"headerInfo":{"entries":["date"],"layout":"table"}}',
 			'createdBy' => 'editor',
 			'createdAt' => $now,
 			'updatedAt' => $now,
@@ -102,6 +106,18 @@ final class SetlistTemplateServiceTest extends TestCase {
 		$this->assertSame(1, $this->service->createTemplate(self::validInput())->getId());
 	}
 
+	public function testCreateRejectsMissingHeaderInfo(): void {
+		$input = self::validInput();
+		unset($input['headerInfo']);
+
+		$this->mapper->expects($this->never())->method('insert');
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage('Invalid headerInfo');
+
+		$this->service->createTemplate($input);
+	}
+
 	public function testPatchMergesAndValidates(): void {
 		$template = self::savedTemplate();
 
@@ -116,6 +132,10 @@ final class SetlistTemplateServiceTest extends TestCase {
 		$updated = $this->service->patchTemplate(1, ['margin' => 12]);
 
 		$this->assertEquals(12, $updated->jsonSerialize()['margin']);
+		$this->assertSame(
+			['entries' => ['date'], 'layout' => 'table'],
+			$updated->jsonSerialize()['headerInfo']
+		);
 		$this->assertSame('Stage layout', $updated->getName());
 		$this->assertSame('editor', $updated->getCreatedBy());
 	}
@@ -193,7 +213,7 @@ final class SetlistTemplateServiceTest extends TestCase {
 
 	public function testPatchRejectsMalformedStoredFontSizes(): void {
 		$template = self::savedTemplate();
-		$template->setConfigJson('{"fontSizes":"invalid","margin":8,"cellPadding":1.5,"rules":[]}');
+		$template->setConfigJson('{"fontSizes":"invalid","margin":8,"cellPadding":1.5,"rules":[],"headerInfo":{"entries":["date"],"layout":"table"}}');
 
 		$this->mapper->method('find')->with(1)->willReturn($template);
 		$this->mapper->expects($this->never())->method('update');

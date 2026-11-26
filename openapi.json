@@ -805,65 +805,15 @@
                         "nullable": true
                     },
                     "headerInfo": {
-                        "type": "object",
-                        "required": [
-                            "entries",
-                            "layout"
-                        ],
-                        "properties": {
-                            "entries": {
-                                "type": "array",
-                                "items": {
-                                    "type": "string",
-                                    "enum": [
-                                        "date",
-                                        "startTime",
-                                        "endTime",
-                                        "playDuration",
-                                        "breaksDuration",
-                                        "overallDuration",
-                                        "folderCollection"
-                                    ]
-                                }
-                            },
-                            "layout": {
-                                "type": "string",
-                                "enum": [
-                                    "table",
-                                    "subtitle"
-                                ]
-                            }
-                        }
+                        "$ref": "#/components/schemas/SetlistTemplateHeaderInfo"
                     },
                     "fontSizes": {
-                        "type": "object",
                         "nullable": true,
-                        "properties": {
-                            "title": {
-                                "type": "number",
-                                "format": "double"
-                            },
-                            "subtitle": {
-                                "type": "number",
-                                "format": "double"
-                            },
-                            "colorLegend": {
-                                "type": "number",
-                                "format": "double"
-                            },
-                            "columnTitle": {
-                                "type": "number",
-                                "format": "double"
-                            },
-                            "scoreRow": {
-                                "type": "number",
-                                "format": "double"
-                            },
-                            "breakRow": {
-                                "type": "number",
-                                "format": "double"
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SetlistTemplateFontSizes"
                             }
-                        }
+                        ]
                     },
                     "margin": {
                         "type": "number",
@@ -876,40 +826,7 @@
                     "rules": {
                         "type": "array",
                         "items": {
-                            "type": "object",
-                            "required": [
-                                "id",
-                                "order",
-                                "expression"
-                            ],
-                            "properties": {
-                                "id": {
-                                    "type": "string"
-                                },
-                                "order": {
-                                    "type": "integer",
-                                    "format": "int64"
-                                },
-                                "label": {
-                                    "type": "string",
-                                    "nullable": true
-                                },
-                                "expression": {
-                                    "type": "object",
-                                    "additionalProperties": {
-                                        "type": "object"
-                                    }
-                                },
-                                "backgroundColor": {
-                                    "type": "string",
-                                    "nullable": true
-                                },
-                                "cellPadding": {
-                                    "type": "number",
-                                    "format": "double",
-                                    "nullable": true
-                                }
-                            }
+                            "$ref": "#/components/schemas/SetlistTemplateRule"
                         }
                     },
                     "createdBy": {
@@ -920,6 +837,183 @@
                     },
                     "updatedAt": {
                         "type": "string"
+                    }
+                }
+            },
+            "SetlistTemplateCreate": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "headerInfo",
+                    "margin",
+                    "cellPadding",
+                    "rules"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "headerInfo": {
+                        "$ref": "#/components/schemas/SetlistTemplateHeaderInfo"
+                    },
+                    "fontSizes": {
+                        "nullable": true,
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SetlistTemplateFontSizes"
+                            }
+                        ]
+                    },
+                    "margin": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "cellPadding": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "rules": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SetlistTemplateRule"
+                        }
+                    }
+                }
+            },
+            "SetlistTemplateFontSizes": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "subtitle": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "colorLegend": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "columnTitle": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "scoreRow": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "breakRow": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                }
+            },
+            "SetlistTemplateHeaderInfo": {
+                "type": "object",
+                "required": [
+                    "entries",
+                    "layout"
+                ],
+                "properties": {
+                    "entries": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "date",
+                                "startTime",
+                                "endTime",
+                                "playDuration",
+                                "breaksDuration",
+                                "overallDuration",
+                                "folderCollection"
+                            ]
+                        }
+                    },
+                    "layout": {
+                        "type": "string",
+                        "enum": [
+                            "table",
+                            "subtitle"
+                        ]
+                    }
+                }
+            },
+            "SetlistTemplatePatch": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "headerInfo": {
+                        "$ref": "#/components/schemas/SetlistTemplateHeaderInfo"
+                    },
+                    "fontSizes": {
+                        "nullable": true,
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SetlistTemplateFontSizes"
+                            }
+                        ]
+                    },
+                    "margin": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "cellPadding": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "rules": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SetlistTemplateRule"
+                        }
+                    }
+                }
+            },
+            "SetlistTemplateRule": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "order",
+                    "expression"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "order": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "label": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "expression": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object"
+                        }
+                    },
+                    "backgroundColor": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "cellPadding": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
                     }
                 }
             },
@@ -10095,131 +10189,8 @@
                                 ],
                                 "properties": {
                                     "template": {
-                                        "type": "object",
-                                        "description": "Template fields",
-                                        "required": [
-                                            "name",
-                                            "margin",
-                                            "cellPadding",
-                                            "rules"
-                                        ],
-                                        "properties": {
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "description": {
-                                                "type": "string",
-                                                "nullable": true
-                                            },
-                                            "headerInfo": {
-                                                "type": "object",
-                                                "required": [
-                                                    "entries",
-                                                    "layout"
-                                                ],
-                                                "properties": {
-                                                    "entries": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "string",
-                                                            "enum": [
-                                                                "date",
-                                                                "startTime",
-                                                                "endTime",
-                                                                "playDuration",
-                                                                "breaksDuration",
-                                                                "overallDuration",
-                                                                "folderCollection"
-                                                            ]
-                                                        }
-                                                    },
-                                                    "layout": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "table",
-                                                            "subtitle"
-                                                        ]
-                                                    }
-                                                }
-                                            },
-                                            "fontSizes": {
-                                                "type": "object",
-                                                "nullable": true,
-                                                "properties": {
-                                                    "title": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    },
-                                                    "subtitle": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    },
-                                                    "colorLegend": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    },
-                                                    "columnTitle": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    },
-                                                    "scoreRow": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    },
-                                                    "breakRow": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    }
-                                                }
-                                            },
-                                            "margin": {
-                                                "type": "number",
-                                                "format": "double"
-                                            },
-                                            "cellPadding": {
-                                                "type": "number",
-                                                "format": "double"
-                                            },
-                                            "rules": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "required": [
-                                                        "id",
-                                                        "order",
-                                                        "expression"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
-                                                        },
-                                                        "order": {
-                                                            "type": "integer",
-                                                            "format": "int64"
-                                                        },
-                                                        "label": {
-                                                            "type": "string",
-                                                            "nullable": true
-                                                        },
-                                                        "expression": {
-                                                            "type": "object",
-                                                            "additionalProperties": {
-                                                                "type": "object"
-                                                            }
-                                                        },
-                                                        "backgroundColor": {
-                                                            "type": "string",
-                                                            "nullable": true
-                                                        },
-                                                        "cellPadding": {
-                                                            "type": "number",
-                                                            "format": "double",
-                                                            "nullable": true
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        "$ref": "#/components/schemas/SetlistTemplateCreate",
+                                        "description": "Template fields"
                                     }
                                 }
                             }
@@ -10326,125 +10297,8 @@
                                 ],
                                 "properties": {
                                     "template": {
-                                        "type": "object",
-                                        "description": "Partial template fields",
-                                        "properties": {
-                                            "name": {
-                                                "type": "string"
-                                            },
-                                            "description": {
-                                                "type": "string",
-                                                "nullable": true
-                                            },
-                                            "headerInfo": {
-                                                "type": "object",
-                                                "required": [
-                                                    "entries",
-                                                    "layout"
-                                                ],
-                                                "properties": {
-                                                    "entries": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "string",
-                                                            "enum": [
-                                                                "date",
-                                                                "startTime",
-                                                                "endTime",
-                                                                "playDuration",
-                                                                "breaksDuration",
-                                                                "overallDuration",
-                                                                "folderCollection"
-                                                            ]
-                                                        }
-                                                    },
-                                                    "layout": {
-                                                        "type": "string",
-                                                        "enum": [
-                                                            "table",
-                                                            "subtitle"
-                                                        ]
-                                                    }
-                                                }
-                                            },
-                                            "fontSizes": {
-                                                "type": "object",
-                                                "nullable": true,
-                                                "properties": {
-                                                    "title": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    },
-                                                    "subtitle": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    },
-                                                    "colorLegend": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    },
-                                                    "columnTitle": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    },
-                                                    "scoreRow": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    },
-                                                    "breakRow": {
-                                                        "type": "number",
-                                                        "format": "double"
-                                                    }
-                                                }
-                                            },
-                                            "margin": {
-                                                "type": "number",
-                                                "format": "double"
-                                            },
-                                            "cellPadding": {
-                                                "type": "number",
-                                                "format": "double"
-                                            },
-                                            "rules": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "object",
-                                                    "required": [
-                                                        "id",
-                                                        "order",
-                                                        "expression"
-                                                    ],
-                                                    "properties": {
-                                                        "id": {
-                                                            "type": "string"
-                                                        },
-                                                        "order": {
-                                                            "type": "integer",
-                                                            "format": "int64"
-                                                        },
-                                                        "label": {
-                                                            "type": "string",
-                                                            "nullable": true
-                                                        },
-                                                        "expression": {
-                                                            "type": "object",
-                                                            "additionalProperties": {
-                                                                "type": "object"
-                                                            }
-                                                        },
-                                                        "backgroundColor": {
-                                                            "type": "string",
-                                                            "nullable": true
-                                                        },
-                                                        "cellPadding": {
-                                                            "type": "number",
-                                                            "format": "double",
-                                                            "nullable": true
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        "$ref": "#/components/schemas/SetlistTemplatePatch",
+                                        "description": "Partial template fields"
                                     }
                                 }
                             }

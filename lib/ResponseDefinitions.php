@@ -125,15 +125,53 @@ namespace OCA\OrchestraScoresManager;
  *     version: OrchestraScoresManagerFolderCollectionVersion,
  *     index: int|null
  * }
+ * @psalm-type OrchestraScoresManagerSetlistTemplateHeaderInfo = array{
+ *     entries: list<'date'|'startTime'|'endTime'|'playDuration'|'breaksDuration'|'overallDuration'|'folderCollection'>,
+ *     layout: 'table'|'subtitle'
+ * }
+ * @psalm-type OrchestraScoresManagerSetlistTemplateFontSizes = array{
+ *     title?: float,
+ *     subtitle?: float,
+ *     colorLegend?: float,
+ *     columnTitle?: float,
+ *     scoreRow?: float,
+ *     breakRow?: float
+ * }
+ * @psalm-type OrchestraScoresManagerSetlistTemplateRule = array{
+ *     id: string,
+ *     order: int,
+ *     label?: string|null,
+ *     expression: array<string,mixed>,
+ *     backgroundColor?: string|null,
+ *     cellPadding?: float|null
+ * }
+ * @psalm-type OrchestraScoresManagerSetlistTemplateCreate = array{
+ *     name: string,
+ *     description?: string|null,
+ *     headerInfo: OrchestraScoresManagerSetlistTemplateHeaderInfo,
+ *     fontSizes?: OrchestraScoresManagerSetlistTemplateFontSizes|null,
+ *     margin: float,
+ *     cellPadding: float,
+ *     rules: list<OrchestraScoresManagerSetlistTemplateRule>
+ * }
+ * @psalm-type OrchestraScoresManagerSetlistTemplatePatch = array{
+ *     name?: string,
+ *     description?: string|null,
+ *     headerInfo?: OrchestraScoresManagerSetlistTemplateHeaderInfo,
+ *     fontSizes?: OrchestraScoresManagerSetlistTemplateFontSizes|null,
+ *     margin?: float,
+ *     cellPadding?: float,
+ *     rules?: list<OrchestraScoresManagerSetlistTemplateRule>
+ * }
  * @psalm-type OrchestraScoresManagerSetlistTemplate = array{
  *     id: int,
  *     name: string,
  *     description: string|null,
- *     headerInfo: array{entries:list<'date'|'startTime'|'endTime'|'playDuration'|'breaksDuration'|'overallDuration'|'folderCollection'>,layout:'table'|'subtitle'},
- *     fontSizes: array{title?:float,subtitle?:float,colorLegend?:float,columnTitle?:float,scoreRow?:float,breakRow?:float}|null,
+ *     headerInfo: OrchestraScoresManagerSetlistTemplateHeaderInfo,
+ *     fontSizes: OrchestraScoresManagerSetlistTemplateFontSizes|null,
  *     margin: float,
  *     cellPadding: float,
- *     rules: list<array{id:string,order:int,label?:string|null,expression:array<string,mixed>,backgroundColor?:string|null,cellPadding?:float|null}>,
+ *     rules: list<OrchestraScoresManagerSetlistTemplateRule>,
  *     createdBy: string,
  *     createdAt: string,
  *     updatedAt: string

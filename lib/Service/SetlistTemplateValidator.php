@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace OCA\OrchestraScoresManager\Service;
 
-use OCA\OrchestraScoresManager\Db\SetlistTemplate;
-
 /**
  * Validate public template metadata and formatting properties.
  * Rule expressions are intentionally opaque: their syntax belongs to the
@@ -13,6 +11,15 @@ use OCA\OrchestraScoresManager\Db\SetlistTemplate;
  */
 class SetlistTemplateValidator {
 	private const FONT_KEYS = ['title', 'subtitle', 'colorLegend', 'columnTitle', 'scoreRow', 'breakRow'];
+	private const HEADER_ENTRIES = [
+		'date',
+		'startTime',
+		'endTime',
+		'playDuration',
+		'breaksDuration',
+		'overallDuration',
+		'folderCollection',
+	];
 	private const CONFIG_KEYS = ['fontSizes', 'margin', 'cellPadding', 'rules', 'headerInfo'];
 
 	/**
@@ -91,7 +98,7 @@ class SetlistTemplateValidator {
 			'margin' => $margin,
 			'cellPadding' => $cellPadding,
 			'rules' => $rules,
-			'headerInfo' => $this->validateHeaderInfo(array_key_exists('headerInfo', $input) ? $input['headerInfo'] : SetlistTemplate::DEFAULT_HEADER_INFO),
+			'headerInfo' => $this->validateHeaderInfo($input['headerInfo'] ?? null),
 		];
 		$json = json_encode($config, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
 
@@ -127,7 +134,7 @@ class SetlistTemplateValidator {
 		$seen = [];
 		foreach ($entries as $entry) {
 			if (!is_string($entry)
-				|| !in_array($entry, SetlistTemplate::DEFAULT_HEADER_INFO['entries'], true)
+				|| !in_array($entry, self::HEADER_ENTRIES, true)
 				|| isset($seen[$entry])) {
 				throw new \InvalidArgumentException('Invalid or duplicate headerInfo entry');
 			}

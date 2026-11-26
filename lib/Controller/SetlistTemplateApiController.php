@@ -16,6 +16,8 @@ use OCP\IRequest;
 
 /**
  * @psalm-import-type OrchestraScoresManagerSetlistTemplate from ResponseDefinitions
+ * @psalm-import-type OrchestraScoresManagerSetlistTemplateCreate from ResponseDefinitions
+ * @psalm-import-type OrchestraScoresManagerSetlistTemplatePatch from ResponseDefinitions
  * @psalm-suppress UnusedClass - discovered by Nextcloud
  */
 #[OpenAPI(scope: OpenAPI::SCOPE_DEFAULT)]
@@ -47,7 +49,7 @@ class SetlistTemplateApiController extends OCSController {
 	/**
 	 * Create a shared PDF template
 	 *
-	 * @param array{name:string,description?:string|null,headerInfo?:array{entries:list<'date'|'startTime'|'endTime'|'playDuration'|'breaksDuration'|'overallDuration'|'folderCollection'>,layout:'table'|'subtitle'},fontSizes?:array{title?:float,subtitle?:float,colorLegend?:float,columnTitle?:float,scoreRow?:float,breakRow?:float}|null,margin:float,cellPadding:float,rules:list<array{id:string,order:int,label?:string|null,expression:array<string,mixed>,backgroundColor?:string|null,cellPadding?:float|null}>} $template Template fields
+	 * @param OrchestraScoresManagerSetlistTemplateCreate $template Template fields
 	 * @return DataResponse<Http::STATUS_CREATED, OrchestraScoresManagerSetlistTemplate, array{}>
 	 *
 	 * 201: Created template
@@ -63,7 +65,7 @@ class SetlistTemplateApiController extends OCSController {
 	 * Update a shared PDF template
 	 *
 	 * @param int $id Stable template ID
-	 * @param array{name?:string,description?:string|null,headerInfo?:array{entries:list<'date'|'startTime'|'endTime'|'playDuration'|'breaksDuration'|'overallDuration'|'folderCollection'>,layout:'table'|'subtitle'},fontSizes?:array{title?:float,subtitle?:float,colorLegend?:float,columnTitle?:float,scoreRow?:float,breakRow?:float}|null,margin?:float,cellPadding?:float,rules?:list<array{id:string,order:int,label?:string|null,expression:array<string,mixed>,backgroundColor?:string|null,cellPadding?:float|null}>} $template Partial template fields
+	 * @param OrchestraScoresManagerSetlistTemplatePatch $template Partial template fields
 	 * @return DataResponse<Http::STATUS_OK, OrchestraScoresManagerSetlistTemplate, array{}>
 	 *
 	 * 200: Updated template

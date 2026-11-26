@@ -20,6 +20,10 @@ final class SetlistTemplateValidatorTest extends TestCase {
 			'name' => 'Stage',
 			'description' => null,
 			'fontSizes' => ['title' => 16, 'scoreRow' => 8],
+			'headerInfo' => [
+				'entries' => ['date', 'startTime', 'endTime', 'playDuration', 'breaksDuration', 'overallDuration', 'folderCollection'],
+				'layout' => 'table',
+			],
 			'margin' => 8,
 			'cellPadding' => 1.5,
 			'rules' => [[
@@ -66,7 +70,7 @@ final class SetlistTemplateValidatorTest extends TestCase {
 		$this->assertCount(40, $validated['config']['rules']);
 	}
 
-	public function testDefaultHeaderInfo(): void {
+	public function testFullHeaderInfo(): void {
 		$validated = $this->validator->validate(self::validTemplate());
 
 		$this->assertSame([
@@ -127,6 +131,9 @@ final class SetlistTemplateValidatorTest extends TestCase {
 		}];
 		yield 'missing header layout' => [static function (array &$i): void {
 			$i['headerInfo'] = ['entries' => ['date']];
+		}];
+		yield 'missing header info' => [static function (array &$i): void {
+			unset($i['headerInfo']);
 		}];
 		yield 'null header info' => [static function (array &$i): void {
 			$i['headerInfo'] = null;

@@ -34,7 +34,7 @@ final class SetlistTemplateScopeTest extends ScopePolicyTestCase {
 		foreach (['Stage', 'Concert'] as $name) {
 			$template = SetlistTemplate::fromParams([
 				'name' => $name,
-				'configJson' => '{"fontSizes":[],"margin":8,"cellPadding":1.5,"rules":[]}',
+				'configJson' => '{"fontSizes":[],"margin":8,"cellPadding":1.5,"rules":[],"headerInfo":{"entries":["date"],"layout":"table"}}',
 				'createdBy' => 'editor',
 				'createdAt' => $now,
 				'updatedAt' => $now,

@@ -29,19 +29,6 @@ use OCP\DB\Types;
  * @method void setUpdatedAt(DateTimeImmutable $value)
  */
 class SetlistTemplate extends Entity implements JsonSerializable {
-	public const DEFAULT_HEADER_INFO = [
-		'entries' => [
-			'date',
-			'startTime',
-			'endTime',
-			'playDuration',
-			'breaksDuration',
-			'overallDuration',
-			'folderCollection',
-		],
-		'layout' => 'table',
-	];
-
 	protected string $name = '';
 	protected ?string $description = null;
 	protected string $configJson = '{}';
@@ -77,7 +64,7 @@ class SetlistTemplate extends Entity implements JsonSerializable {
 			'margin' => $config['margin'],
 			'cellPadding' => $config['cellPadding'],
 			'rules' => $config['rules'],
-			'headerInfo' => $config['headerInfo'] ?? self::DEFAULT_HEADER_INFO,
+			'headerInfo' => $config['headerInfo'],
 			'createdBy' => $this->createdBy,
 			'createdAt' => $this->createdAt?->format('Y-m-d H:i:s'),
 			'updatedAt' => $this->updatedAt?->format('Y-m-d H:i:s'),
