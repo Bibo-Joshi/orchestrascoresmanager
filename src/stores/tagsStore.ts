@@ -89,16 +89,6 @@ export const useTagsStore = defineStore('tags', () => {
 		return ids
 	}
 
-	/**
-	 * Convert an array of tag IDs to tag names, skipping unknown IDs
-	 *
-	 * @param ids - Array of tag IDs
-	 * @return Array of tag names
-	 */
-	function idsToNames(ids: number[]): string[] {
-		return ids.flatMap((id) => tags.value.find((tag) => tag.id === id)?.name ?? [])
-	}
-
 	return {
 		tags,
 		isLoaded,
@@ -106,6 +96,5 @@ export const useTagsStore = defineStore('tags', () => {
 		initialize,
 		getOrCreateTag,
 		namesToIds,
-		idsToNames,
 	}
 })

@@ -5,7 +5,6 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { apiClients } from '@/api/client'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
-import { useTagsStore } from '@/stores/tagsStore'
 
 /**
  * Pinia store for managing scores state.
@@ -19,7 +18,6 @@ export const useScoresStore = defineStore('scores', () => {
 	const isLoaded = ref(false)
 	const isLoading = ref(false)
 	const scoreBooksStore = useScoreBooksStore()
-	const tagsStore = useTagsStore()
 
 	/**
 	 * Get scores sorted by title
@@ -147,18 +145,10 @@ export const useScoresStore = defineStore('scores', () => {
 	 * @throws { Error } if API call fails
 	 */
 	async function updateScoreTags(id: number, tagIds: number[]): Promise<void> {
+		const response = await apiClients.default.scoreApiPatchScore(id, { tagIds })
 		const index = scores.value.findIndex((s) => s.id === id)
-		const oldTags = index === -1 ? null : scores.value[index].tags
 		if (index !== -1) {
-			scores.value[index] = { ...scores.value[index], tags: tagsStore.idsToNames(tagIds) }
-		}
-		try {
-			await apiClients.default.scoreApiPatchScore(id, { tagIds })
-		} catch (error) {
-			if (index !== -1) {
-				scores.value[index] = { ...scores.value[index], tags: oldTags }
-			}
-			throw error
+			scores.value[index] = { ...scores.value[index], tags: response.data.ocs.data.tags }
 		}
 	}
 
