@@ -35,6 +35,6 @@ export const DEFAULT_PDF_TEMPLATE: PdfTemplateConfig = {
 		breakRow: 8,
 	},
 	margin: 8,
-	cellPadding: 5 * 25.4 / 72,
+	cellPadding: 1.8,
 	rules: [],
 }

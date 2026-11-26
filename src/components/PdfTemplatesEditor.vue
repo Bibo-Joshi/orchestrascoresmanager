@@ -520,12 +520,6 @@ async function removeTemplate(item: SetlistTemplate): Promise<void> {
 	gap: 12px;
 }
 
-.template-form {
-	max-height: 65vh;
-	overflow-y: auto;
-	padding: 4px;
-}
-
 .template-form fieldset {
 	border: 1px solid var(--color-border);
 	border-radius: var(--border-radius);
