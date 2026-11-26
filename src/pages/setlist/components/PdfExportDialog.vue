@@ -3,6 +3,17 @@
 		:name="t('Export PDF')"
 		:open="dialogOpen"
 		@update:open="dialogOpen = $event">
+		<div v-if="pdfTemplatesStore.templates.length" class="pdf-template-select">
+			<label for="pdf-template-select"><strong>{{ t('PDF template') }}</strong></label>
+			<select id="pdf-template-select" v-model="selectedPdfTemplateId">
+				<option :value="null">
+					{{ t('Standard template (built-in)') }}
+				</option>
+				<option v-for="template in pdfTemplatesStore.templates" :key="template.id" :value="template.id">
+					{{ template.name }}
+				</option>
+			</select>
+		</div>
 		<p>{{ t('Select and reorder the columns to include in the PDF export.') }}</p>
 		<draggable
 			:list="dialogColumns"
@@ -34,7 +45,7 @@
 				</template>
 				{{ t('Cancel') }}
 			</NcButton>
-			<NcButton variant="primary" @click="onPdfExport">
+			<NcButton variant="primary" :disabled="pdfTemplatesStore.isLoading || pdfExporting" @click="onPdfExport">
 				<template #icon>
 					<DownloadIcon />
 				</template>
@@ -46,7 +57,7 @@
 
 <script setup lang="ts">
 import type { FolderCollection, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
-import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
+import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdfexport'
 
 import { computed, ref, watch } from 'vue'
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
@@ -55,11 +66,12 @@ import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwit
 import NcDialog from '@nextcloud/vue/components/NcDialog'
 import NcListItem from '@nextcloud/vue/components/NcListItem'
 import { CancelIcon, DownloadIcon, DragVerticalIcon } from '@/icons/vue-material'
+import { usePdfTemplatesStore } from '@/stores/pdfTemplatesStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { tryShowError } from '@/utils/errorHandling'
 import { t } from '@/utils/l10n'
-import { exportSetlistToPdf } from '@/utils/pdf-exporter'
+import { exportSetlistToPdf } from '@/utils/pdfexport'
 
 interface Props {
 	setlist: Setlist
@@ -76,8 +88,9 @@ const dialogOpen = defineModel<boolean>('open', { default: false })
 
 const props = defineProps<Props>()
 
-const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
+const pdfTemplatesStore = usePdfTemplatesStore()
+const scoresStore = useScoresStore()
 
 interface DialogColumn extends PdfColumnConfig {
 	enabled: boolean
@@ -85,6 +98,8 @@ interface DialogColumn extends PdfColumnConfig {
 
 const dialogColumns = ref<DialogColumn[]>([])
 const hasUserCustomizedColumns = ref(false)
+const selectedPdfTemplateId = ref<number | null>(null)
+const pdfExporting = ref(false)
 
 /**
  * indicator if any of the pieces in the setlist has a comment
@@ -94,8 +109,8 @@ const hasAnyComment = computed<boolean>(() => {
 })
 
 /** Column IDs that are enabled by default in the export dialog */
-const DEFAULT_ENABLED_IDS: computed<ReadonlySet<PdfColumnId>> = computed(() => {
-	const enabledIds = new Set([
+const DEFAULT_ENABLED_IDS = computed<ReadonlySet<PdfColumnId>>(() => {
+	const enabledIds = new Set<PdfColumnId>([
 		'startTime',
 		'duration',
 		'fcvIndex',
@@ -122,10 +137,22 @@ function populateColumns(): void {
 	}
 }
 
-watch(dialogOpen, (isOpen) => {
-	if (isOpen) {
-		populateColumns()
+watch(dialogOpen, async (isOpen) => {
+	if (!isOpen) {
+		return
 	}
+	populateColumns()
+	const setlistId = props.setlist.id
+	selectedPdfTemplateId.value = null
+	await tryShowError(
+		() => pdfTemplatesStore.initialize(),
+		t('Failed to load PDF templates'),
+	)
+	if (!dialogOpen.value || setlistId !== props.setlist.id) {
+		return
+	}
+	selectedPdfTemplateId.value = pdfTemplatesStore.templates
+		.find(({ id }) => id === props.setlist.defaultTemplateId)?.id ?? null
 })
 
 /**
@@ -139,30 +166,51 @@ function markColumnsCustomized(): void {
  * Export the PDF using the currently selected columns, then close the dialog.
  */
 async function onPdfExport(): Promise<void> {
+	if (pdfTemplatesStore.isLoading || pdfExporting.value) {
+		return
+	}
 	dialogOpen.value = false
+	pdfExporting.value = true
+	const templateId = selectedPdfTemplateId.value
+	const { setlist, entries, fcvScoresMap, fcvScoreBookIndicesMap, folderCollection } = props
 	const selectedColumns = dialogColumns.value
 		.filter((col) => col.enabled)
 		.map(({ id, label }) => ({ id, label }))
 
-	await tryShowError(
-		async () => {
-			exportSetlistToPdf({
-				setlist: props.setlist,
-				entries: props.entries,
-				getScoreById: (id) => scoresStore.getScoreById(id),
-				getScoreBookById: (id) => scoreBooksStore.getScoreBookById(id),
-				fcvScoresMap: props.fcvScoresMap,
-				fcvScoreBookIndicesMap: props.fcvScoreBookIndicesMap,
-				folderCollection: props.folderCollection,
-				columnConfigs: selectedColumns,
-			})
-		},
-		t('Export failed: '),
-	)
+	try {
+		await tryShowError(
+			async () => {
+				const data = {
+					setlist,
+					entries,
+					getScoreById: (id: number) => scoresStore.getScoreById(id),
+					getScoreBookById: (id: number) => scoreBooksStore.getScoreBookById(id),
+					fcvScoresMap,
+					fcvScoreBookIndicesMap,
+					folderCollection,
+					columnConfigs: selectedColumns,
+				}
+				const template = templateId === null
+					? undefined
+					: pdfTemplatesStore.getTemplateById(templateId)
+				await exportSetlistToPdf(data, template)
+			},
+			t('Export failed: '),
+		)
+	} finally {
+		pdfExporting.value = false
+	}
 }
 </script>
 
 <style lang="scss" scoped>
+.pdf-template-select {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5ex;
+	margin-bottom: 1.5ex;
+}
+
 .column-list {
 	padding: 1ex 0;
 }

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-11-04 21:06+0000\n"
+"POT-Creation-Date: 2026-11-26 17:59+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -265,7 +265,7 @@ msgid "Allowed Groups"
 msgstr "Erlaubte Gruppen"
 
 msgid "Select groups…"
-msgstr ""
+msgstr "Gruppen auswählen…"
 
 msgid "Invalid default moderation time format. Use (HH:)MM:SS"
 msgstr "Ungültiges Format für Standard-Moderationszeit. Verwenden Sie (HH:)MM:SS"
@@ -292,10 +292,13 @@ msgid "Select folder collection"
 msgstr "Ordnersammlung auswählen"
 
 msgid "Saving …"
-msgstr ""
+msgstr "Wird gespeichert …"
 
 msgid "Save"
 msgstr "Speichern"
+
+msgid "Setlist PDF-Export Templates"
+msgstr "PDF-Exportvorlagen für Setlisten"
 
 msgid "Score book assignment updated"
 msgstr "Notenbuch-Zuweisung aktualisiert"
@@ -340,7 +343,7 @@ msgid "Confirm"
 msgstr "Bestätigen"
 
 msgid "Loading…"
-msgstr ""
+msgstr "Wird geladen…"
 
 msgid "An error occurred"
 msgstr "Ein Fehler ist aufgetreten"
@@ -361,19 +364,175 @@ msgid "Not in any folder collection"
 msgstr "In keiner Ordnersammlung"
 
 msgid "Actions"
-msgstr ""
+msgstr "Aktionen"
 
 msgid "Search Score or Score details"
 msgstr "Partiturtitel und -details durchsuchen"
 
 msgid "Search"
-msgstr ""
+msgstr "Suchen"
 
 msgid "Main app navigation"
 msgstr "Haupt App-Navigation"
 
 msgid "No folder collections yet"
 msgstr "Noch keine Ordnersammlungen"
+
+msgid "Score tags"
+msgstr "Schlagwörter der Partitur"
+
+msgid "Break rows"
+msgstr "Pausenzeilen"
+
+msgid "Single tag"
+msgstr "Einzelnes Schlagwort"
+
+msgid "Could not load shared PDF templates."
+msgstr "Gemeinsame PDF-Vorlagen konnten nicht geladen werden."
+
+msgid "Full"
+msgstr "Vollständig"
+
+msgid "Compact"
+msgstr "Kompakt"
+
+msgid "Custom"
+msgstr "Benutzerdefiniert"
+
+msgid "Could not read PDF template rules."
+msgstr "Die Regeln der PDF-Vorlage konnten nicht gelesen werden."
+
+msgid "Please check the font sizes and spacing values."
+msgstr "Bitte die Schriftgrößen und Abstände überprüfen."
+
+msgid "Could not save PDF template."
+msgstr "PDF-Vorlage konnte nicht gespeichert werden."
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Delete template \"{name}\"? Setlists using it will revert to the standard template."
+msgstr "Vorlage „{name}“ löschen? Setlisten, die diese Vorlage verwenden, werden auf die Standardvorlage zurückgesetzt."
+
+msgid "Could not delete PDF template."
+msgstr "PDF-Vorlage konnte nicht gelöscht werden."
+
+msgid "Shared templates for PDF setlist exports. The built-in standard template is always available."
+msgstr "Gemeinsame Vorlagen für den PDF-Export von Setlisten. Die integrierte Standardvorlage ist immer verfügbar."
+
+msgid "Loading templates…"
+msgstr "Vorlagen werden geladen…"
+
+msgid "No shared templates have been created yet."
+msgstr "Es wurden noch keine gemeinsamen Vorlagen erstellt."
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "New template"
+msgstr "Neue Vorlage"
+
+msgid "Edit PDF template"
+msgstr "PDF-Vorlage bearbeiten"
+
+msgid "New PDF template"
+msgstr "Neue PDF-Vorlage"
+
+msgid "Template name"
+msgstr "Vorlagenname"
+
+msgid "Please enter a template name."
+msgstr "Bitte einen Vorlagennamen eingeben."
+
+msgid "Description (optional)"
+msgstr "Beschreibung (optional)"
+
+msgid "Header layout"
+msgstr "Kopfbereich"
+
+msgid "Font sizes (pt)"
+msgstr "Schriftgrößen (pt)"
+
+msgid "Subtitle"
+msgstr "Untertitel"
+
+msgid "Color legend"
+msgstr "Farblegende"
+
+msgid "Column header"
+msgstr "Spaltenüberschrift"
+
+msgid "Score row"
+msgstr "Partiturzeile"
+
+msgid "Break row"
+msgstr "Pausenzeile"
+
+msgid "Spacing (mm)"
+msgstr "Abstände (mm)"
+
+msgid "Page margin"
+msgstr "Seitenrand"
+
+msgid "Default cell padding"
+msgstr "Standard-Zellinnenabstand"
+
+msgid "Row formatting rules"
+msgstr "Regeln zur Zeilenformatierung"
+
+msgid "Rules are evaluated from top to bottom. The first matching rule wins."
+msgstr "Die Regeln werden von oben nach unten ausgewertet. Die erste zutreffende Regel wird angewendet."
+
+msgid "Rule"
+msgstr "Regel"
+
+msgid "Move rule up"
+msgstr "Regel nach oben"
+
+msgid "Move rule down"
+msgstr "Regel nach unten"
+
+msgid "Delete rule"
+msgstr "Regel löschen"
+
+msgid "Legend label (optional)"
+msgstr "Legendenbeschriftung (optional)"
+
+msgid "Match rows"
+msgstr "Bedingung für Zeilen"
+
+msgid "Tag"
+msgstr "Schlagwort"
+
+msgid "First tag"
+msgstr "Erstes Schlagwort"
+
+msgid "Each tag rule must have the required tag names."
+msgstr "Für jede Schlagwortregel müssen die erforderlichen Schlagwörter angegeben werden."
+
+msgid "Combine"
+msgstr "Verknüpfung"
+
+msgid "Second tag"
+msgstr "Zweites Schlagwort"
+
+msgid "Background color"
+msgstr "Hintergrundfarbe"
+
+msgid "Cell padding override (mm, optional)"
+msgstr "Abweichender Zellinnenabstand (mm, optional)"
+
+msgid "Default"
+msgstr "Standard"
+
+msgid "Invalid rule cell padding."
+msgstr "Ungültiger Zellinnenabstand der Regel."
+
+msgid "Add rule"
+msgstr "Regel hinzufügen"
+
+msgid "Saving…"
+msgstr "Wird gespeichert…"
 
 msgid "Operation failed: "
 msgstr "Operation fehlgeschlagen: "
@@ -398,9 +557,6 @@ msgstr "Partitur konnte nicht gelöscht werden: "
 
 msgid "Details"
 msgstr "Details"
-
-msgid "Delete"
-msgstr "Löschen"
 
 msgid "Comments"
 msgstr "Kommentare"
@@ -526,7 +682,7 @@ msgid "Add"
 msgstr "Hinzufügen"
 
 msgid "Version"
-msgstr ""
+msgstr "Version"
 
 msgid "Select version"
 msgstr "Version auswählen"
@@ -781,7 +937,7 @@ msgid "No comments yet"
 msgstr "Noch keine Kommentare"
 
 msgid "Write a new comment …"
-msgstr ""
+msgstr "Neuen Kommentar schreiben …"
 
 msgid "GitHub flavored markdown is supported."
 msgstr "GitHub Markdown wird unterstützt."
@@ -863,11 +1019,20 @@ msgstr "Partitur auswählen"
 msgid "Break Duration (HH:MM:SS)"
 msgstr "Pausendauer (HH:MM:SS)"
 
+msgid "Failed to load PDF templates"
+msgstr "PDF-Vorlagen konnten nicht geladen werden"
+
 msgid "Export failed: "
 msgstr "Export fehlgeschlagen: "
 
 msgid "Export PDF"
 msgstr "PDF exportieren"
+
+msgid "PDF template"
+msgstr "PDF-Vorlage"
+
+msgid "Standard template (built-in)"
+msgstr "Standardvorlage (integriert)"
 
 msgid "Select and reorder the columns to include in the PDF export."
 msgstr "Spalten für den PDF-Export auswählen und sortieren."
@@ -935,14 +1100,14 @@ msgstr "Dauer (HH:MM)"
 msgid "e.g., 90 or 1:30"
 msgstr "z.B. 90 oder 1:30"
 
+msgid "Default PDF template"
+msgstr "Standard-PDF-Vorlage"
+
 msgid "Is Draft"
 msgstr "Ist Entwurf"
 
 msgid "Is Published"
 msgstr "Ist veröffentlicht"
-
-msgid "Saving…"
-msgstr ""
 
 msgid "Saved"
 msgstr "Gespeichert"
@@ -1029,7 +1194,7 @@ msgid "This index is already occupied"
 msgstr "Dieser Index ist bereits belegt"
 
 msgid "Loading occupied indices…"
-msgstr ""
+msgstr "Belegte Positionen werden geladen…"
 
 msgid "Index is unchanged"
 msgstr "Index unverändert"
@@ -1076,9 +1241,6 @@ msgstr "Inhalt"
 msgid "h"
 msgstr "h"
 
-msgid "Info"
-msgstr "Info"
-
 msgid "Date"
 msgstr "Datum"
 
@@ -1090,6 +1252,9 @@ msgstr "Moderation & Pausen"
 
 msgid "Overall Duration"
 msgstr "Gesamtdauer"
+
+msgid "Info"
+msgstr "Info"
 
 msgid "Invalid duration format"
 msgstr "Ungültiges Spieldauerformat"
@@ -1227,3 +1392,108 @@ msgstr "Ungültiges Spieldauerformat"
 
 #~ msgid "Score Book Version History"
 #~ msgstr "Notenbuch-Versionshistorie"
+
+#~ msgid "PDF layouts"
+#~ msgstr "PDF-Layouts"
+
+#~ msgid "Manage PDF layouts for setlist exports. The built-in standard layout cannot be modified."
+#~ msgstr "PDF-Vorlagen für den Setlistenexport verwalten. Das integrierte Standardlayout kann nicht verändert werden."
+
+#~ msgid "Add layout"
+#~ msgstr "Layout hinzufügen"
+
+#~ msgid "Standard layout (built-in, read-only)"
+#~ msgstr "Standardlayout (integriert, nicht veränderbar)"
+
+#~ msgid "Layout name"
+#~ msgstr "Layoutname"
+
+#~ msgid "Title font size (pt)"
+#~ msgstr "Überschrift (pt)"
+
+#~ msgid "Section font size (pt)"
+#~ msgstr "Abschnitt (pt)"
+
+#~ msgid "Table font size (pt)"
+#~ msgstr "Tabellenschrift (pt)"
+
+#~ msgid "Page margin (mm)"
+#~ msgstr "Seitenrand (mm)"
+
+#~ msgid "Cell padding (mm)"
+#~ msgstr "Zellenabstand (mm)"
+
+#~ msgid "Break padding (mm)"
+#~ msgstr "Pausenabstand (mm)"
+
+#~ msgid "Break row color"
+#~ msgstr "Pausenfarbe"
+
+#~ msgid "Tag-based row colors"
+#~ msgstr "Farbregeln nach Schlagworten"
+
+#~ msgid "The first matching rule wins. Use & for AND and | for OR."
+#~ msgstr "Die erste passende Regel gewinnt. & bedeutet UND, | bedeutet ODER."
+
+#~ msgid "Rule label"
+#~ msgstr "Regelbezeichnung"
+
+#~ msgid "Legend label"
+#~ msgstr "Legendenbezeichnung"
+
+#~ msgid "Tag expression"
+#~ msgstr "Schlagwortkombination"
+
+#~ msgid "Color"
+#~ msgstr "Farbe"
+
+#~ msgid "Remove rule"
+#~ msgstr "Regel entfernen"
+
+#~ msgid "Add color rule"
+#~ msgstr "Farbregel hinzufügen"
+
+#~ msgid "Duplicate layout"
+#~ msgstr "Layout duplizieren"
+
+#~ msgid "Remove layout"
+#~ msgstr "Layout entfernen"
+
+#~ msgid "Save PDF layouts"
+#~ msgstr "PDF-Layouts speichern"
+
+#~ msgid "You can create up to 12 PDF layouts."
+#~ msgstr "Maximal 12 PDF-Layouts möglich."
+
+#~ msgid "New layout"
+#~ msgstr "Neues Layout"
+
+#~ msgid "copy"
+#~ msgstr "Kopie"
+
+#~ msgid "Delete layout \"{name}\"?"
+#~ msgstr "Layout „{name}“ wirklich entfernen?"
+
+#~ msgid "You can create up to 30 color rules per layout."
+#~ msgstr "Maximal 30 Farbregeln pro Layout möglich."
+
+#~ msgid "New rule"
+#~ msgstr "Neue Regel"
+
+#~ msgid "Please fill in all layout names, rule labels and tag expressions."
+#~ msgstr "Bitte alle Layoutnamen sowie die Bezeichnungen und Ausdrücke der Farbregeln ausfüllen."
+
+#~ msgid "Failed to save PDF layouts."
+#~ msgstr "Konnte PDF-Layouts nicht speichern."
+
+#~ msgid "PDF layout"
+#~ msgstr "PDF-Layout"
+
+#~ msgid "Standard layout (built-in)"
+#~ msgstr "Standardlayout (Original)"
+
+#~ msgid "e.g. Singer"
+#~ msgstr "z. B. Sänger"
+
+#~ msgid "e.g. Tag A & Tag B | Tag C"
+#~ msgstr "z. B. Male & Female | Duett"

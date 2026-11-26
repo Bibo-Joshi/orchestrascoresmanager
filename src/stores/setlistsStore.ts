@@ -216,6 +216,18 @@ export const useSetlistsStore = defineStore('setlists', () => {
 		return updated
 	}
 
+	/**
+	 * Clear references to a deleted PDF template in the local store.
+	 * @param templateId ID of the deleted template.
+	 */
+	function clearDefaultTemplateReferences(templateId: number): void {
+		for (const setlist of setlists.value) {
+			if (setlist.defaultTemplateId === templateId) {
+				setlist.defaultTemplateId = null
+			}
+		}
+	}
+
 	return {
 		setlists,
 		isLoaded,
@@ -231,5 +243,6 @@ export const useSetlistsStore = defineStore('setlists', () => {
 		cloneSetlist,
 		deleteSetlist,
 		updateSetlist,
+		clearDefaultTemplateReferences,
 	}
 })

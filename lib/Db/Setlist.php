@@ -26,6 +26,8 @@ use OCP\DB\Types;
  * @method void setDefaultModerationDuration(?int $value)
  * @method int|null getFolderCollectionVersionId()
  * @method void setFolderCollectionVersionId(?int $value)
+ * @method int|null getDefaultTemplateId()
+ * @method void setDefaultTemplateId(?int $value)
  * @method bool getIsDraft()
  * @method void setIsDraft(bool $value)
  * @method bool getIsPublished()
@@ -38,6 +40,7 @@ class Setlist extends Entity implements JsonSerializable {
 	protected ?string $description = null;
 	protected ?int $defaultModerationDuration = null;
 	protected ?int $folderCollectionVersionId = null;
+	protected ?int $defaultTemplateId = null;
 	protected bool $isDraft = false;
 	protected bool $isPublished = false;
 
@@ -48,6 +51,7 @@ class Setlist extends Entity implements JsonSerializable {
 		$this->addType('duration', Types::BIGINT);
 		$this->addType('defaultModerationDuration', Types::BIGINT);
 		$this->addType('folderCollectionVersionId', Types::BIGINT);
+		$this->addType('defaultTemplateId', Types::BIGINT);
 		$this->addType('isDraft', Types::BOOLEAN);
 		$this->addType('isPublished', Types::BOOLEAN);
 	}
@@ -61,6 +65,7 @@ class Setlist extends Entity implements JsonSerializable {
 			'duration' => $this->duration,
 			'defaultModerationDuration' => $this->defaultModerationDuration,
 			'folderCollectionVersionId' => $this->folderCollectionVersionId,
+			'defaultTemplateId' => $this->defaultTemplateId,
 			'isDraft' => $this->isDraft,
 			'isPublished' => $this->isPublished,
 		];

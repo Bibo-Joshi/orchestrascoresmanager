@@ -652,6 +652,7 @@
                     "duration",
                     "defaultModerationDuration",
                     "folderCollectionVersionId",
+                    "defaultTemplateId",
                     "isDraft",
                     "isPublished"
                 ],
@@ -682,6 +683,11 @@
                         "nullable": true
                     },
                     "folderCollectionVersionId": {
+                        "type": "integer",
+                        "format": "int64",
+                        "nullable": true
+                    },
+                    "defaultTemplateId": {
                         "type": "integer",
                         "format": "int64",
                         "nullable": true
@@ -768,6 +774,246 @@
                                 "format": "int64"
                             }
                         }
+                    }
+                }
+            },
+            "SetlistTemplate": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "name",
+                    "description",
+                    "headerInfo",
+                    "fontSizes",
+                    "margin",
+                    "cellPadding",
+                    "rules",
+                    "createdBy",
+                    "createdAt",
+                    "updatedAt"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "headerInfo": {
+                        "$ref": "#/components/schemas/SetlistTemplateHeaderInfo"
+                    },
+                    "fontSizes": {
+                        "nullable": true,
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SetlistTemplateFontSizes"
+                            }
+                        ]
+                    },
+                    "margin": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "cellPadding": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "rules": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SetlistTemplateRule"
+                        }
+                    },
+                    "createdBy": {
+                        "type": "string"
+                    },
+                    "createdAt": {
+                        "type": "string"
+                    },
+                    "updatedAt": {
+                        "type": "string"
+                    }
+                }
+            },
+            "SetlistTemplateCreate": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "headerInfo",
+                    "margin",
+                    "cellPadding",
+                    "rules"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "headerInfo": {
+                        "$ref": "#/components/schemas/SetlistTemplateHeaderInfo"
+                    },
+                    "fontSizes": {
+                        "nullable": true,
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SetlistTemplateFontSizes"
+                            }
+                        ]
+                    },
+                    "margin": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "cellPadding": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "rules": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SetlistTemplateRule"
+                        }
+                    }
+                }
+            },
+            "SetlistTemplateFontSizes": {
+                "type": "object",
+                "properties": {
+                    "title": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "subtitle": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "colorLegend": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "columnTitle": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "scoreRow": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "breakRow": {
+                        "type": "number",
+                        "format": "double"
+                    }
+                }
+            },
+            "SetlistTemplateHeaderInfo": {
+                "type": "object",
+                "required": [
+                    "entries",
+                    "layout"
+                ],
+                "properties": {
+                    "entries": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "date",
+                                "startTime",
+                                "endTime",
+                                "playDuration",
+                                "breaksDuration",
+                                "overallDuration",
+                                "folderCollection"
+                            ]
+                        }
+                    },
+                    "layout": {
+                        "type": "string",
+                        "enum": [
+                            "table",
+                            "subtitle"
+                        ]
+                    }
+                }
+            },
+            "SetlistTemplatePatch": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "headerInfo": {
+                        "$ref": "#/components/schemas/SetlistTemplateHeaderInfo"
+                    },
+                    "fontSizes": {
+                        "nullable": true,
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/SetlistTemplateFontSizes"
+                            }
+                        ]
+                    },
+                    "margin": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "cellPadding": {
+                        "type": "number",
+                        "format": "double"
+                    },
+                    "rules": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SetlistTemplateRule"
+                        }
+                    }
+                }
+            },
+            "SetlistTemplateRule": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "order",
+                    "expression"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "order": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "label": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "expression": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object"
+                        }
+                    },
+                    "backgroundColor": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "cellPadding": {
+                        "type": "number",
+                        "format": "double",
+                        "nullable": true
                     }
                 }
             },
@@ -8197,6 +8443,13 @@
                                         "default": null,
                                         "description": "The ID of the folder collection version"
                                     },
+                                    "defaultTemplateId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Optional shared PDF template ID"
+                                    },
                                     "isDraft": {
                                         "type": "boolean",
                                         "default": false,
@@ -8557,6 +8810,13 @@
                                         "nullable": true,
                                         "default": null,
                                         "description": "The ID of the folder collection version"
+                                    },
+                                    "defaultTemplateId": {
+                                        "type": "integer",
+                                        "format": "int64",
+                                        "nullable": true,
+                                        "default": null,
+                                        "description": "Optional shared PDF template ID"
                                     },
                                     "isDraft": {
                                         "type": "boolean",
@@ -10079,6 +10339,419 @@
                                                     "$ref": "#/components/schemas/OCSMeta"
                                                 },
                                                 "data": {}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ocs/v2.php/apps/orchestrascoresmanager/setlist-templates": {
+            "get": {
+                "operationId": "setlist_template_api-get-templates",
+                "summary": "List shared PDF templates",
+                "tags": [
+                    "setlist_template_api"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Shared PDF templates",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/SetlistTemplate"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "setlist_template_api-post-template",
+                "summary": "Create a shared PDF template",
+                "tags": [
+                    "setlist_template_api"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "template"
+                                ],
+                                "properties": {
+                                    "template": {
+                                        "$ref": "#/components/schemas/SetlistTemplateCreate",
+                                        "description": "Template fields"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created template",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "$ref": "#/components/schemas/SetlistTemplate"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/ocs/v2.php/apps/orchestrascoresmanager/setlist-templates/{id}": {
+            "patch": {
+                "operationId": "setlist_template_api-patch-template",
+                "summary": "Update a shared PDF template",
+                "tags": [
+                    "setlist_template_api"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "template"
+                                ],
+                                "properties": {
+                                    "template": {
+                                        "$ref": "#/components/schemas/SetlistTemplatePatch",
+                                        "description": "Partial template fields"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Stable template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated template",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "$ref": "#/components/schemas/SetlistTemplate"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Current user is not logged in",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {}
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "setlist_template_api-delete-template",
+                "summary": "Delete a shared PDF template",
+                "tags": [
+                    "setlist_template_api"
+                ],
+                "security": [
+                    {
+                        "bearer_auth": []
+                    },
+                    {
+                        "basic_auth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Stable template ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64"
+                        }
+                    },
+                    {
+                        "name": "OCS-APIRequest",
+                        "in": "header",
+                        "description": "Required to be true for the API request to pass",
+                        "required": true,
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted template",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": [
+                                        "ocs"
+                                    ],
+                                    "properties": {
+                                        "ocs": {
+                                            "type": "object",
+                                            "required": [
+                                                "meta",
+                                                "data"
+                                            ],
+                                            "properties": {
+                                                "meta": {
+                                                    "$ref": "#/components/schemas/OCSMeta"
+                                                },
+                                                "data": {
+                                                    "type": "object"
+                                                }
                                             }
                                         }
                                     }
