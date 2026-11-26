@@ -4,6 +4,7 @@ import { loadState } from '@nextcloud/initial-state'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { apiClients } from '@/api/client'
+import { useTagsStore } from '@/stores/tagsStore'
 
 /**
  * Pinia store for managing score books state.
@@ -13,6 +14,7 @@ import { apiClients } from '@/api/client'
  * state management and reactive updates across the application.
  */
 export const useScoreBooksStore = defineStore('scoreBooks', () => {
+	const tagsStore = useTagsStore()
 	const scoreBooks = ref<ScoreBook[]>([])
 	const isLoaded = ref(false)
 	const isLoading = ref(false)
@@ -145,7 +147,19 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	 * @throws { Error } if API call fails
 	 */
 	async function updateScoreBookTags(id: number, tagIds: number[]): Promise<void> {
-		await apiClients.default.scoreBookApiPatchScoreBook(id, { tagIds })
+		const index = scoreBooks.value.findIndex((sb) => sb.id === id)
+		const oldTags = index === -1 ? null : scoreBooks.value[index].tags
+		if (index !== -1) {
+			scoreBooks.value[index] = { ...scoreBooks.value[index], tags: tagsStore.idsToNames(tagIds) }
+		}
+		try {
+			await apiClients.default.scoreBookApiPatchScoreBook(id, { tagIds })
+		} catch (error) {
+			if (index !== -1) {
+				scoreBooks.value[index] = { ...scoreBooks.value[index], tags: oldTags }
+			}
+			throw error
+		}
 	}
 
 	/**
