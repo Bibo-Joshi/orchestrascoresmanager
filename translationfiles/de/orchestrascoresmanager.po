@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-11-24 19:08+0100\n"
+"POT-Creation-Date: 2026-11-26 07:58+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -417,6 +417,9 @@ msgstr "Ungültiger Zellinnenabstand der Regel."
 msgid "Could not save PDF template."
 msgstr "PDF-Vorlage konnte nicht gespeichert werden."
 
+msgid "Delete"
+msgstr "Löschen"
+
 msgid "Delete template \"{name}\"? Setlists using it will revert to the standard template."
 msgstr "Vorlage „{name}“ löschen? Setlisten, die diese Vorlage verwenden, werden auf die Standardvorlage zurückgesetzt."
 
@@ -434,9 +437,6 @@ msgstr "Es wurden noch keine gemeinsamen Vorlagen erstellt."
 
 msgid "Edit"
 msgstr "Bearbeiten"
-
-msgid "Delete"
-msgstr "Löschen"
 
 msgid "New template"
 msgstr "Neue Vorlage"
