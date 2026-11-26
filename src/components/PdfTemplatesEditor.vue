@@ -52,6 +52,7 @@
 
 		<NcDialog
 			:open="editorOpen"
+			size="normal"
 			:name="form.id ? t('Edit PDF template') : t('New PDF template')"
 			@update:open="onDialogOpenChange">
 			<div class="template-form">
@@ -154,7 +155,8 @@
 									variant="tertiary"
 									:aria-label="t('Move rule up')"
 									:disabled="index === 0"
-									@click="moveRule(index, -1)">
+									data-rule-move="up"
+									@click="moveRule(index, -1, $event)">
 									<template #icon>
 										<ArrowUpIcon :size="20" />
 									</template>
@@ -163,7 +165,8 @@
 									variant="tertiary"
 									:aria-label="t('Move rule down')"
 									:disabled="index === form.rules.length - 1"
-									@click="moveRule(index, 1)">
+									data-rule-move="down"
+									@click="moveRule(index, 1, $event)">
 									<template #icon>
 										<ArrowDownIcon :size="20" />
 									</template>
@@ -280,7 +283,8 @@ import type { SetlistTemplate, SetlistTemplateApiPostTemplatePayload } from '@/a
 import type { PdfRuleDraft } from '@/utils/pdfexport/ruleEditor'
 
 import { showError } from '@nextcloud/dialogs'
-import { computed, onMounted, ref } from 'vue'
+import { spawnDialog } from '@nextcloud/vue/functions/dialog'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
@@ -291,6 +295,7 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
+import ConfirmationDialog from '@/components/ConfirmationDialog.vue'
 import ContentStateWrapper from '@/components/ContentStateWrapper.vue'
 import { AddIcon, ArrowDownIcon, ArrowUpIcon, ConfirmIcon, DeleteIcon, EditIcon } from '@/icons/vue-material'
 import { usePdfTemplatesStore } from '@/stores/pdfTemplatesStore'
@@ -417,14 +422,25 @@ function addRule(): void {
 	form.value.rules.push(newPdfRule())
 }
 
-function moveRule(index: number, delta: number): void {
+async function moveRule(index: number, delta: number, event: MouseEvent): Promise<void> {
 	const target = index + delta
 	if (target < 0 || target >= form.value.rules.length) {
 		return
 	}
+
+	const button = event.currentTarget as HTMLButtonElement
+	const ruleElement = button.closest('.rule')
 	const [rule] = form.value.rules.splice(index, 1)
+
 	if (rule) {
 		form.value.rules.splice(target, 0, rule)
+		await nextTick()
+
+		const focusTarget = button.disabled
+			? ruleElement?.querySelector<HTMLButtonElement>('button[data-rule-move]:not(:disabled)')
+			: button
+
+		focusTarget?.focus()
 	}
 }
 
@@ -484,28 +500,39 @@ async function saveTemplate(): Promise<void> {
 	}
 	saving.value = true
 	try {
-		if (form.value.id !== null) {
-			await pdfTemplatesStore.updateTemplate(form.value.id, payload)
-		} else {
-			await pdfTemplatesStore.createTemplate(payload)
-		}
-		editorOpen.value = false
-	} catch {
-		showError(t('Could not save PDF template.'))
+		await tryShowError(
+			async () => {
+				if (form.value.id !== null) {
+					await pdfTemplatesStore.updateTemplate(form.value.id, payload)
+				} else {
+					await pdfTemplatesStore.createTemplate(payload)
+				}
+				editorOpen.value = false
+			},
+			t('Could not save PDF template.') + ' ',
+		)
 	} finally {
 		saving.value = false
 	}
 }
 
 async function removeTemplate(item: SetlistTemplate): Promise<void> {
-	if (!window.confirm(t('Delete template "{name}"? Setlists using it will revert to the standard template.', { name: item.name }))) {
+	if (saving.value) {
 		return
 	}
 	saving.value = true
 	try {
-		await pdfTemplatesStore.deleteTemplate(item.id)
-	} catch {
-		showError(t('Could not delete PDF template.'))
+		const confirmed = await spawnDialog(ConfirmationDialog, {
+			title: t('Delete'),
+			message: t('Delete template "{name}"? Setlists using it will revert to the standard template.', { name: item.name }),
+		})
+		if (!confirmed) {
+			return
+		}
+		await tryShowError(
+			() => pdfTemplatesStore.deleteTemplate(item.id),
+			t('Could not delete PDF template.') + ' ',
+		)
 	} finally {
 		saving.value = false
 	}
@@ -526,11 +553,22 @@ async function removeTemplate(item: SetlistTemplate): Promise<void> {
 	padding: 12px;
 }
 
-.field-grid,
-.rule-condition {
+.field-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 	gap: 10px;
+}
+
+.rule-condition {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	min-width: 0;
+}
+
+.rule-condition > * {
+	min-width: 0;
+	max-width: 100%;
 }
 
 .rule {
