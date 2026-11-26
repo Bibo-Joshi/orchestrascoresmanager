@@ -193,6 +193,8 @@ export interface Setlist {
   defaultModerationDuration: number | null;
   /** @format int64 */
   folderCollectionVersionId: number | null;
+  /** @format int64 */
+  defaultTemplateId: number | null;
   isDraft: boolean;
   isPublished: boolean;
 }
@@ -220,6 +222,86 @@ export interface SetlistPage {
     /** @format int64 */
     total: number;
   };
+}
+
+export interface SetlistTemplate {
+  /** @format int64 */
+  id: number;
+  name: string;
+  description: string | null;
+  headerInfo: SetlistTemplateHeaderInfo;
+  fontSizes: SetlistTemplateFontSizes | null;
+  /** @format double */
+  margin: number;
+  /** @format double */
+  cellPadding: number;
+  rules: SetlistTemplateRule[];
+  createdBy: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SetlistTemplateCreate {
+  name: string;
+  description?: string | null;
+  headerInfo: SetlistTemplateHeaderInfo;
+  fontSizes?: SetlistTemplateFontSizes | null;
+  /** @format double */
+  margin: number;
+  /** @format double */
+  cellPadding: number;
+  rules: SetlistTemplateRule[];
+}
+
+export interface SetlistTemplateFontSizes {
+  /** @format double */
+  title?: number;
+  /** @format double */
+  subtitle?: number;
+  /** @format double */
+  colorLegend?: number;
+  /** @format double */
+  columnTitle?: number;
+  /** @format double */
+  scoreRow?: number;
+  /** @format double */
+  breakRow?: number;
+}
+
+export interface SetlistTemplateHeaderInfo {
+  entries: (
+    | "date"
+    | "startTime"
+    | "endTime"
+    | "playDuration"
+    | "breaksDuration"
+    | "overallDuration"
+    | "folderCollection"
+  )[];
+  layout: "table" | "subtitle";
+}
+
+export interface SetlistTemplatePatch {
+  name?: string;
+  description?: string | null;
+  headerInfo?: SetlistTemplateHeaderInfo;
+  fontSizes?: SetlistTemplateFontSizes | null;
+  /** @format double */
+  margin?: number;
+  /** @format double */
+  cellPadding?: number;
+  rules?: SetlistTemplateRule[];
+}
+
+export interface SetlistTemplateRule {
+  id: string;
+  /** @format int64 */
+  order: number;
+  label?: string | null;
+  expression: Record<string, object>;
+  backgroundColor?: string | null;
+  /** @format double */
+  cellPadding?: number | null;
 }
 
 export interface Tag {
@@ -972,6 +1054,12 @@ export interface SetlistApiPostSetlistPayload {
    */
   folderCollectionVersionId?: number | null;
   /**
+   * Optional shared PDF template ID
+   * @format int64
+   * @default null
+   */
+  defaultTemplateId?: number | null;
+  /**
    * Whether the setlist is a draft
    * @default false
    */
@@ -1031,6 +1119,12 @@ export interface SetlistApiPatchSetlistPayload {
    * @default null
    */
   folderCollectionVersionId?: number | null;
+  /**
+   * Optional shared PDF template ID
+   * @format int64
+   * @default null
+   */
+  defaultTemplateId?: number | null;
   /**
    * Whether the setlist is a draft
    * @default null
@@ -1188,6 +1282,44 @@ export interface SetlistEntryApiPostSetlistEntriesBatchData {
   ocs: {
     meta: OCSMeta;
     data: SetlistEntry[];
+  };
+}
+
+export interface SetlistTemplateApiGetTemplatesData {
+  ocs: {
+    meta: OCSMeta;
+    data: SetlistTemplate[];
+  };
+}
+
+export interface SetlistTemplateApiPostTemplatePayload {
+  /** Template fields */
+  template: SetlistTemplateCreate;
+}
+
+export interface SetlistTemplateApiPostTemplateData {
+  ocs: {
+    meta: OCSMeta;
+    data: SetlistTemplate;
+  };
+}
+
+export interface SetlistTemplateApiPatchTemplatePayload {
+  /** Partial template fields */
+  template: SetlistTemplatePatch;
+}
+
+export interface SetlistTemplateApiPatchTemplateData {
+  ocs: {
+    meta: OCSMeta;
+    data: SetlistTemplate;
+  };
+}
+
+export interface SetlistTemplateApiDeleteTemplateData {
+  ocs: {
+    meta: OCSMeta;
+    data: object;
   };
 }
 

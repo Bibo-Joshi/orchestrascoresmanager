@@ -138,7 +138,7 @@
 
 <script setup lang="ts">
 import type { FolderCollection, Score, ScoreBookIndexed, ScoreIndexed, Setlist } from '@/api/generated/openapi/data-contracts'
-import type { PdfColumnConfig } from '@/utils/pdf-exporter'
+import type { PdfColumnConfig } from '@/utils/pdfexport'
 
 import { loadState } from '@nextcloud/initial-state'
 import { computed, onMounted, ref, watch } from 'vue'

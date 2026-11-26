@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import type { CellValueChangedEvent, ColDef, GridApi, RowDragEndEvent } from 'ag-grid-community'
 import type { FolderCollection, Score, Setlist, SetlistEntry } from '@/api/generated/openapi/data-contracts'
-import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdf-exporter'
+import type { PdfColumnConfig, PdfColumnId } from '@/utils/pdfexport'
 import type { ScoreInfoField } from '@/utils/setlistScoreUtils'
 
 import { showError } from '@nextcloud/dialogs'
