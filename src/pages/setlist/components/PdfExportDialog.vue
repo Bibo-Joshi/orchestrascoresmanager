@@ -3,13 +3,13 @@
 		:name="t('Export PDF')"
 		:open="dialogOpen"
 		@update:open="dialogOpen = $event">
-		<div v-if="availablePdfTemplates.length" class="pdf-template-select">
+		<div v-if="pdfTemplatesStore.templates.length" class="pdf-template-select">
 			<label for="pdf-template-select"><strong>{{ t('PDF template') }}</strong></label>
 			<select id="pdf-template-select" v-model="selectedPdfTemplateId">
 				<option :value="null">
 					{{ t('Standard template (built-in)') }}
 				</option>
-				<option v-for="template in availablePdfTemplates" :key="template.id" :value="template.id">
+				<option v-for="template in pdfTemplatesStore.templates" :key="template.id" :value="template.id">
 					{{ template.name }}
 				</option>
 			</select>
@@ -45,7 +45,7 @@
 				</template>
 				{{ t('Cancel') }}
 			</NcButton>
-			<NcButton variant="primary" :disabled="loadingTemplates || pdfExporting" @click="onPdfExport">
+			<NcButton variant="primary" :disabled="pdfTemplatesStore.isLoading || pdfExporting" @click="onPdfExport">
 				<template #icon>
 					<DownloadIcon />
 				</template>
@@ -99,8 +99,6 @@ interface DialogColumn extends PdfColumnConfig {
 const dialogColumns = ref<DialogColumn[]>([])
 const hasUserCustomizedColumns = ref(false)
 const selectedPdfTemplateId = ref<number | null>(null)
-const availablePdfTemplates = computed(() => pdfTemplatesStore.templates)
-const loadingTemplates = computed(() => pdfTemplatesStore.isLoading)
 const pdfExporting = ref(false)
 
 /**
@@ -153,7 +151,7 @@ watch(dialogOpen, async (isOpen) => {
 	if (!dialogOpen.value || setlistId !== props.setlist.id) {
 		return
 	}
-	selectedPdfTemplateId.value = availablePdfTemplates.value
+	selectedPdfTemplateId.value = pdfTemplatesStore.templates
 		.find(({ id }) => id === props.setlist.defaultTemplateId)?.id ?? null
 })
 
@@ -168,7 +166,7 @@ function markColumnsCustomized(): void {
  * Export the PDF using the currently selected columns, then close the dialog.
  */
 async function onPdfExport(): Promise<void> {
-	if (loadingTemplates.value || pdfExporting.value) {
+	if (pdfTemplatesStore.isLoading || pdfExporting.value) {
 		return
 	}
 	dialogOpen.value = false

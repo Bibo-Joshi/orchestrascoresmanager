@@ -69,7 +69,7 @@
 					@input="restrictToTimeFormat"
 					@paste="restrictToTimeFormat" />
 
-				<label v-if="editable" class="pdf-template-select">
+				<label v-if="editable && pdfTemplatesStore.templates.length" class="pdf-template-select">
 					{{ t('Default PDF template') }}
 					<select
 						v-model="formData.defaultTemplateId"
