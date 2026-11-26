@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Score, ScoreBook, ScoreBookIndexed, ScoreIndexed } from '@/api/generated/openapi/data-contracts'
+import type { Score, ScoreBook } from '@/api/generated/openapi/data-contracts'
 import type { EntityOption } from '@/composables/useEntitySelect'
 
 import { showSuccess } from '@nextcloud/dialogs'
@@ -64,7 +64,6 @@ import NcSelect from '@nextcloud/vue/components/NcSelect'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import AddOrEditDialog from '@/components/AddOrEditDialog.vue'
 import FocusTrap from '@/components/FocusTrap.vue'
-import { apiClients } from '@/api/client'
 import {
 	createScoreBookOptions,
 	createScoreBookSelectable,
@@ -74,6 +73,7 @@ import {
 	filterScores,
 } from '@/composables/useEntitySelect'
 import { useIndexValidation } from '@/composables/useIndexValidation'
+import { useFolderCollectionMembersStore } from '@/stores/folderCollectionMembersStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
 import { useScoresStore } from '@/stores/scoresStore'
 import { tryShowError } from '@/utils/errorHandling'
@@ -92,16 +92,12 @@ const showDialog = defineModel<boolean>('open', { default: false })
 
 const props = defineProps<Props>()
 
-const emit = defineEmits<{
-	scoreAdded: [score: Score | ScoreIndexed]
-	scorebookAdded: [scoreBook: ScoreBook | ScoreBookIndexed]
-}>()
-
 interface TypeOption {
 	label: string
 	value: 'score' | 'scorebook'
 }
 
+const membersStore = useFolderCollectionMembersStore()
 const scoresStore = useScoresStore()
 const scoreBooksStore = useScoreBooksStore()
 
@@ -218,49 +214,12 @@ async function handleSubmit() {
 
 	await tryShowError(
 		async () => {
+			const index = props.isIndexed ? inputIndex.value : undefined
 			if (selectedType.value!.value === 'score') {
-				const payload: { scoreId: number, index?: number | null } = {
-					scoreId: selectedScore.value!.value,
-				}
-				if (props.isIndexed) {
-					payload.index = inputIndex.value
-				}
-
-				await apiClients.default.folderCollectionApiPostFolderCollectionScore(
-					props.folderCollectionId,
-					payload,
-				)
-
-				const addedScore = selectedScore.value!.entity
-				if (props.isIndexed) {
-					const scoreIndexed: ScoreIndexed = { ...addedScore, index: inputIndex.value }
-					emit('scoreAdded', scoreIndexed)
-				} else {
-					emit('scoreAdded', addedScore)
-				}
-
+				await membersStore.addScore(props.folderCollectionId, selectedScore.value!.entity, index)
 				showSuccess(t('Score added to collection'))
 			} else {
-				const payload: { scoreBookId: number, index?: number | null } = {
-					scoreBookId: selectedScoreBook.value!.value,
-				}
-				if (props.isIndexed) {
-					payload.index = inputIndex.value
-				}
-
-				await apiClients.default.folderCollectionApiPostFolderCollectionScoreBook(
-					props.folderCollectionId,
-					payload,
-				)
-
-				const addedScoreBook = selectedScoreBook.value!.entity
-				if (props.isIndexed) {
-					const scoreBookIndexed: ScoreBookIndexed = { ...addedScoreBook, index: inputIndex.value }
-					emit('scorebookAdded', scoreBookIndexed)
-				} else {
-					emit('scorebookAdded', addedScoreBook)
-				}
-
+				await membersStore.addScoreBook(props.folderCollectionId, selectedScoreBook.value!.value, index)
 				showSuccess(t('Score book added to collection'))
 			}
 

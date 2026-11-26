@@ -145,7 +145,11 @@ export const useScoreBooksStore = defineStore('scoreBooks', () => {
 	 * @throws { Error } if API call fails
 	 */
 	async function updateScoreBookTags(id: number, tagIds: number[]): Promise<void> {
-		await apiClients.default.scoreBookApiPatchScoreBook(id, { tagIds })
+		const response = await apiClients.default.scoreBookApiPatchScoreBook(id, { tagIds })
+		const index = scoreBooks.value.findIndex((sb) => sb.id === id)
+		if (index !== -1) {
+			scoreBooks.value[index] = { ...scoreBooks.value[index], tags: response.data.ocs.data.tags }
+		}
 	}
 
 	/**

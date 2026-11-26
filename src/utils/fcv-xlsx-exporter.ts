@@ -240,7 +240,7 @@ function flattenEntries(
 					indexDisplay,
 				})
 			}
-		} else if (entry.type === 'score' && entry.score) {
+		} else if (entry.type === 'score' && entry.score && !entry.score.viaScoreBook) {
 			// Direct score
 			let indexDisplay: string | undefined
 			const indexedScore = entry.score as ScoreIndexed
@@ -316,15 +316,17 @@ function createTocData(
 		const existingIndices = new Map<number, {
 			title: string
 			indexDisplay: string
-		}>()
+		}[]>()
 		for (const item of flatItems) {
 			if (item.index === undefined) {
 				continue
 			}
-			existingIndices.set(item.index, {
+			const items = existingIndices.get(item.index) ?? []
+			items.push({
 				title: item.title,
 				indexDisplay: item.indexDisplay ?? String(item.index),
 			})
+			existingIndices.set(item.index, items)
 		}
 
 		// Group by tens, including missing indices
@@ -335,17 +337,20 @@ function createTocData(
 				groups.set(groupLabel, [])
 			}
 
-			if (existingIndices.has(i)) {
-				groups.get(groupLabel)!.push({
-					leftColumn: {
-						text: existingIndices.get(i)!.indexDisplay,
-						bold: true,
-					},
-					rightColumn: {
-						text: existingIndices.get(i)!.title,
-						bold: false,
-					},
-				})
+			const items = existingIndices.get(i)
+			if (items) {
+				for (const item of items) {
+					groups.get(groupLabel)!.push({
+						leftColumn: {
+							text: item.indexDisplay,
+							bold: true,
+						},
+						rightColumn: {
+							text: item.title,
+							bold: false,
+						},
+					})
+				}
 			} else {
 				// Add empty row for missing index
 				groups.get(groupLabel)!.push({

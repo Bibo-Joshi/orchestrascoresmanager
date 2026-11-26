@@ -102,9 +102,7 @@
 				:isIndexed="isIndexed"
 				:existingScoreIds="existingScoreIds"
 				:existingScoreBookIds="existingScoreBookIds"
-				:occupiedIndices="occupiedIndices"
-				@scoreAdded="handleScoreAdded"
-				@scorebookAdded="handleScoreBookAdded" />
+				:occupiedIndices="occupiedIndices" />
 		</template>
 
 		<!-- Sidebar removed - using score table sidebar instead -->
@@ -135,10 +133,10 @@ import ScoreSidebar from '@/components/ScoreSidebar.vue'
 import ScoresTable from '@/components/ScoresTable.vue'
 import { useStartNewVersion } from './composables/useStartNewVersion.ts'
 import { useTocExport } from './composables/useTocExport.ts'
-import { apiClients } from '@/api/client'
 import { useCsvExport } from '@/composables/useCsvExport'
 import { formatDateStr } from '@/composables/useDateFormatting'
 import { AddIcon, DownloadIcon, HistoryIcon, ScoreIcon } from '@/icons/vue-material'
+import { useFolderCollectionMembersStore } from '@/stores/folderCollectionMembersStore'
 import { useFolderCollectionsStore } from '@/stores/folderCollectionsStore'
 import { useFolderCollectionVersionsStore } from '@/stores/folderCollectionVersionsStore'
 import { useScoreBooksStore } from '@/stores/scoreBooksStore'
@@ -164,13 +162,11 @@ const route = useRoute()
 const router = useRouter()
 const folderCollectionsStore = useFolderCollectionsStore()
 const versionsStore = useFolderCollectionVersionsStore()
+const membersStore = useFolderCollectionMembersStore()
 const scoreBooksStore = useScoreBooksStore()
 
 const loading = ref(false)
 const loadError = ref(false)
-const scores = ref<(Score | ScoreIndexed)[]>([])
-const scoreBooks = ref<(ScoreBook | ScoreBookIndexed)[]>([])
-const scoreBookScoresMap = ref<Map<number, Score[]>>(new Map())
 const editable = ref<boolean>(!!loadState('orchestrascoresmanager', 'editable'))
 const searchText = ref<string | undefined>(undefined)
 
@@ -277,15 +273,14 @@ const isIndexed = computed(() => {
 })
 
 /**
- * Sort scores in place
+ * Scores of the collection, sorted.
  * For indexed collections, sort by index. Lexicographical sorting on (<index of score in collection>, <index of score in book>|null)
  * For alphabetical collections, sort by lexicographical sorting (<scorebook title if viaScoreBook>|<score title>, <index of score in book>|null)
  */
-function sortScores(): void {
-	if (!scores.value) {
-		return
+const scores = computed<(Score | ScoreIndexed)[]>(() => {
+	if (!folderCollection.value) {
+		return []
 	}
-
 	const collectionIndex = (s: Score | ScoreIndexed): number | null => {
 		return (s as ScoreIndexed).index ?? null
 	}
@@ -297,8 +292,9 @@ function sortScores(): void {
 		return null
 	}
 
+	const sorted = membersStore.getScores(folderCollection.value.id)
 	if (isIndexed.value) {
-		scores.value.sort((a, b) => {
+		sorted.sort((a, b) => {
 			const aCol = collectionIndex(a) ?? Number.MAX_SAFE_INTEGER
 			const bCol = collectionIndex(b) ?? Number.MAX_SAFE_INTEGER
 			if (aCol !== bCol) {
@@ -310,10 +306,11 @@ function sortScores(): void {
 			return aInner - bInner
 		})
 	} else {
-		scores.value.sort((a, b) => {
-			const titleA = a.viaScoreBook && a.scoreBook ? scoreBooksStore.getScoreBookById(a.scoreBook.id).title : a.title
-			const titleB = b.viaScoreBook && b.scoreBook ? scoreBooksStore.getScoreBookById(b.scoreBook.id).title : b.title
-			const cmp = titleA.localeCompare(titleB)
+		const sortTitle = (s: Score | ScoreIndexed): string => {
+			return s.viaScoreBook && s.scoreBook ? (scoreBooksStore.getScoreBookById(s.scoreBook.id)?.title ?? s.title) : s.title
+		}
+		sorted.sort((a, b) => {
+			const cmp = sortTitle(a).localeCompare(sortTitle(b))
 			if (cmp !== 0) {
 				return cmp
 			}
@@ -323,7 +320,30 @@ function sortScores(): void {
 			return aInner - bInner
 		})
 	}
-}
+	return sorted
+})
+
+/**
+ * Score books of the collection
+ */
+const scoreBooks = computed<(ScoreBook | ScoreBookIndexed)[]>(() => {
+	return folderCollection.value ? membersStore.getScoreBooks(folderCollection.value.id) : []
+})
+
+/**
+ * Map of score book ID to its scores within the collection
+ */
+const scoreBookScoresMap = computed<Map<number, Score[]>>(() => {
+	const map = new Map<number, Score[]>()
+	for (const score of scores.value) {
+		if (score.viaScoreBook && score.scoreBook?.id) {
+			const scoresOfBook = map.get(score.scoreBook.id) ?? []
+			scoresOfBook.push(score)
+			map.set(score.scoreBook.id, scoresOfBook)
+		}
+	}
+	return map
+})
 
 /**
  * Combined and sorted entries (scores + score books)
@@ -442,42 +462,11 @@ async function loadData() {
 			await versionsStore.loadVersions(folderCollection.value.id, folderCollection.value.activeVersionId)
 		}
 
-		// Determine which version to load data for
-		const versionIdToLoad = selectedVersionId.value
-
-		// Load all scores (direct members and those via score books)
-		const scoresResponse = await apiClients.default.folderCollectionApiGetFolderCollectionScores(
-			folderCollection.value.id,
-			{ versionId: versionIdToLoad ?? undefined },
-		)
-		scores.value = (scoresResponse.data.ocs.data || []) as (Score | ScoreIndexed)[]
-		sortScores()
-
-		// Load score books
-		const scoreBooksResponse = await apiClients.default.folderCollectionApiGetFolderCollectionScoreBooks(
-			folderCollection.value.id,
-			{ versionId: versionIdToLoad ?? undefined },
-		)
-		scoreBooks.value = (scoreBooksResponse.data.ocs.data || []) as (ScoreBook | ScoreBookIndexed)[]
-
-		// Build scoreBookScoresMap from scores that have viaScoreBook flag
-		const newMap = new Map<number, Score[]>()
-		for (const score of scores.value) {
-			if (score.viaScoreBook && score.scoreBook?.id) {
-				const bookId = score.scoreBook.id
-				if (!newMap.has(bookId)) {
-					newMap.set(bookId, [])
-				}
-				newMap.get(bookId)!.push(score)
-			}
-		}
-		scoreBookScoresMap.value = newMap
+		await membersStore.loadMembers(folderCollection.value.id, selectedVersionId.value)
 	} catch (error) {
 		console.error('Failed to load folder collection data', error)
 		loadError.value = false
-		scores.value = []
-		scoreBooks.value = []
-		scoreBookScoresMap.value = new Map()
+		membersStore.clearMembers(folderCollection.value.id)
 	} finally {
 		loading.value = false
 	}
@@ -544,28 +533,6 @@ const occupiedIndices = computed<Set<number>>(() => {
 })
 
 /**
- * Handle score added event
- * @param newScore - The newly added score
- */
-function handleScoreAdded(newScore: Score | ScoreIndexed) {
-	scores.value = [...scores.value, newScore]
-	sortScores()
-	if (folderCollection.value) {
-		folderCollectionsStore.incrementScoreCount(folderCollection.value.id)
-	}
-}
-
-/**
- * Handle score book added event
- * @param newScoreBook - The newly added score book
- */
-async function handleScoreBookAdded(newScoreBook: ScoreBook | ScoreBookIndexed) {
-	scoreBooks.value = [...scoreBooks.value, newScoreBook]
-	// Reload all scores to get the new scores from this book
-	await loadData()
-}
-
-/**
  * Handle delete score - called from ScoresTable
  * @param scoreId - The ID of the score to delete
  * @param scoreBookId - The score book ID if the score is from a score book, null otherwise
@@ -630,12 +597,7 @@ async function deleteScore(score: Score | ScoreIndexed) {
 
 	await tryShowError(
 		async () => {
-			await apiClients.default.folderCollectionApiDeleteFolderCollectionScore(
-				collectionId,
-				score.id,
-			)
-			scores.value = scores.value.filter((s) => s.id !== score.id)
-			folderCollectionsStore.decrementScoreCount(collectionId)
+			await membersStore.removeScore(collectionId, score.id)
 		},
 		t('Failed to remove score from collection: '),
 	)
@@ -651,21 +613,10 @@ async function deleteScoreBook(scoreBook: ScoreBook | ScoreBookIndexed) {
 	}
 
 	const collectionId = folderCollection.value.id
-	const scoreCount = scoreBookScoresMap.value.get(scoreBook.id)?.length || 0
 
 	await tryShowError(
 		async () => {
-			await apiClients.default.folderCollectionApiDeleteFolderCollectionScoreBook(
-				collectionId,
-				scoreBook.id,
-			)
-			scoreBooks.value = scoreBooks.value.filter((sb) => sb.id !== scoreBook.id)
-			scores.value = scores.value.filter((s) => s.scoreBook?.id !== scoreBook.id)
-			scoreBookScoresMap.value.delete(scoreBook.id)
-			// Update score count
-			Array.from({ length: scoreCount }).forEach(() => {
-				folderCollectionsStore.decrementScoreCount(collectionId)
-			})
+			await membersStore.removeScoreBook(collectionId, scoreBook.id)
 		},
 		t('Failed to remove score book from collection: '),
 	)
