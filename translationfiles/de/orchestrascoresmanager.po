@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Nextcloud 3.14159\n"
 "Report-Msgid-Bugs-To: translations\\@example.com\n"
-"POT-Creation-Date: 2026-11-26 07:58+0000\n"
+"POT-Creation-Date: 2026-11-26 17:59+0000\n"
 "PO-Revision-Date: 2025-11-28 22:37+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -402,17 +402,8 @@ msgstr "Benutzerdefiniert"
 msgid "Could not read PDF template rules."
 msgstr "Die Regeln der PDF-Vorlage konnten nicht gelesen werden."
 
-msgid "Please enter a template name."
-msgstr "Bitte einen Vorlagennamen eingeben."
-
 msgid "Please check the font sizes and spacing values."
 msgstr "Bitte die Schriftgrößen und Abstände überprüfen."
-
-msgid "Each tag rule must have the required tag names."
-msgstr "Für jede Schlagwortregel müssen die erforderlichen Schlagwörter angegeben werden."
-
-msgid "Invalid rule cell padding."
-msgstr "Ungültiger Zellinnenabstand der Regel."
 
 msgid "Could not save PDF template."
 msgstr "PDF-Vorlage konnte nicht gespeichert werden."
@@ -449,6 +440,9 @@ msgstr "Neue PDF-Vorlage"
 
 msgid "Template name"
 msgstr "Vorlagenname"
+
+msgid "Please enter a template name."
+msgstr "Bitte einen Vorlagennamen eingeben."
 
 msgid "Description (optional)"
 msgstr "Beschreibung (optional)"
@@ -513,6 +507,9 @@ msgstr "Schlagwort"
 msgid "First tag"
 msgstr "Erstes Schlagwort"
 
+msgid "Each tag rule must have the required tag names."
+msgstr "Für jede Schlagwortregel müssen die erforderlichen Schlagwörter angegeben werden."
+
 msgid "Combine"
 msgstr "Verknüpfung"
 
@@ -527,6 +524,9 @@ msgstr "Abweichender Zellinnenabstand (mm, optional)"
 
 msgid "Default"
 msgstr "Standard"
+
+msgid "Invalid rule cell padding."
+msgstr "Ungültiger Zellinnenabstand der Regel."
 
 msgid "Add rule"
 msgstr "Regel hinzufügen"
