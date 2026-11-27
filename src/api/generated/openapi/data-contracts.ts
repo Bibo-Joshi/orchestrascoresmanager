@@ -10,6 +10,17 @@
  * ---------------------------------------------------------------
  */
 
+export interface Clef {
+  /** @format int64 */
+  id: number;
+  sign: "G" | "C" | "F" | "percussion" | "TAB";
+  /** @format int64 */
+  line: number | null;
+  /** @format int64 */
+  octave: number;
+  title: string | null;
+}
+
 export interface Comment {
   /** @format int64 */
   id: number;
@@ -24,6 +35,22 @@ export interface Comment {
 export interface CommentAuthor {
   userId: string;
   displayName: string | null;
+}
+
+export interface ConductorsScore {
+  /** @format int64 */
+  id: number;
+  /** @format int64 */
+  scoreId: number;
+}
+
+export interface ConductorsScoreVariant {
+  /** @format int64 */
+  id: number;
+  /** @format int64 */
+  conductorsScoreId: number;
+  type: "full" | "condensed";
+  description: string | null;
 }
 
 export interface FolderCollection {
@@ -63,12 +90,44 @@ export interface FolderCollectionVersion {
   validTo: string | null;
 }
 
+export interface NotationPreset {
+  /** @format int64 */
+  id: number;
+  /** @format int64 */
+  clefId: number;
+  transposition: Transposition;
+  title: string;
+  description: string | null;
+}
+
 export interface OCSMeta {
   status: string;
   statuscode: number;
   message?: string;
   totalitems?: string;
   itemsperpage?: string;
+}
+
+export interface Part {
+  /** @format int64 */
+  id: number;
+  /** @format int64 */
+  scoreId: number;
+  title: string;
+  description: string | null;
+}
+
+export interface PartVariant {
+  /** @format int64 */
+  id: number;
+  /** @format int64 */
+  partId: number;
+  /** @format int64 */
+  clefId: number;
+  transposition: Transposition;
+  /** @format int64 */
+  notationPresetId: number | null;
+  description: string | null;
 }
 
 export interface Score {
@@ -310,11 +369,104 @@ export interface Tag {
   name: string;
 }
 
+export interface Transposition {
+  /** @format int64 */
+  diatonic: number;
+  /** @format int64 */
+  chromatic: number;
+  /** @format int64 */
+  octave: number;
+}
+
 export interface UserSetlistSettings {
   /** @format int64 */
   defaultModerationTime: number | null;
   /** @format int64 */
   defaultFolderCollectionId: number | null;
+}
+
+export interface ClefApiGetClefsData {
+  ocs: {
+    meta: OCSMeta;
+    data: {
+      clefs: Clef[];
+    };
+  };
+}
+
+export interface ClefApiPostClefPayload {
+  /** The clef sign: `G`, `C`, `F`, `percussion` or `TAB` */
+  sign: string;
+  /**
+   * The staff line (1-5), required for `G`, `C` and `F`, not allowed otherwise
+   * @format int64
+   * @default null
+   */
+  line?: number | null;
+  /**
+   * The octave shift
+   * @format int64
+   * @default 0
+   */
+  octave?: number;
+  /**
+   * Optional title of the clef
+   * @default null
+   */
+  title?: string | null;
+}
+
+export interface ClefApiPostClefData {
+  ocs: {
+    meta: OCSMeta;
+    data: Clef;
+  };
+}
+
+export interface ClefApiGetClefData {
+  ocs: {
+    meta: OCSMeta;
+    data: Clef;
+  };
+}
+
+export interface ClefApiPatchClefPayload {
+  /**
+   * The clef sign: `G`, `C`, `F`, `percussion` or `TAB`
+   * @default null
+   */
+  sign?: string | null;
+  /**
+   * The staff line (1-5)
+   * @format int64
+   * @default null
+   */
+  line?: number | null;
+  /**
+   * The octave shift
+   * @format int64
+   * @default null
+   */
+  octave?: number | null;
+  /**
+   * The title of the clef, an empty string removes it
+   * @default null
+   */
+  title?: string | null;
+}
+
+export interface ClefApiPatchClefData {
+  ocs: {
+    meta: OCSMeta;
+    data: Clef;
+  };
+}
+
+export interface ClefApiDeleteClefData {
+  ocs: {
+    meta: OCSMeta;
+    data: object;
+  };
 }
 
 export interface CommentApiGetCommentData {
@@ -325,6 +477,89 @@ export interface CommentApiGetCommentData {
 }
 
 export interface CommentApiDeleteCommentData {
+  ocs: {
+    meta: OCSMeta;
+    data: object;
+  };
+}
+
+export interface ConductorsScoreApiGetScoreConductorsScoreData {
+  ocs: {
+    meta: OCSMeta;
+    data: {
+      conductorsScore: ConductorsScore | null;
+    };
+  };
+}
+
+export interface ConductorsScoreApiPostScoreConductorsScoreData {
+  ocs: {
+    meta: OCSMeta;
+    data: ConductorsScore;
+  };
+}
+
+export interface ConductorsScoreApiDeleteConductorsScoreData {
+  ocs: {
+    meta: OCSMeta;
+    data: object;
+  };
+}
+
+export interface ConductorsScoreVariantApiGetConductorsScoreVariantsData {
+  ocs: {
+    meta: OCSMeta;
+    data: {
+      variants: ConductorsScoreVariant[];
+    };
+  };
+}
+
+export interface ConductorsScoreVariantApiPostConductorsScoreVariantPayload {
+  /** The type of the variant, `full` or `condensed` */
+  type: string;
+  /**
+   * Optional description of the variant
+   * @default null
+   */
+  description?: string | null;
+}
+
+export interface ConductorsScoreVariantApiPostConductorsScoreVariantData {
+  ocs: {
+    meta: OCSMeta;
+    data: ConductorsScoreVariant;
+  };
+}
+
+export interface ConductorsScoreVariantApiGetConductorsScoreVariantData {
+  ocs: {
+    meta: OCSMeta;
+    data: ConductorsScoreVariant;
+  };
+}
+
+export interface ConductorsScoreVariantApiPatchConductorsScoreVariantPayload {
+  /**
+   * The type of the variant, `full` or `condensed`
+   * @default null
+   */
+  type?: string | null;
+  /**
+   * The description of the variant, an empty string removes it
+   * @default null
+   */
+  description?: string | null;
+}
+
+export interface ConductorsScoreVariantApiPatchConductorsScoreVariantData {
+  ocs: {
+    meta: OCSMeta;
+    data: ConductorsScoreVariant;
+  };
+}
+
+export interface ConductorsScoreVariantApiDeleteConductorsScoreVariantData {
   ocs: {
     meta: OCSMeta;
     data: object;
@@ -530,6 +765,283 @@ export interface FolderCollectionVersionApiPatchFolderCollectionVersionData {
   ocs: {
     meta: OCSMeta;
     data: FolderCollectionVersion;
+  };
+}
+
+export interface NotationPresetApiGetNotationPresetsData {
+  ocs: {
+    meta: OCSMeta;
+    data: {
+      notationPresets: NotationPreset[];
+    };
+  };
+}
+
+export interface NotationPresetApiPostNotationPresetPayload {
+  /**
+   * The ID of the clef of the preset
+   * @format int64
+   */
+  clefId: number;
+  /** The transposition of the preset */
+  transposition: {
+    /** @format int64 */
+    diatonic: number;
+    /** @format int64 */
+    chromatic: number;
+    /** @format int64 */
+    octave: number;
+  };
+  /** The title of the preset */
+  title: string;
+  /**
+   * Optional description of the preset
+   * @default null
+   */
+  description?: string | null;
+}
+
+export interface NotationPresetApiPostNotationPresetData {
+  ocs: {
+    meta: OCSMeta;
+    data: NotationPreset;
+  };
+}
+
+export interface NotationPresetApiGetNotationPresetData {
+  ocs: {
+    meta: OCSMeta;
+    data: NotationPreset;
+  };
+}
+
+export interface NotationPresetApiPatchNotationPresetPayload {
+  /**
+   * The ID of the clef of the preset
+   * @format int64
+   * @default null
+   */
+  clefId?: number | null;
+  /**
+   * The transposition of the preset
+   * @default null
+   */
+  transposition?: {
+    /** @format int64 */
+    diatonic: number;
+    /** @format int64 */
+    chromatic: number;
+    /** @format int64 */
+    octave: number;
+  } | null;
+  /**
+   * The title of the preset
+   * @default null
+   */
+  title?: string | null;
+  /**
+   * The description of the preset, an empty string removes it
+   * @default null
+   */
+  description?: string | null;
+}
+
+export interface NotationPresetApiPatchNotationPresetData {
+  ocs: {
+    meta: OCSMeta;
+    data: NotationPreset;
+  };
+}
+
+export interface NotationPresetApiDeleteNotationPresetData {
+  ocs: {
+    meta: OCSMeta;
+    data: object;
+  };
+}
+
+export interface PartApiGetScorePartsData {
+  ocs: {
+    meta: OCSMeta;
+    data: {
+      parts: Part[];
+    };
+  };
+}
+
+export interface PartApiPostScorePartPayload {
+  /** The title of the part */
+  title: string;
+  /**
+   * Optional description of the part
+   * @default null
+   */
+  description?: string | null;
+}
+
+export interface PartApiPostScorePartData {
+  ocs: {
+    meta: OCSMeta;
+    data: Part;
+  };
+}
+
+export interface PartApiGetPartData {
+  ocs: {
+    meta: OCSMeta;
+    data: Part;
+  };
+}
+
+export interface PartApiPatchPartPayload {
+  /**
+   * The title of the part
+   * @default null
+   */
+  title?: string | null;
+  /**
+   * The description of the part, an empty string removes it
+   * @default null
+   */
+  description?: string | null;
+}
+
+export interface PartApiPatchPartData {
+  ocs: {
+    meta: OCSMeta;
+    data: Part;
+  };
+}
+
+export interface PartApiDeletePartData {
+  ocs: {
+    meta: OCSMeta;
+    data: object;
+  };
+}
+
+export interface PartVariantApiGetPartVariantsData {
+  ocs: {
+    meta: OCSMeta;
+    data: {
+      variants: PartVariant[];
+    };
+  };
+}
+
+export interface PartVariantApiPostPartVariantPayload {
+  /**
+   * The ID of the notation preset to use
+   * @format int64
+   * @default null
+   */
+  notationPresetId?: number | null;
+  /**
+   * The clef of the variant
+   * @default null
+   */
+  clef?:
+    | {
+        /** @format int64 */
+        id: number;
+      }
+    | {
+        sign: string;
+        /** @format int64 */
+        line?: number | null;
+        /** @format int64 */
+        octave?: number;
+        title?: string | null;
+      }
+    | null;
+  /**
+   * The transposition of the variant
+   * @default null
+   */
+  transposition?: {
+    /** @format int64 */
+    diatonic: number;
+    /** @format int64 */
+    chromatic: number;
+    /** @format int64 */
+    octave: number;
+  } | null;
+  /**
+   * Optional description of the variant
+   * @default null
+   */
+  description?: string | null;
+}
+
+export interface PartVariantApiPostPartVariantData {
+  ocs: {
+    meta: OCSMeta;
+    data: PartVariant;
+  };
+}
+
+export interface PartVariantApiGetPartVariantData {
+  ocs: {
+    meta: OCSMeta;
+    data: PartVariant;
+  };
+}
+
+export interface PartVariantApiPatchPartVariantPayload {
+  /**
+   * The ID of the notation preset to use
+   * @format int64
+   * @default null
+   */
+  notationPresetId?: number | null;
+  /**
+   * The new clef of the variant
+   * @default null
+   */
+  clef?:
+    | {
+        /** @format int64 */
+        id: number;
+      }
+    | {
+        sign: string;
+        /** @format int64 */
+        line?: number | null;
+        /** @format int64 */
+        octave?: number;
+        title?: string | null;
+      }
+    | null;
+  /**
+   * The new transposition of the variant
+   * @default null
+   */
+  transposition?: {
+    /** @format int64 */
+    diatonic: number;
+    /** @format int64 */
+    chromatic: number;
+    /** @format int64 */
+    octave: number;
+  } | null;
+  /**
+   * The description of the variant, an empty string removes it
+   * @default null
+   */
+  description?: string | null;
+}
+
+export interface PartVariantApiPatchPartVariantData {
+  ocs: {
+    meta: OCSMeta;
+    data: PartVariant;
+  };
+}
+
+export interface PartVariantApiDeletePartVariantData {
+  ocs: {
+    meta: OCSMeta;
+    data: object;
   };
 }
 

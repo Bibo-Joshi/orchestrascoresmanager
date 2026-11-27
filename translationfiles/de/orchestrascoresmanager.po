@@ -20,6 +20,51 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr "Unzureichende Berechtigungen"
 
+msgid "Clef not found"
+msgstr "Schlüssel nicht gefunden"
+
+msgid "An identical clef already exists"
+msgstr "Ein identischer Schlüssel existiert bereits"
+
+msgid "Clef is still in use"
+msgstr "Der Schlüssel wird noch verwendet"
+
+#, php-format
+msgid "Unsupported clef sign \"%s\""
+msgstr "Nicht unterstütztes Schlüsselzeichen \"%s\""
+
+#, php-format
+msgid "The line of a %s clef must be between %d and %d"
+msgstr "Die Linie eines %s-Schlüssels muss zwischen %d und %d liegen"
+
+#, php-format
+msgid "A %s clef must not have a line"
+msgstr "Ein %s-Schlüssel darf keine Linie haben"
+
+#, php-format
+msgid "The octave of a clef must be between %d and %d"
+msgstr "Die Oktave eines Schlüssels muss zwischen %d und %d liegen"
+
+#, php-format
+msgid "The title must not be longer than %d characters"
+msgstr "Der Titel darf nicht länger als %d Zeichen sein"
+
+msgid "Conductor's score not found"
+msgstr "Dirigierpartitur nicht gefunden"
+
+msgid "The score already has a conductor's score"
+msgstr "Die Partitur hat bereits eine Dirigierpartitur"
+
+msgid "Score not found"
+msgstr "Partitur nicht gefunden"
+
+msgid "Conductor's score variant not found"
+msgstr "Dirigierpartitur-Variante nicht gefunden"
+
+#, php-format
+msgid "Unsupported conductor's score variant type \"%s\""
+msgstr "Nicht unterstützter Dirigierpartitur-Variantentyp \"%s\""
+
 msgid "Folder collection not found"
 msgstr "Ordnersammlung nicht gefunden"
 
@@ -37,9 +82,6 @@ msgstr "Ungültiger Sammlungstyp. Muss \"alphabetisch\" oder \"indiziert\" sein.
 
 msgid "Collection type cannot be changed after creation."
 msgstr "Sammlungstyp kann nach der Erstellung nicht mehr geändert werden."
-
-msgid "Score not found"
-msgstr "Partitur nicht gefunden"
 
 msgid "Cannot add score individually when its score book is already in the collection"
 msgstr "Partitur kann nicht einzeln hinzugefügt werden, wenn ihr Notenbuch bereits in der Sammlung ist"
@@ -93,6 +135,30 @@ msgstr "Eine aktive Version existiert bereits. Deaktivieren Sie sie zuerst, inde
 
 msgid "New version must start at least one day after the current version"
 msgstr "Neue Version muss mindestens einen Tag nach der aktuellen Version beginnen"
+
+msgid "Notation preset not found"
+msgstr "Notationsvorlage nicht gefunden"
+
+msgid "The title must not be empty"
+msgstr "Der Titel darf nicht leer sein"
+
+msgid "Part not found"
+msgstr "Stimme nicht gefunden"
+
+msgid "Part variant not found"
+msgstr "Stimmenvariante nicht gefunden"
+
+msgid "Provide either a notation preset or a clef with a transposition, not both"
+msgstr "Gib entweder eine Notationsvorlage oder einen Schlüssel mit Transposition an, nicht beides"
+
+msgid "Either a notation preset or a clef with a transposition is required"
+msgstr "Entweder eine Notationsvorlage oder ein Schlüssel mit Transposition ist erforderlich"
+
+msgid "Provide either a clef ID or the properties of a clef, not both"
+msgstr "Gib entweder eine Schlüssel-ID oder die Eigenschaften eines Schlüssels an, nicht beides"
+
+msgid "Either a clef ID or a clef sign is required"
+msgstr "Entweder eine Schlüssel-ID oder ein Schlüsselzeichen ist erforderlich"
 
 #, php-format
 msgid "The comment must not be longer than %d characters"
@@ -208,6 +274,13 @@ msgstr "Nur eines von scoreId oder breakDuration kann gesetzt sein"
 
 msgid "An entry with this index already exists in the setlist"
 msgstr "Ein Eintrag mit diesem Index existiert bereits in der Setlist"
+
+msgid "The transposition requires the integer values diatonic, chromatic and octave"
+msgstr "Die Transposition erfordert die ganzzahligen Werte diatonic, chromatic und octave"
+
+#, php-format
+msgid "The transposition value \"%s\" must be between %d and %d"
+msgstr "Der Transpositionswert \"%s\" muss zwischen %d und %d liegen"
 
 msgid "Orchestra Scores Manager"
 msgstr "Orchester-Noten-Verwaltung"

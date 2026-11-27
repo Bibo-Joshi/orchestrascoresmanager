@@ -100,6 +100,49 @@ namespace OCA\OrchestraScoresManager;
  *     link: string|null,
  *     comment: string|null
  * }
+ * @psalm-type OrchestraScoresManagerClef = array{
+ *     id: int,
+ *     sign: 'G'|'C'|'F'|'percussion'|'TAB',
+ *     line: int|null,
+ *     octave: int,
+ *     title: string|null
+ * }
+ * @psalm-type OrchestraScoresManagerTransposition = array{
+ *     diatonic: int,
+ *     chromatic: int,
+ *     octave: int
+ * }
+ * @psalm-type OrchestraScoresManagerNotationPreset = array{
+ *     id: int,
+ *     clefId: int,
+ *     transposition: OrchestraScoresManagerTransposition,
+ *     title: string,
+ *     description: string|null
+ * }
+ * @psalm-type OrchestraScoresManagerPart = array{
+ *     id: int,
+ *     scoreId: int,
+ *     title: string,
+ *     description: string|null
+ * }
+ * @psalm-type OrchestraScoresManagerPartVariant = array{
+ *     id: int,
+ *     partId: int,
+ *     clefId: int,
+ *     transposition: OrchestraScoresManagerTransposition,
+ *     notationPresetId: int|null,
+ *     description: string|null
+ * }
+ * @psalm-type OrchestraScoresManagerConductorsScore = array{
+ *     id: int,
+ *     scoreId: int
+ * }
+ * @psalm-type OrchestraScoresManagerConductorsScoreVariant = array{
+ *     id: int,
+ *     conductorsScoreId: int,
+ *     type: 'full'|'condensed',
+ *     description: string|null
+ * }
  * @psalm-type OrchestraScoresManagerFolderCollectionVersion = array{
  *     id: int,
  *     folderCollectionId: int,

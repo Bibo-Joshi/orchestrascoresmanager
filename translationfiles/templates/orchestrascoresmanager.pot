@@ -21,6 +21,51 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr ""
 
+msgid "Clef not found"
+msgstr ""
+
+msgid "An identical clef already exists"
+msgstr ""
+
+msgid "Clef is still in use"
+msgstr ""
+
+#, php-format
+msgid "Unsupported clef sign \"%s\""
+msgstr ""
+
+#, php-format
+msgid "The line of a %s clef must be between %d and %d"
+msgstr ""
+
+#, php-format
+msgid "A %s clef must not have a line"
+msgstr ""
+
+#, php-format
+msgid "The octave of a clef must be between %d and %d"
+msgstr ""
+
+#, php-format
+msgid "The title must not be longer than %d characters"
+msgstr ""
+
+msgid "Conductor's score not found"
+msgstr ""
+
+msgid "The score already has a conductor's score"
+msgstr ""
+
+msgid "Score not found"
+msgstr ""
+
+msgid "Conductor's score variant not found"
+msgstr ""
+
+#, php-format
+msgid "Unsupported conductor's score variant type \"%s\""
+msgstr ""
+
 msgid "Folder collection not found"
 msgstr ""
 
@@ -37,9 +82,6 @@ msgid "Invalid collection type. Must be \"alphabetical\" or \"indexed\"."
 msgstr ""
 
 msgid "Collection type cannot be changed after creation."
-msgstr ""
-
-msgid "Score not found"
 msgstr ""
 
 msgid ""
@@ -99,6 +141,31 @@ msgid ""
 msgstr ""
 
 msgid "New version must start at least one day after the current version"
+msgstr ""
+
+msgid "Notation preset not found"
+msgstr ""
+
+msgid "The title must not be empty"
+msgstr ""
+
+msgid "Part not found"
+msgstr ""
+
+msgid "Part variant not found"
+msgstr ""
+
+msgid ""
+"Provide either a notation preset or a clef with a transposition, not both"
+msgstr ""
+
+msgid "Either a notation preset or a clef with a transposition is required"
+msgstr ""
+
+msgid "Provide either a clef ID or the properties of a clef, not both"
+msgstr ""
+
+msgid "Either a clef ID or a clef sign is required"
 msgstr ""
 
 #, php-format
@@ -214,6 +281,14 @@ msgid "Only one of scoreId or breakDuration can be set"
 msgstr ""
 
 msgid "An entry with this index already exists in the setlist"
+msgstr ""
+
+msgid ""
+"The transposition requires the integer values diatonic, chromatic and octave"
+msgstr ""
+
+#, php-format
+msgid "The transposition value \"%s\" must be between %d and %d"
 msgstr ""
 
 msgid "Orchestra Scores Manager"
