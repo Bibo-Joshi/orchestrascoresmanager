@@ -1277,3 +1277,69 @@ msgstr ""
 
 msgid "Invalid duration format"
 msgstr ""
+
+msgid "A %s clef must not have a line"
+msgstr ""
+
+msgid "An identical clef already exists"
+msgstr ""
+
+msgid "Clef is still in use"
+msgstr ""
+
+msgid "Clef not found"
+msgstr ""
+
+msgid "Conductor's score not found"
+msgstr ""
+
+msgid "Conductor's score variant not found"
+msgstr ""
+
+msgid "Either a clef ID or a clef sign is required"
+msgstr ""
+
+msgid "Either a notation preset or a clef with a transposition is required"
+msgstr ""
+
+msgid "Notation preset not found"
+msgstr ""
+
+msgid "Part not found"
+msgstr ""
+
+msgid "Part variant not found"
+msgstr ""
+
+msgid "Provide either a clef ID or the properties of a clef, not both"
+msgstr ""
+
+msgid "Provide either a notation preset or a clef with a transposition, not both"
+msgstr ""
+
+msgid "The line of a %s clef must be between %d and %d"
+msgstr ""
+
+msgid "The octave of a clef must be between %d and %d"
+msgstr ""
+
+msgid "The score already has a conductor's score"
+msgstr ""
+
+msgid "The title must not be empty"
+msgstr ""
+
+msgid "The title must not be longer than %d characters"
+msgstr ""
+
+msgid "The transposition requires the integer values diatonic, chromatic and octave"
+msgstr ""
+
+msgid "The transposition value \"%s\" must be between %d and %d"
+msgstr ""
+
+msgid "Unsupported clef sign \"%s\""
+msgstr ""
+
+msgid "Unsupported conductor's score variant type \"%s\""
+msgstr ""

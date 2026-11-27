@@ -11,8 +11,25 @@
  */
 
 import {
+  ClefApiDeleteClefData,
+  ClefApiGetClefData,
+  ClefApiGetClefsData,
+  ClefApiPatchClefData,
+  ClefApiPatchClefPayload,
+  ClefApiPostClefData,
+  ClefApiPostClefPayload,
   CommentApiDeleteCommentData,
   CommentApiGetCommentData,
+  ConductorsScoreApiDeleteConductorsScoreData,
+  ConductorsScoreApiGetScoreConductorsScoreData,
+  ConductorsScoreApiPostScoreConductorsScoreData,
+  ConductorsScoreVariantApiDeleteConductorsScoreVariantData,
+  ConductorsScoreVariantApiGetConductorsScoreVariantData,
+  ConductorsScoreVariantApiGetConductorsScoreVariantsData,
+  ConductorsScoreVariantApiPatchConductorsScoreVariantData,
+  ConductorsScoreVariantApiPatchConductorsScoreVariantPayload,
+  ConductorsScoreVariantApiPostConductorsScoreVariantData,
+  ConductorsScoreVariantApiPostConductorsScoreVariantPayload,
   FolderCollectionApiDeleteFolderCollectionData,
   FolderCollectionApiDeleteFolderCollectionScoreBookData,
   FolderCollectionApiDeleteFolderCollectionScoreData,
@@ -36,7 +53,28 @@ import {
   FolderCollectionVersionApiGetFolderCollectionVersionData,
   FolderCollectionVersionApiPatchFolderCollectionVersionData,
   FolderCollectionVersionApiPatchFolderCollectionVersionPayload,
+  NotationPresetApiDeleteNotationPresetData,
+  NotationPresetApiGetNotationPresetData,
+  NotationPresetApiGetNotationPresetsData,
+  NotationPresetApiPatchNotationPresetData,
+  NotationPresetApiPatchNotationPresetPayload,
+  NotationPresetApiPostNotationPresetData,
+  NotationPresetApiPostNotationPresetPayload,
   OCSMeta,
+  PartApiDeletePartData,
+  PartApiGetPartData,
+  PartApiGetScorePartsData,
+  PartApiPatchPartData,
+  PartApiPatchPartPayload,
+  PartApiPostScorePartData,
+  PartApiPostScorePartPayload,
+  PartVariantApiDeletePartVariantData,
+  PartVariantApiGetPartVariantData,
+  PartVariantApiGetPartVariantsData,
+  PartVariantApiPatchPartVariantData,
+  PartVariantApiPatchPartVariantPayload,
+  PartVariantApiPostPartVariantData,
+  PartVariantApiPostPartVariantPayload,
   ScoreApiDeleteScoreData,
   ScoreApiGetScoreCommentsData,
   ScoreApiGetScoreFolderCollectionsData,
@@ -103,6 +141,142 @@ export class Ocs<
   SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
+   * @description all clefs
+   *
+   * @tags clef_api
+   * @name ClefApiGetClefs
+   * @summary Get all clefs
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/clefs
+   * @secure
+   */
+  clefApiGetClefs = (params: RequestParams = {}) =>
+    this.request<
+      ClefApiGetClefsData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/clefs`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description If an identical clef already exists, it is returned instead of creating a duplicate. the created or already existing clef
+   *
+   * @tags clef_api
+   * @name ClefApiPostClef
+   * @summary Create a clef
+   * @request POST:/ocs/v2.php/apps/orchestrascoresmanager/clefs
+   * @secure
+   */
+  clefApiPostClef = (
+    data: ClefApiPostClefPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ClefApiPostClefData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/clefs`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the clef
+   *
+   * @tags clef_api
+   * @name ClefApiGetClef
+   * @summary Get a clef
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/clefs/{id}
+   * @secure
+   */
+  clefApiGetClef = (id: number, params: RequestParams = {}) =>
+    this.request<
+      ClefApiGetClefData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/clefs/${id}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the updated clef
+   *
+   * @tags clef_api
+   * @name ClefApiPatchClef
+   * @summary Update a clef
+   * @request PATCH:/ocs/v2.php/apps/orchestrascoresmanager/clefs/{id}
+   * @secure
+   */
+  clefApiPatchClef = (
+    id: number,
+    data?: ClefApiPatchClefPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ClefApiPatchClefData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/clefs/${id}`,
+      method: "PATCH",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description empty response
+   *
+   * @tags clef_api
+   * @name ClefApiDeleteClef
+   * @summary Delete a clef that is not in use
+   * @request DELETE:/ocs/v2.php/apps/orchestrascoresmanager/clefs/{id}
+   * @secure
+   */
+  clefApiDeleteClef = (id: number, params: RequestParams = {}) =>
+    this.request<
+      ClefApiDeleteClefData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/clefs/${id}`,
+      method: "DELETE",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
    * @description the comment
    *
    * @tags comment_api
@@ -147,6 +321,236 @@ export class Ocs<
       }
     >({
       path: `/ocs/v2.php/apps/orchestrascoresmanager/comments/${id}`,
+      method: "DELETE",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the conductor's score, null if the score has none
+   *
+   * @tags conductors_score_api
+   * @name ConductorsScoreApiGetScoreConductorsScore
+   * @summary Get the conductor's score of a specific score
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/scores/{id}/conductors-score
+   * @secure
+   */
+  conductorsScoreApiGetScoreConductorsScore = (
+    id: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ConductorsScoreApiGetScoreConductorsScoreData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/scores/${id}/conductors-score`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the created conductor's score
+   *
+   * @tags conductors_score_api
+   * @name ConductorsScoreApiPostScoreConductorsScore
+   * @summary Add a conductor's score to a specific score
+   * @request POST:/ocs/v2.php/apps/orchestrascoresmanager/scores/{id}/conductors-score
+   * @secure
+   */
+  conductorsScoreApiPostScoreConductorsScore = (
+    id: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ConductorsScoreApiPostScoreConductorsScoreData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/scores/${id}/conductors-score`,
+      method: "POST",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description empty response
+   *
+   * @tags conductors_score_api
+   * @name ConductorsScoreApiDeleteConductorsScore
+   * @summary Delete a conductor's score together with its variants
+   * @request DELETE:/ocs/v2.php/apps/orchestrascoresmanager/conductors-scores/{id}
+   * @secure
+   */
+  conductorsScoreApiDeleteConductorsScore = (
+    id: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ConductorsScoreApiDeleteConductorsScoreData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/conductors-scores/${id}`,
+      method: "DELETE",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the variants of the conductor's score
+   *
+   * @tags conductors_score_variant_api
+   * @name ConductorsScoreVariantApiGetConductorsScoreVariants
+   * @summary Get all variants of a specific conductor's score
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/conductors-scores/{id}/variants
+   * @secure
+   */
+  conductorsScoreVariantApiGetConductorsScoreVariants = (
+    id: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ConductorsScoreVariantApiGetConductorsScoreVariantsData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/conductors-scores/${id}/variants`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the created variant
+   *
+   * @tags conductors_score_variant_api
+   * @name ConductorsScoreVariantApiPostConductorsScoreVariant
+   * @summary Add a variant to a specific conductor's score
+   * @request POST:/ocs/v2.php/apps/orchestrascoresmanager/conductors-scores/{id}/variants
+   * @secure
+   */
+  conductorsScoreVariantApiPostConductorsScoreVariant = (
+    id: number,
+    data: ConductorsScoreVariantApiPostConductorsScoreVariantPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ConductorsScoreVariantApiPostConductorsScoreVariantData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/conductors-scores/${id}/variants`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the variant
+   *
+   * @tags conductors_score_variant_api
+   * @name ConductorsScoreVariantApiGetConductorsScoreVariant
+   * @summary Get a conductor's score variant
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/conductors-score-variants/{id}
+   * @secure
+   */
+  conductorsScoreVariantApiGetConductorsScoreVariant = (
+    id: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ConductorsScoreVariantApiGetConductorsScoreVariantData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/conductors-score-variants/${id}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the updated variant
+   *
+   * @tags conductors_score_variant_api
+   * @name ConductorsScoreVariantApiPatchConductorsScoreVariant
+   * @summary Update a conductor's score variant
+   * @request PATCH:/ocs/v2.php/apps/orchestrascoresmanager/conductors-score-variants/{id}
+   * @secure
+   */
+  conductorsScoreVariantApiPatchConductorsScoreVariant = (
+    id: number,
+    data?: ConductorsScoreVariantApiPatchConductorsScoreVariantPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ConductorsScoreVariantApiPatchConductorsScoreVariantData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/conductors-score-variants/${id}`,
+      method: "PATCH",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description empty response
+   *
+   * @tags conductors_score_variant_api
+   * @name ConductorsScoreVariantApiDeleteConductorsScoreVariant
+   * @summary Delete a conductor's score variant
+   * @request DELETE:/ocs/v2.php/apps/orchestrascoresmanager/conductors-score-variants/{id}
+   * @secure
+   */
+  conductorsScoreVariantApiDeleteConductorsScoreVariant = (
+    id: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      ConductorsScoreVariantApiDeleteConductorsScoreVariantData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/conductors-score-variants/${id}`,
       method: "DELETE",
       secure: true,
       format: "json",
@@ -634,6 +1038,422 @@ export class Ocs<
       body: data,
       secure: true,
       type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description all notation presets
+   *
+   * @tags notation_preset_api
+   * @name NotationPresetApiGetNotationPresets
+   * @summary Get all notation presets
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/notation-presets
+   * @secure
+   */
+  notationPresetApiGetNotationPresets = (params: RequestParams = {}) =>
+    this.request<
+      NotationPresetApiGetNotationPresetsData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/notation-presets`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the created notation preset
+   *
+   * @tags notation_preset_api
+   * @name NotationPresetApiPostNotationPreset
+   * @summary Create a notation preset
+   * @request POST:/ocs/v2.php/apps/orchestrascoresmanager/notation-presets
+   * @secure
+   */
+  notationPresetApiPostNotationPreset = (
+    data: NotationPresetApiPostNotationPresetPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      NotationPresetApiPostNotationPresetData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/notation-presets`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the notation preset
+   *
+   * @tags notation_preset_api
+   * @name NotationPresetApiGetNotationPreset
+   * @summary Get a notation preset
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/notation-presets/{id}
+   * @secure
+   */
+  notationPresetApiGetNotationPreset = (
+    id: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      NotationPresetApiGetNotationPresetData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/notation-presets/${id}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Part variants linked to the preset that no longer match its clef and transposition are unlinked. the updated notation preset
+   *
+   * @tags notation_preset_api
+   * @name NotationPresetApiPatchNotationPreset
+   * @summary Update a notation preset
+   * @request PATCH:/ocs/v2.php/apps/orchestrascoresmanager/notation-presets/{id}
+   * @secure
+   */
+  notationPresetApiPatchNotationPreset = (
+    id: number,
+    data?: NotationPresetApiPatchNotationPresetPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      NotationPresetApiPatchNotationPresetData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/notation-presets/${id}`,
+      method: "PATCH",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Part variants using the preset keep their clef and transposition and are unlinked from the preset. empty response
+   *
+   * @tags notation_preset_api
+   * @name NotationPresetApiDeleteNotationPreset
+   * @summary Delete a notation preset
+   * @request DELETE:/ocs/v2.php/apps/orchestrascoresmanager/notation-presets/{id}
+   * @secure
+   */
+  notationPresetApiDeleteNotationPreset = (
+    id: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      NotationPresetApiDeleteNotationPresetData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/notation-presets/${id}`,
+      method: "DELETE",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the parts of the score
+   *
+   * @tags part_api
+   * @name PartApiGetScoreParts
+   * @summary Get all parts of a specific score
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/scores/{id}/parts
+   * @secure
+   */
+  partApiGetScoreParts = (id: number, params: RequestParams = {}) =>
+    this.request<
+      PartApiGetScorePartsData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/scores/${id}/parts`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the created part
+   *
+   * @tags part_api
+   * @name PartApiPostScorePart
+   * @summary Add a part to a specific score
+   * @request POST:/ocs/v2.php/apps/orchestrascoresmanager/scores/{id}/parts
+   * @secure
+   */
+  partApiPostScorePart = (
+    id: number,
+    data: PartApiPostScorePartPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      PartApiPostScorePartData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/scores/${id}/parts`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the part
+   *
+   * @tags part_api
+   * @name PartApiGetPart
+   * @summary Get a part
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/parts/{id}
+   * @secure
+   */
+  partApiGetPart = (id: number, params: RequestParams = {}) =>
+    this.request<
+      PartApiGetPartData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/parts/${id}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the updated part
+   *
+   * @tags part_api
+   * @name PartApiPatchPart
+   * @summary Update a part
+   * @request PATCH:/ocs/v2.php/apps/orchestrascoresmanager/parts/{id}
+   * @secure
+   */
+  partApiPatchPart = (
+    id: number,
+    data?: PartApiPatchPartPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      PartApiPatchPartData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/parts/${id}`,
+      method: "PATCH",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description empty response
+   *
+   * @tags part_api
+   * @name PartApiDeletePart
+   * @summary Delete a part together with its variants
+   * @request DELETE:/ocs/v2.php/apps/orchestrascoresmanager/parts/{id}
+   * @secure
+   */
+  partApiDeletePart = (id: number, params: RequestParams = {}) =>
+    this.request<
+      PartApiDeletePartData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/parts/${id}`,
+      method: "DELETE",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the variants of the part
+   *
+   * @tags part_variant_api
+   * @name PartVariantApiGetPartVariants
+   * @summary Get all variants of a specific part
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/parts/{id}/variants
+   * @secure
+   */
+  partVariantApiGetPartVariants = (id: number, params: RequestParams = {}) =>
+    this.request<
+      PartVariantApiGetPartVariantsData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/parts/${id}/variants`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description The notation is given either by `notationPresetId` or by `clef` together with `transposition`. A clef is either `{id}` of an existing clef or `{sign, line, octave, title}`, which finds or creates the clef. the created part variant
+   *
+   * @tags part_variant_api
+   * @name PartVariantApiPostPartVariant
+   * @summary Add a variant to a specific part
+   * @request POST:/ocs/v2.php/apps/orchestrascoresmanager/parts/{id}/variants
+   * @secure
+   */
+  partVariantApiPostPartVariant = (
+    id: number,
+    data?: PartVariantApiPostPartVariantPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      PartVariantApiPostPartVariantData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/parts/${id}/variants`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description the part variant
+   *
+   * @tags part_variant_api
+   * @name PartVariantApiGetPartVariant
+   * @summary Get a part variant
+   * @request GET:/ocs/v2.php/apps/orchestrascoresmanager/part-variants/{id}
+   * @secure
+   */
+  partVariantApiGetPartVariant = (id: number, params: RequestParams = {}) =>
+    this.request<
+      PartVariantApiGetPartVariantData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/part-variants/${id}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description Either `notationPresetId` or `clef` and/or `transposition` can be given to change the notation. the updated part variant
+   *
+   * @tags part_variant_api
+   * @name PartVariantApiPatchPartVariant
+   * @summary Update a part variant
+   * @request PATCH:/ocs/v2.php/apps/orchestrascoresmanager/part-variants/{id}
+   * @secure
+   */
+  partVariantApiPatchPartVariant = (
+    id: number,
+    data?: PartVariantApiPatchPartVariantPayload,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      PartVariantApiPatchPartVariantData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/part-variants/${id}`,
+      method: "PATCH",
+      body: data,
+      secure: true,
+      type: "application/json",
+      format: "json",
+      ...params,
+    });
+  /**
+   * @description empty response
+   *
+   * @tags part_variant_api
+   * @name PartVariantApiDeletePartVariant
+   * @summary Delete a part variant
+   * @request DELETE:/ocs/v2.php/apps/orchestrascoresmanager/part-variants/{id}
+   * @secure
+   */
+  partVariantApiDeletePartVariant = (id: number, params: RequestParams = {}) =>
+    this.request<
+      PartVariantApiDeletePartVariantData,
+      {
+        ocs: {
+          meta: OCSMeta;
+          data: any;
+        };
+      }
+    >({
+      path: `/ocs/v2.php/apps/orchestrascoresmanager/part-variants/${id}`,
+      method: "DELETE",
+      secure: true,
       format: "json",
       ...params,
     });

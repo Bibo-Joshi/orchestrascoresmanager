@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace OCA\OrchestraScoresManager\Tests\unit\Service;
 
 use OCA\OrchestraScoresManager\Db\CommentMapper;
+use OCA\OrchestraScoresManager\Db\ConductorsScoreMapper;
+use OCA\OrchestraScoresManager\Db\ConductorsScoreVariantMapper;
+use OCA\OrchestraScoresManager\Db\PartMapper;
+use OCA\OrchestraScoresManager\Db\PartVariantMapper;
 use OCA\OrchestraScoresManager\Db\Score;
 use OCA\OrchestraScoresManager\Db\ScoreBookScoreLinkMapper;
 use OCA\OrchestraScoresManager\Db\ScoreFolderCollectionLinkMapper;
@@ -19,6 +23,7 @@ use OCA\OrchestraScoresManager\Service\Exceptions\PermissionDeniedException;
 use OCA\OrchestraScoresManager\Service\ScoreService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\DB\Exception;
+use OCP\IDBConnection;
 use OCP\IL10N;
 use PHPUnit\Framework\TestCase;
 
@@ -32,6 +37,11 @@ final class ScoreServiceTest extends TestCase {
 	private ScoreBookScoreLinkMapper $scoreBookScoreLinkMapper;
 	private ScoreFolderCollectionLinkMapper $scoreFolderCollectionLinkMapper;
 	private ScoreTagLinkMapper $scoreTagLinkMapper;
+	private PartMapper $partMapper;
+	private PartVariantMapper $partVariantMapper;
+	private ConductorsScoreMapper $conductorsScoreMapper;
+	private ConductorsScoreVariantMapper $conductorsScoreVariantMapper;
+	private IDBConnection $db;
 	private AuthorizationService $authorizationService;
 	private ScorePolicy $scorePolicy;
 	private IL10N $l10n;
@@ -46,6 +56,11 @@ final class ScoreServiceTest extends TestCase {
 		$this->scoreBookScoreLinkMapper = $this->createMock(ScoreBookScoreLinkMapper::class);
 		$this->scoreFolderCollectionLinkMapper = $this->createMock(ScoreFolderCollectionLinkMapper::class);
 		$this->scoreTagLinkMapper = $this->createMock(ScoreTagLinkMapper::class);
+		$this->partMapper = $this->createMock(PartMapper::class);
+		$this->partVariantMapper = $this->createMock(PartVariantMapper::class);
+		$this->conductorsScoreMapper = $this->createMock(ConductorsScoreMapper::class);
+		$this->conductorsScoreVariantMapper = $this->createMock(ConductorsScoreVariantMapper::class);
+		$this->db = $this->createMock(IDBConnection::class);
 		$this->authorizationService = $this->createMock(AuthorizationService::class);
 		$this->scorePolicy = $this->createMock(ScorePolicy::class);
 		$this->l10n = $this->createMock(IL10N::class);
@@ -59,6 +74,11 @@ final class ScoreServiceTest extends TestCase {
 			$this->scoreBookScoreLinkMapper,
 			$this->scoreFolderCollectionLinkMapper,
 			$this->scoreTagLinkMapper,
+			$this->partMapper,
+			$this->partVariantMapper,
+			$this->conductorsScoreMapper,
+			$this->conductorsScoreVariantMapper,
+			$this->db,
 			$this->authorizationService,
 			$this->scorePolicy,
 			$this->l10n
@@ -205,9 +225,36 @@ final class ScoreServiceTest extends TestCase {
 			->method('deleteByScoreId')
 			->with(1);
 
+		$this->partVariantMapper->expects($this->once())->method('deleteByScoreId')->with(1);
+		$this->partMapper->expects($this->once())->method('deleteByScoreId')->with(1);
+		$this->conductorsScoreVariantMapper->expects($this->once())->method('deleteByScoreId')->with(1);
+		$this->conductorsScoreMapper->expects($this->once())->method('deleteByScoreId')->with(1);
+
+		$this->db->expects($this->once())->method('beginTransaction');
+		$this->db->expects($this->once())->method('commit');
+		$this->db->expects($this->never())->method('rollBack');
+
 		$this->scoreMapper->expects($this->once())
 			->method('delete')
 			->with($score);
+
+		$this->service->deleteScoreById(1);
+	}
+
+	public function testDeleteScoreByIdRollsBackOnFailure(): void {
+		$score = new Score();
+		$score->setId(1);
+
+		$this->scoreMapper->method('find')->willReturn($score);
+		$this->scoreFolderCollectionLinkMapper->method('findVersionsForScore')->willReturn([]);
+		$this->partMapper->method('deleteByScoreId')->willThrowException(new Exception('fail'));
+
+		$this->db->expects($this->once())->method('beginTransaction');
+		$this->db->expects($this->never())->method('commit');
+		$this->db->expects($this->once())->method('rollBack');
+		$this->scoreMapper->expects($this->never())->method('delete');
+
+		$this->expectException(Exception::class);
 
 		$this->service->deleteScoreById(1);
 	}

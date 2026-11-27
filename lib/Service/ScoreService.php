@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace OCA\OrchestraScoresManager\Service;
 
 use OCA\OrchestraScoresManager\Db\CommentMapper;
+use OCA\OrchestraScoresManager\Db\ConductorsScoreMapper;
+use OCA\OrchestraScoresManager\Db\ConductorsScoreVariantMapper;
+use OCA\OrchestraScoresManager\Db\PartMapper;
+use OCA\OrchestraScoresManager\Db\PartVariantMapper;
 use OCA\OrchestraScoresManager\Db\Score;
 use OCA\OrchestraScoresManager\Db\ScoreBookScoreLinkMapper;
 use OCA\OrchestraScoresManager\Db\ScoreFolderCollectionLinkMapper;
@@ -16,6 +20,7 @@ use OCA\OrchestraScoresManager\Policy\ScorePolicy;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\MultipleObjectsReturnedException;
 use OCP\DB\Exception;
+use OCP\IDBConnection;
 use OCP\IL10N;
 use Throwable;
 
@@ -28,6 +33,11 @@ class ScoreService {
 		private readonly ScoreBookScoreLinkMapper $scoreBookScoreLinkMapper,
 		private readonly ScoreFolderCollectionLinkMapper $scoreFolderCollectionLinkMapper,
 		private readonly ScoreTagLinkMapper $scoreTagLinkMapper,
+		private readonly PartMapper $partMapper,
+		private readonly PartVariantMapper $partVariantMapper,
+		private readonly ConductorsScoreMapper $conductorsScoreMapper,
+		private readonly ConductorsScoreVariantMapper $conductorsScoreVariantMapper,
+		private readonly IDBConnection $db,
 		private readonly AuthorizationService $authorizationService,
 		private readonly ScorePolicy $scorePolicy,
 		private IL10N $l,
@@ -75,13 +85,29 @@ class ScoreService {
 		//Delete score from score books (cascade should handle this, but let's be sure)
 		$this->scoreBookScoreLinkMapper->removeScoreFromAllBooks($id);
 
-		// Delete tag links first (cascade should handle this, but let's be sure)
-		$this->scoreTagLinkMapper->deleteAllTagsForScore($id);
+		$this->db->beginTransaction();
+		try {
+			// Delete tag links first (cascade should handle this, but let's be sure)
+			$this->scoreTagLinkMapper->deleteAllTagsForScore($id);
 
-		// Delete comments first (cascade should handle this, but let's be sure)
-		$this->commentMapper->deleteByScoreId($id);
+			// Delete comments first (cascade should handle this, but let's be sure)
+			$this->commentMapper->deleteByScoreId($id);
 
-		$this->scoreMapper->delete($score);
+			// Delete part variants and parts first (cascade should handle this, but let's be sure)
+			// Clefs and notation presets are shared and must stay untouched
+			$this->partVariantMapper->deleteByScoreId($id);
+			$this->partMapper->deleteByScoreId($id);
+
+			// Delete conductor's score variants and the conductor's score first (cascade should handle this, but let's be sure)
+			$this->conductorsScoreVariantMapper->deleteByScoreId($id);
+			$this->conductorsScoreMapper->deleteByScoreId($id);
+
+			$this->scoreMapper->delete($score);
+			$this->db->commit();
+		} catch (Throwable $e) {
+			$this->db->rollBack();
+			throw $e;
+		}
 	}
 
 	/**
