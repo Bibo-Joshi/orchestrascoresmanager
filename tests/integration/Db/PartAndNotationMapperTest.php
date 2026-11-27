@@ -47,10 +47,10 @@ final class PartAndNotationMapperTest extends MapperTestCase {
 			new TagMapper($this->db),
 			new ScoreBookScoreLinkMapper($this->db),
 		);
-		$this->clefMapper = new ClefMapper($this->db);
 		$this->presetMapper = new NotationPresetMapper($this->db);
 		$this->partMapper = new PartMapper($this->db);
 		$this->partVariantMapper = new PartVariantMapper($this->db);
+		$this->clefMapper = new ClefMapper($this->db, $this->partVariantMapper, $this->presetMapper);
 		$this->csMapper = new ConductorsScoreMapper($this->db);
 		$this->csVariantMapper = new ConductorsScoreVariantMapper($this->db);
 	}

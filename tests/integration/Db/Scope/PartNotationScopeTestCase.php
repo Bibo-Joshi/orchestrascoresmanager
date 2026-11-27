@@ -8,8 +8,10 @@ use OCA\OrchestraScoresManager\Db\Clef;
 use OCA\OrchestraScoresManager\Db\ClefMapper;
 use OCA\OrchestraScoresManager\Db\ConductorsScore;
 use OCA\OrchestraScoresManager\Db\ConductorsScoreMapper;
+use OCA\OrchestraScoresManager\Db\NotationPresetMapper;
 use OCA\OrchestraScoresManager\Db\Part;
 use OCA\OrchestraScoresManager\Db\PartMapper;
+use OCA\OrchestraScoresManager\Db\PartVariantMapper;
 use OCA\OrchestraScoresManager\Db\Score;
 use OCA\OrchestraScoresManager\Db\ScoreBookScoreLinkMapper;
 use OCA\OrchestraScoresManager\Db\ScoreMapper;
@@ -33,7 +35,11 @@ abstract class PartNotationScopeTestCase extends ScopePolicyTestCase {
 	}
 
 	protected function insertClef(string $sign = 'G', ?int $line = 2): Clef {
-		return (new ClefMapper($this->db))->insert(Clef::fromParams([
+		return (new ClefMapper(
+			$this->db,
+			new PartVariantMapper($this->db),
+			new NotationPresetMapper($this->db),
+		))->insert(Clef::fromParams([
 			'sign' => $sign, 'line' => $line, 'octave' => 0, 'title' => null,
 		]));
 	}

@@ -16,7 +16,11 @@ use OCP\IDBConnection;
  */
 class ClefMapper extends QBMapper {
 	/** @psalm-suppress PossiblyUnusedMethod - Constructor used by DI container */
-	public function __construct(IDBConnection $db) {
+	public function __construct(
+		IDBConnection $db,
+		private readonly PartVariantMapper $partVariantMapper,
+		private readonly NotationPresetMapper $notationPresetMapper,
+	) {
 		parent::__construct($db, 'osm_clefs', Clef::class);
 	}
 
@@ -91,19 +95,7 @@ class ClefMapper extends QBMapper {
 	 * @throws Exception
 	 */
 	public function isInUse(int $id): bool {
-		foreach (['osm_part_variants', 'osm_notation_presets'] as $table) {
-			$qb = $this->db->getQueryBuilder();
-			$qb->select('id')
-				->from($table)
-				->where($qb->expr()->eq('clef_id', $qb->createNamedParameter($id, IQueryBuilder::PARAM_INT)))
-				->setMaxResults(1);
-			$result = $qb->executeQuery();
-			$found = $result->fetchOne() !== false;
-			$result->closeCursor();
-			if ($found) {
-				return true;
-			}
-		}
-		return false;
+		return $this->partVariantMapper->existsByClefId($id)
+			|| $this->notationPresetMapper->existsByClefId($id);
 	}
 }
