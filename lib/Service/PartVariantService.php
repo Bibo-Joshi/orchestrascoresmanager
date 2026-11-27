@@ -236,13 +236,13 @@ class PartVariantService {
 			throw new InvalidArgumentException($this->l->t('Either a notation preset or a clef with a transposition is required'));
 		}
 
-		$clefId = $clef !== null ? $this->resolveClefId($clef) : ($existing?->getClefId() ?? 0);
+		$clefId = $clef !== null ? $this->resolveClefId($clef) : $existing->getClefId();
 		$normalized = $transposition !== null
 			? $this->transpositionValidator->normalize($transposition)
 			: [
-				'diatonic' => $existing?->getTranspositionDiatonic() ?? 0,
-				'chromatic' => $existing?->getTranspositionChromatic() ?? 0,
-				'octave' => $existing?->getTranspositionOctave() ?? 0,
+				'diatonic' => $existing->getTranspositionDiatonic(),
+				'chromatic' => $existing->getTranspositionChromatic(),
+				'octave' => $existing->getTranspositionOctave(),
 			];
 
 		$candidates = $this->notationPresetMapper->findByClefAndTransposition(
